@@ -1,0 +1,95 @@
+# CUSTOM SCALAR TYPES
+scalar Date
+
+# TYPES
+type User {
+	_id: ID
+	name: String!
+	email: String!
+	password: String!
+	createdAt: String!
+	log: [Session]
+}
+
+type Session {
+	_id: ID!
+	newSession: Boolean
+	createdAt: String
+	updatedAt: String
+	title: String!
+	sessionDate: Date!
+	exercises: [Exercise]
+	notes: String
+	bodyweigth: String
+	creator: User
+}
+
+type Exercise {
+	id: Int!
+	movements: [Movement]
+}
+
+type Movement {
+	id: Int!
+	name: String
+	sets: [Set]
+}
+
+type Set {
+	id: Int!
+	setQty: Int
+	repsOrTime: String
+	weight: String
+}
+
+type AuthData {
+	token: String!
+}
+
+# INPUT TYPES
+input SessionInput {
+	_id: ID
+	newSession: Boolean
+	createdAt: String
+	updatedAt: String
+	title: String!
+	sessionDate: Date!
+	exercises: [ExerciseInput]
+	bodyweigth: String
+	notes: String
+}
+
+input ExerciseInput {
+	id: Int!
+	movements: [MovementInput]
+}
+
+input MovementInput {
+	id: Int!
+	name: String
+	sets: [SetInput]
+}
+
+input SetInput {
+	id: Int!
+	setQty: Int
+	repsOrTime: String
+	weight: String
+}
+
+# ROOT
+type Query {
+	getUserData: User
+	getSessionById(sessionId: ID!): Session
+	getSessionsByDate(sessionDate: Date!): [Session]
+	getSessionsByTitle(title: String!): [Session]
+	getSessionsFromTo(fromDate: Date!, toDate: Date!): [Session]
+	isAuth(token: String!): Boolean
+}
+
+type Mutation {
+	signupUser(name: String!, email: String!, password: String!): AuthData!
+	loginUser(email: String!, password: String!): AuthData!
+	saveSession(sessionData: SessionInput!): Session!
+	deleteSession(sessionId: ID!): Boolean
+}
