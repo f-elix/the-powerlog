@@ -6,12 +6,9 @@ A simple strength training log PWA, perfect for tracking workouts.
 
 ### Client side
 
--   Vue / Vue-router
+-   Svelte / Sapper
 -   XState
--   Workbox / vue-pwa-plugin
--   Vue material
--   Vuedraggable
--   Vee-validate
+-   Workbox
 
 ### Server side
 
