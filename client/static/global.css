@@ -1,0 +1,126 @@
+:root {
+	/* Colors */
+	--color-primary: #f8f8f8;
+	--color-bg: #141d26;
+	--color-bg-light: #151f2a;
+	--color-fg-dark: #15222f;
+	--color-fg: #1c2937;
+	--color-fg-light: #243447;
+	--color-border: #121213;
+	--color-action: #2b8528;
+	--color-info: #1989ac;
+	--color-error: #ef5350;
+	--color-greyedout: #a8a8a8;
+	--color-dimmer: rgba(255, 255, 255, 0.9);
+
+	/* Border */
+	--default-border: 3px solid;
+	--default-radius: 5px;
+
+	/* Box shadow */
+	/* --default-box-shadow: 0px 2px 2px var(--color-secondary-light), 0px 2px 4px var(--color-secondary-light); */
+	--default-box-shadow: 0 2px 4px 0px rgba(0, 0, 0, 0.3);
+}
+
+html {
+	font-size: 14px;
+	font-family: 'Roboto', sans-serif;
+}
+
+body {
+	background-color: var(--color-bg);
+	color: var(--color-primary);
+}
+
+button {
+	display: block;
+	border: none;
+	background: none;
+	cursor: pointer;
+	outline: none;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.app__btn,
+.app__btn--small {
+	display: block;
+	border-radius: var(--default-radius);
+	color: var(--color-primary) !important;
+}
+
+.app__btn {
+	width: 100%;
+	height: 3.75rem;
+	margin: 1.5rem auto;
+	font-size: 1.5rem;
+	text-transform: none;
+}
+
+.app__btn--small {
+	height: 2.25rem;
+	font-size: 1rem;
+}
+
+.app__btn--small-dark {
+	background-color: #121212 !important;
+}
+
+.plain-light,
+.info-light,
+.action-light,
+.error-light {
+	background-color: var(--color-bg) !important;
+	border: var(--default-border);
+}
+
+.plain {
+	color: var(--color-primary) !important;
+	background-color: var(--color-fg-light) !important;
+}
+
+.plain-light {
+	border-color: var(--color-primary);
+}
+
+.info {
+	background-color: var(--color-info) !important;
+}
+
+.info-light {
+	border-color: var(--color-info);
+}
+
+.action {
+	background-color: var(--color-action) !important;
+}
+
+.action-light {
+	border-color: var(--color-action);
+}
+
+.error {
+	background-color: var(--color-error) !important;
+}
+
+.error-light {
+	border-color: var(--color-error);
+}
+
+/* Vue transition */
+.loaded-enter {
+	opacity: 0;
+	transform: translateY(3rem);
+}
+
+.loaded-enter-active {
+	transition: opacity 0.1s linear, transform 0.2s ease-out;
+}
+
+/* Utils */
+.text-center {
+	text-align: center;
+}
