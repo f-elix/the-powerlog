@@ -5,7 +5,7 @@
 	"main": "server.js",
 	"scripts": {
 		"server": "nodemon server.js",
-		"client": "cd client && npm run serve",
+		"client": "cd client && npm run dev",
 		"dev": "concurrently --names \"server,client\" \"npm run server --silent\" \"npm run client --silent\""
 	},
 	"author": "Felix Guerin",
