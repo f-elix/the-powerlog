@@ -29,7 +29,10 @@ html {
 
 body {
 	background-color: var(--color-bg);
-	color: var(--color-primary);
+	/* color: var(--color-primary); */
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 button {

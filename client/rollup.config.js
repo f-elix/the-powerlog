@@ -8,6 +8,7 @@ import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
+import postcss from 'rollup-plugin-postcss';
 
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
@@ -16,22 +17,53 @@ const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 const onwarn = (warning, onwarn) =>
 	(warning.code === 'CIRCULAR_DEPENDENCY' && /[/\\]@sapper[/\\]/.test(warning.message)) || onwarn(warning);
 
-const aliases = {
-	resolve: ['.js', '.svelte', '.css'],
+const aliases = () => ({
+	resolve: ['.js', '.svelte', 'scss', '.css'],
 	entries: [
+		{
+			find: /^@smui\/([^\/]+)$/,
+			replacement: path.resolve(__dirname, 'node_modules', '@smui', '$1', 'index.js')
+		},
+		{
+			find: /^@smui\/([^\/]+)\/(.*)$/,
+
+			replacement: path.resolve(__dirname, 'node_modules', '@smui', '$1', '$2')
+		},
 		{
 			find: '@',
 			replacement: path.resolve(__dirname, 'src/').replace(/\\/g, '/')
 		}
 	]
-};
+});
+
+const dedupe = importee => importee === 'svelte' || importee.startsWith('svelte/');
+
+const postcssOptions = () => ({
+	extensions: ['.scss', '.sass'],
+	extract: false,
+	minimize: true,
+	use: [
+		[
+			'sass',
+			{
+				includePaths: [
+					'./src/theme',
+					'./node_modules',
+					// This is only needed because we're using a local module. :-/
+					// Normally, you would not need this line.
+					path.resolve(__dirname, '..', 'node_modules')
+				]
+			}
+		]
+	]
+});
 
 export default {
 	client: {
 		input: config.client.input(),
 		output: config.client.output(),
 		plugins: [
-			alias(aliases),
+			alias(aliases()),
 			replace({
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode)
@@ -39,14 +71,15 @@ export default {
 			svelte({
 				dev,
 				hydratable: true,
-				emitCss: true
+				emitCss: true,
+				css: true
 			}),
 			resolve({
 				browser: true,
-				dedupe: ['svelte']
+				dedupe
 			}),
 			commonjs(),
-
+			postcss(postcssOptions()),
 			legacy &&
 				babel({
 					extensions: ['.js', '.mjs', '.html', '.svelte'],
@@ -84,7 +117,7 @@ export default {
 		input: config.server.input(),
 		output: config.server.output(),
 		plugins: [
-			alias(aliases),
+			alias(aliases()),
 			replace({
 				'process.browser': false,
 				'process.env.NODE_ENV': JSON.stringify(mode)
@@ -94,9 +127,10 @@ export default {
 				dev
 			}),
 			resolve({
-				dedupe: ['svelte']
+				dedupe
 			}),
-			commonjs()
+			commonjs(),
+			postcss(postcssOptions())
 		],
 		external: Object.keys(pkg.dependencies).concat(
 			require('module').builtinModules || Object.keys(process.binding('natives'))
