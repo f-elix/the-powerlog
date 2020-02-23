@@ -4,9 +4,7 @@
 </script>
 
 <style>
-  :global(.class) {
-    margin: 1rem;
-  }
+
 </style>
 
 <div>
@@ -19,4 +17,5 @@
   <Input label="E-mail" name="email" type="email" />
   <Input label="Qty" name="qty" type="number" value="42" />
   <Input label="Date" name="date" type="date" />
+  <Input label="Textarea" name="text" type="textarea" />
 </div>

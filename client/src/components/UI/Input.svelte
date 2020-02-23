@@ -5,6 +5,8 @@
   export let label = "";
   export let name = "";
   export let placeholder = " ";
+  export let cols;
+  export let rows = 5;
 </script>
 
 <style>
@@ -18,26 +20,42 @@
     cursor: text;
   }
 
-  input {
+  input,
+  textarea {
     width: 100%;
     padding: var(--padding);
     background: none;
     color: var(--color-primary);
     outline: none;
+    transition: background-color 0.2s;
+  }
+
+  input {
     border: none;
     border-bottom: var(--border-thin);
     border-bottom-color: var(--color-greyedout);
     border-top-right-radius: var(--radius-default);
     border-top-left-radius: var(--radius-default);
-    transition: background-color 0.2s;
   }
 
-  label:hover input {
-    border-bottom-color: var(--color-primary);
+  textarea {
+    border: var(--border-thin) var(--color-greyedout);
+    border-radius: var(--radius-default);
+    transition: box-shadow 0.2s;
   }
 
-  label:focus-within input {
+  label:hover input,
+  label:hover textarea {
+    border-color: var(--color-primary);
+  }
+
+  label:focus-within input,
+  label:focus-within textarea {
     background-color: var(--color-fg-light);
+  }
+
+  label:focus-within textarea {
+    box-shadow: inset 0 0 0 2px var(--color-primary);
   }
 
   .label {
@@ -48,8 +66,13 @@
     transition: transform 0.2s, color 0.2s;
   }
 
+  .label.textarea-label {
+    top: 1.6rem;
+  }
+
   label:focus-within .label,
-  input:not(:placeholder-shown) + .label {
+  input:not(:placeholder-shown) + .label,
+  textarea:not(:placeholder-shown) + .label {
     transform: translate(calc(var(--padding) * -1), -50%) scale(0.75);
     color: var(--color-greyedout);
   }
@@ -74,11 +97,25 @@
   .label-padding {
     padding: calc(var(--padding) * 3) var(--padding) var(--padding);
   }
+
+  .label-padding-textarea {
+    padding: calc(var(--padding) * 4) var(--padding) var(--padding);
+  }
 </style>
 
 <label>
-  <input {type} {value} {name} class:label-padding={label} {placeholder} />
-  <span class="label">{label}</span>
-  <div class="underline" />
-  <Ripple />
+  {#if type !== 'textarea'}
+    <input {type} {value} {name} class:label-padding={label} {placeholder} />
+    <span class="label">{label}</span>
+    <div class="underline" />
+  {:else}
+    <textarea
+      {name}
+      {cols}
+      {rows}
+      {value}
+      class:label-padding-textarea={label}
+      {placeholder} />
+    <span class="label textarea-label">{label}</span>
+  {/if}
 </label>
