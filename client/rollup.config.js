@@ -8,7 +8,6 @@ import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
-import postcss from 'rollup-plugin-postcss';
 
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
@@ -21,15 +20,6 @@ const aliases = () => ({
 	resolve: ['.js', '.svelte', 'scss', '.css'],
 	entries: [
 		{
-			find: /^@smui\/([^\/]+)$/,
-			replacement: path.resolve(__dirname, 'node_modules', '@smui', '$1', 'index.js')
-		},
-		{
-			find: /^@smui\/([^\/]+)\/(.*)$/,
-
-			replacement: path.resolve(__dirname, 'node_modules', '@smui', '$1', '$2')
-		},
-		{
 			find: '@',
 			replacement: path.resolve(__dirname, 'src/').replace(/\\/g, '/')
 		}
@@ -37,26 +27,6 @@ const aliases = () => ({
 });
 
 const dedupe = importee => importee === 'svelte' || importee.startsWith('svelte/');
-
-const postcssOptions = () => ({
-	extensions: ['.scss', '.sass'],
-	extract: false,
-	minimize: true,
-	use: [
-		[
-			'sass',
-			{
-				includePaths: [
-					'./src/theme',
-					'./node_modules',
-					// This is only needed because we're using a local module. :-/
-					// Normally, you would not need this line.
-					path.resolve(__dirname, '..', 'node_modules')
-				]
-			}
-		]
-	]
-});
 
 export default {
 	client: {
@@ -79,7 +49,6 @@ export default {
 				dedupe
 			}),
 			commonjs(),
-			postcss(postcssOptions()),
 			legacy &&
 				babel({
 					extensions: ['.js', '.mjs', '.html', '.svelte'],
@@ -129,8 +98,7 @@ export default {
 			resolve({
 				dedupe
 			}),
-			commonjs(),
-			postcss(postcssOptions())
+			commonjs()
 		],
 		external: Object.keys(pkg.dependencies).concat(
 			require('module').builtinModules || Object.keys(process.binding('natives'))
