@@ -15,12 +15,18 @@
 	--color-border: #121213;
 	--color-dimmer: #ffffff;
 
+	/* Typography */
+	--text-small: 1.2rem;
+	--text-normal: 1.6rem;
+	--text-big: 2rem;
+
 	/* Border */
-	--default-border: 2px solid;
-	--default-radius: 5px;
+	--border-thin: 1px solid;
+	--border-default: 2px solid;
+	--radius-default: 5px;
 
 	/* Box shadow */
-	--default-box-shadow: 0 2px 6px 0px rgba(0, 0, 0, 0.3);
+	--shadow-default: 0 2px 6px 0px rgba(0, 0, 0, 0.4);
 }
 
 html {

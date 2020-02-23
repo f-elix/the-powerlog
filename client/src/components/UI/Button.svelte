@@ -11,6 +11,7 @@
   export let color = "primary";
   export let variant = "outlined";
   export let type = "button";
+  export let position;
 </script>
 
 <style>
@@ -24,14 +25,15 @@
     background: none;
     text-transform: uppercase;
     letter-spacing: 0.15rem;
-    border-radius: var(--default-radius);
+    border-radius: var(--radius-default);
     color: var(--color-primary);
     cursor: pointer;
     outline: none;
+    box-shadow: var(--shadow-default);
   }
 
   .outlined {
-    border: var(--default-border) var(--theme);
+    border: var(--border-default) var(--theme);
   }
 
   .outlined:hover {
@@ -64,13 +66,13 @@
 
   .small {
     padding: 0.6rem;
-    font-size: 1.2rem;
+    font-size: var(--text-small);
     width: 10rem;
   }
 
   .big {
     padding: 1rem;
-    font-size: 1.6rem;
+    font-size: var(--text-big);
     width: 20rem;
   }
 
@@ -79,6 +81,25 @@
     height: 5rem;
     border-radius: 50%;
   }
+
+  .bottom-center {
+    position: fixed;
+    bottom: 10%;
+    left: 50%;
+    right: 50%;
+  }
+
+  .bottom-left {
+    position: fixed;
+    bottom: 10%;
+    left: 10%;
+  }
+
+  .bottom-right {
+    position: fixed;
+    bottom: 10%;
+    right: 10%;
+  }
 </style>
 
 <button
@@ -86,7 +107,8 @@
   {type}
   class="{size}
   {variant}
-  {extClass}"
+  {extClass}
+  {position}"
   style="--theme: var(--color-{color})">
   {#if variant === 'filled'}
     <div class="filled-overlay" />

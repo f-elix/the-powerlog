@@ -96,8 +96,8 @@
   }
 
   .show-ripple {
-    opacity: 0.4;
-    animation: scale 0.25s forwards;
+    opacity: 0.2;
+    animation: scale 0.225s forwards;
   }
 
   @keyframes scale {
