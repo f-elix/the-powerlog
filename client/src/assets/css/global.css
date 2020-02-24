@@ -13,7 +13,7 @@
 	--color-error: #ef5350;
 	--color-greyedout: #a8a8a8;
 	--color-border: #121213;
-	--color-dimmer: #ffffff;
+	--color-dimmer: #f8f8f880;
 
 	/* Typography */
 	--text-small: 1.2rem;
@@ -30,6 +30,7 @@
 }
 
 html {
+	margin-top: 0;
 	font-size: 10px;
 	font-family: 'Roboto', sans-serif;
 }

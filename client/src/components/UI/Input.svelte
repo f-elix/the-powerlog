@@ -1,5 +1,6 @@
 <script>
   import Ripple from "./Ripple.svelte";
+
   export let type = "text";
   export let value = "";
   export let label = "";
@@ -7,6 +8,8 @@
   export let placeholder = " ";
   export let cols;
   export let rows = 5;
+  export let error = false;
+  export let errorMessage = '';
 </script>
 
 <style>
@@ -15,7 +18,6 @@
     position: relative;
     display: block;
     max-width: 40rem;
-    margin: 1rem auto;
     font-size: var(--text-normal);
     cursor: text;
   }
@@ -101,6 +103,12 @@
   .label-padding-textarea {
     padding: calc(var(--padding) * 4) var(--padding) var(--padding);
   }
+
+  .error-message {
+    margin: 0;
+    font-size: var(--text-small);
+    color: var(--color-error);
+  }
 </style>
 
 <label>
@@ -119,3 +127,6 @@
     <span class="label textarea-label">{label}</span>
   {/if}
 </label>
+{#if error && errorMessage}
+<p class="error-message">{errorMessage}</p>
+{/if}
