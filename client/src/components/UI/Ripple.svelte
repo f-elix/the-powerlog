@@ -92,7 +92,6 @@
     border-radius: 50%;
     transition: opacity 0.3s;
     background-color: var(--parent-color);
-    box-shadow: 0 0 8px var(--parent-color);
   }
 
   .show-ripple {
