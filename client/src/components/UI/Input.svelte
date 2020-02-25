@@ -6,10 +6,14 @@
   export let label = "";
   export let name = "";
   export let placeholder = " ";
-  export let cols;
+  export let cols = 20;
   export let rows = 5;
-  export let error = false;
-  export let errorMessage = '';
+  export let error = true;
+  export let errorMessage = "";
+
+  function onInput(e) {
+    value = e.target.value;
+  }
 </script>
 
 <style>
@@ -113,7 +117,13 @@
 
 <label>
   {#if type !== 'textarea'}
-    <input {type} {value} {name} class:label-padding={label} {placeholder} />
+    <input
+      {type}
+      {name}
+      class:label-padding={label}
+      {placeholder}
+      {value}
+      on:input={onInput} />
     <span class="label">{label}</span>
     <div class="underline" />
   {:else}
@@ -128,5 +138,5 @@
   {/if}
 </label>
 {#if error && errorMessage}
-<p class="error-message">{errorMessage}</p>
+  <p class="error-message">{errorMessage}</p>
 {/if}

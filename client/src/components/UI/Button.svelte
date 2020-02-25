@@ -6,12 +6,11 @@
 
   let outlinedColor;
 
-  export let extClass;
   export let size = "small";
   export let color = "primary";
   export let variant = "outlined";
   export let type = "button";
-  export let position;
+  export let position = "bottom-right";
 </script>
 
 <style>
@@ -20,10 +19,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1rem;
     border: none;
     background: none;
-    text-transform: uppercase;
     letter-spacing: 0.15rem;
     border-radius: var(--radius-default);
     color: var(--color-primary);
@@ -68,12 +65,15 @@
     padding: 0.6rem;
     font-size: var(--text-small);
     width: 10rem;
+    text-transform: uppercase;
   }
 
   .big {
     padding: 1rem;
     font-size: var(--text-big);
-    width: 20rem;
+    min-width: 20rem;
+    width: 100%;
+    text-transform: capitalize;
   }
 
   .fab {
@@ -82,20 +82,20 @@
     border-radius: 50%;
   }
 
-  .bottom-center {
+  .fab.bottom-center {
     position: fixed;
     bottom: 10%;
     left: 50%;
     right: 50%;
   }
 
-  .bottom-left {
+  .fab.bottom-left {
     position: fixed;
     bottom: 10%;
     left: 10%;
   }
 
-  .bottom-right {
+  .fab.bottom-right {
     position: fixed;
     bottom: 10%;
     right: 10%;
@@ -103,11 +103,11 @@
 </style>
 
 <button
+  on:click
   bind:this={btn}
   {type}
   class="{size}
   {variant}
-  {extClass}
   {position}"
   style="--theme: var(--color-{color})">
   {#if variant === 'filled'}
