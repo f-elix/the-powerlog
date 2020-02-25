@@ -14,6 +14,10 @@
     align-items: center;
     text-align: center;
   }
+
+  h2 {
+    margin-bottom: 3rem;
+  }
 </style>
 
 <section>

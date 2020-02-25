@@ -1,7 +1,7 @@
 <script>
   // Svelte
-  import { slide } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
+  import { fly } from "svelte/transition";
+  import { expoInOut } from "svelte/easing";
   // Components
   import SignupForm from "./SignupForm.svelte";
   import LoginForm from "./LoginForm.svelte";
@@ -14,30 +14,17 @@
 </script>
 
 <style>
-  div {
+  .formbox {
     width: 100%;
-    /* position: absolute; */
   }
 </style>
 
-<!-- Login -->
-{#if $state.matches('idle.login')}
-  <div transition:slide>
-    <LoginForm />
-    <p>Don't have an account yet?</p>
-    <Button
-      size="big"
-      variant="filled"
-      color="info"
-      on:click={() => send({ type: 'SIGNUP' })}>
-      Sign up here
-    </Button>
-  </div>
-{/if}
-
 <!-- Sign up -->
 {#if $state.matches('idle.signup')}
-  <div transition:slide>
+  <div
+    class="formbox"
+    in:fly={{ y: -300, delay: 600 }}
+    out:fly={{ y: -300, duration: 400 }}>
     <SignupForm />
     <p>Already have an account?</p>
     <Button
@@ -46,6 +33,23 @@
       color="info"
       on:click={() => send({ type: 'LOGIN' })}>
       Login here
+    </Button>
+  </div>
+
+  <!-- Login -->
+{:else if $state.matches('idle.login')}
+  <div
+    class="formbox"
+    in:fly={{ y: -300, delay: 600 }}
+    out:fly={{ y: -300, duration: 400 }}>
+    <LoginForm />
+    <p>Don't have an account yet?</p>
+    <Button
+      size="big"
+      variant="filled"
+      color="info"
+      on:click={() => send({ type: 'SIGNUP' })}>
+      Sign up here
     </Button>
   </div>
 {/if}
