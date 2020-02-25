@@ -38,7 +38,6 @@
   }
 
   function onMouseUp() {
-    console.log("mouse up CALLED");
     isMouseDown = false;
     if (!isTransitionEnded) {
       return;
