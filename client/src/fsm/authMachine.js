@@ -1,7 +1,5 @@
 import { Machine, assign } from 'xstate';
 
-import router from '../router';
-
 const services = {
 	isAuth: async () => {
 		const token = localStorage.getItem('token');
@@ -110,10 +108,10 @@ const services = {
 
 const actions = {
 	routeDashboard: () => {
-		router.push('/dashboard').catch(err => console.log(err));
+		// router.push('/dashboard').catch(err => console.log(err));
 	},
 	routeAuth: () => {
-		router.push('/').catch(err => console.log(err));
+		// router.push('/').catch(err => console.log(err));
 	},
 	storeToken: (_, event) => {
 		localStorage.setItem('token', event.data);

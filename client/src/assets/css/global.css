@@ -38,18 +38,22 @@ html {
 body {
 	background-color: var(--color-bg);
 	color: var(--color-primary);
+	font-size: var(--text-normal);
+}
 
+main {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
+section {
+	width: 100%;
+	max-width: 400px;
+	padding: 1rem;
+}
+
 table {
 	width: 100%;
 	border-collapse: collapse;
-}
-
-/* Utils */
-.text-center {
-	text-align: center;
 }

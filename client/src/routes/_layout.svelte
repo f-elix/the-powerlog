@@ -6,4 +6,6 @@
 
 </style>
 
-<slot />
+<main>
+  <slot />
+</main>
