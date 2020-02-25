@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { fly } from "svelte/transition";
+  import { slide, scale, fly } from "svelte/transition";
   import { expoInOut } from "svelte/easing";
   // Components
   import SignupForm from "./SignupForm.svelte";
@@ -11,45 +11,70 @@
   import { authMachine } from "@/fsm/authMachine.js";
 
   const { state, send } = useMachine(authMachine);
+
+  const forms = [
+    {
+      state: "idle.signup",
+      bottomText: "Already have an account?",
+      buttonEvent: { type: "LOGIN" },
+      buttonLabel: "Login here",
+      component: SignupForm
+    },
+    {
+      state: "idle.login",
+      bottomText: "Don't have an account yet?",
+      buttonEvent: { type: "SIGNUP" },
+      buttonLabel: "Sign up here",
+      component: LoginForm
+    }
+  ];
 </script>
 
 <style>
-  .formbox {
+  .ctn {
     width: 100%;
+    position: relative;
+    /* overflow: hidden; */
+  }
+  .form-ctn {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
   }
 </style>
 
-<!-- Sign up -->
-{#if $state.matches('idle.signup')}
-  <div
-    class="formbox"
-    in:fly={{ y: -300, delay: 600 }}
-    out:fly={{ y: -300, duration: 400 }}>
-    <SignupForm />
-    <p>Already have an account?</p>
-    <Button
-      size="big"
-      variant="filled"
-      color="info"
-      on:click={() => send({ type: 'LOGIN' })}>
-      Login here
-    </Button>
-  </div>
-
-  <!-- Login -->
-{:else if $state.matches('idle.login')}
-  <div
-    class="formbox"
-    in:fly={{ y: -300, delay: 600 }}
-    out:fly={{ y: -300, duration: 400 }}>
-    <LoginForm />
-    <p>Don't have an account yet?</p>
-    <Button
-      size="big"
-      variant="filled"
-      color="info"
-      on:click={() => send({ type: 'SIGNUP' })}>
-      Sign up here
-    </Button>
-  </div>
-{/if}
+<div class="ctn">
+  <!-- Sign up -->
+  {#if $state.matches('idle.signup')}
+    <div
+      class="form-ctn"
+      transition:fly={{y: -400}}>
+      <SignupForm />
+      <p>Already have an account?</p>
+      <Button
+        size="big"
+        variant="filled"
+        color="info"
+        on:click={() => send({ type: 'LOGIN' })}>
+        Login here
+      </Button>
+    </div>
+    <!-- Login -->
+  {:else if $state.matches('idle.login')}
+    <div
+      class="form-ctn"
+      transition:fly={{y: -400}}>
+      <LoginForm />
+      <p>Don't have an account yet?</p>
+      <Button
+        size="big"
+        variant="filled"
+        color="info"
+        on:click={() => send({ type: 'SIGNUP' })}>
+        Sign up here
+      </Button>
+    </div>
+  {/if}
+</div>
