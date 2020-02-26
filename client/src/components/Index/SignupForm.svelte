@@ -7,7 +7,6 @@
   import { requiredPasswordLength } from "@/assets/js/utils.js";
 
   // Components
-  import FormLayout from "./FormLayout.svelte";
   import Input from "../UI/Input.svelte";
   import Button from "../UI/Button.svelte";
 
@@ -17,20 +16,20 @@
   let emailError = "";
   let passwordError = "";
 
-  $: nameError = $state.name.invalid.empty ? "Name is required." : "";
-  $: emailError = $state.email.invalid.empty ? "Email is required." : "";
-  $: emailError = $state.email.invalid.badFormat
+  $: nameError = $state.matches('idle.name.invalid.empty') ? "Name is required." : "";
+  $: emailError = $state.matches('idle.name.invalid.empty') ? "Email is required." : "";
+  $: emailError = $state.matches('idle.name.invalid.badFormat')
     ? "Please provide a valid email."
     : "";
-  $: passwordError = $state.password.invalid.empty
+  $: passwordError = $state.matches('idle.password.invalid.empty')
     ? "Passord is required."
     : "";
-  $: passwordError = $state.password.invalid.tooShort
+  $: passwordError = $state.matches('idle.password.invalid.tooShort')
     ? "Password must have at least " + requiredPasswordLength + " characters."
     : "";
 </script>
 
-<FormLayout>
+<form class="auth-form" on:submit|preventDefault={e => send({type: 'SUBMIT'})} novalidate>
   <!-- Name -->
   <Input
     name="name"
@@ -63,5 +62,5 @@
         type: 'INPUT_PASSWORD',
         params: { value: e.target.value }
       })} />
-  <Button size="big" color="info">Sign Up</Button>
-</FormLayout>
+  <Button size="big" color="info" type="submit">Sign Up</Button>
+</form>

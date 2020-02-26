@@ -66,3 +66,12 @@ h1 {
 h2 {
 	font-size: var(--text-big);
 }
+
+.auth-form {
+    width: 100%;
+    height: 32rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 1rem 0;
+  }

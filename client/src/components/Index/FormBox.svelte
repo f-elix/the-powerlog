@@ -9,25 +9,8 @@
   // FSM
   import { useMachine } from "@/fsm/useMachine.js";
   import { authMachine } from "@/fsm/authMachine.js";
-
+  
   const { state, send } = useMachine(authMachine);
-
-  const forms = [
-    {
-      state: "idle.signup",
-      bottomText: "Already have an account?",
-      buttonEvent: { type: "LOGIN" },
-      buttonLabel: "Login here",
-      component: SignupForm
-    },
-    {
-      state: "idle.login",
-      bottomText: "Don't have an account yet?",
-      buttonEvent: { type: "SIGNUP" },
-      buttonLabel: "Sign up here",
-      component: LoginForm
-    }
-  ];
 </script>
 
 <style>
@@ -37,7 +20,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .form-ctn {
     position: absolute;
     top: 0;
@@ -45,7 +27,6 @@
     width: 100%;
     height: 100%;
   }
-
   .signup {
     padding: 0 1rem;
     background-color: var(--color-fg);
