@@ -139,18 +139,18 @@ export const authMachine = Machine(
 		states: {
 			idle: {
 				id: 'idle',
-				initial: 'login',
+				initial: 'displayLogin',
 				states: {
-					login: {
+					displayLogin: {
 						on: {
-							SIGNUP: 'signup',
+							SIGNUP: 'displaySignup',
 							LOGIN: '#loading.authenticatingUser'
 						},
 						exit: ['clearError']
 					},
-					signup: {
+					displaySignup: {
 						on: {
-							LOGIN: 'login',
+							LOGIN: 'displayLogin',
 							SIGNUP: '#loading.authenticatingUser'
 						},
 						exit: ['clearError']

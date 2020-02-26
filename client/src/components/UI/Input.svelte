@@ -8,12 +8,7 @@
   export let placeholder = " ";
   export let cols = 20;
   export let rows = 5;
-  export let error = true;
   export let errorMessage = "";
-
-  function onInput(e) {
-    value = e.target.value;
-  }
 </script>
 
 <style>
@@ -123,7 +118,7 @@
       class:label-padding={label}
       {placeholder}
       {value}
-      on:input={onInput} />
+      on:input />
     <span class="label">{label}</span>
     <div class="underline" />
   {:else}
@@ -137,6 +132,6 @@
     <span class="label textarea-label">{label}</span>
   {/if}
 </label>
-{#if error && errorMessage}
+{#if errorMessage}
   <p class="error-message">{errorMessage}</p>
 {/if}
