@@ -17,16 +17,20 @@
   let passwordError = "";
 
   $: nameError = $state.matches('idle.name.invalid.empty') ? "Name is required." : "";
-  $: emailError = $state.matches('idle.name.invalid.empty') ? "Email is required." : "";
-  $: emailError = $state.matches('idle.name.invalid.badFormat')
-    ? "Please provide a valid email."
-    : "";
-  $: passwordError = $state.matches('idle.password.invalid.empty')
-    ? "Passord is required."
-    : "";
-  $: passwordError = $state.matches('idle.password.invalid.tooShort')
-    ? "Password must have at least " + requiredPasswordLength + " characters."
-    : "";
+  $: if ($state.matches('idle.email.invalid.empty')) {
+    emailError = "Email is required.";
+  } else if ($state.matches('idle.email.invalid.badFormat')) {
+    emailError = "Please provide a valid email.";
+  } else {
+    emailError = "";
+  }
+  $: if ($state.matches('idle.password.invalid.empty')) {
+    passwordError = "Password is required.";
+  } else if ($state.matches('idle.password.invalid.tooShort')) {
+    passwordError = "Password must have at least " + requiredPasswordLength + " characters.";
+  } else {
+    passwordError = "";
+  }
 </script>
 
 <form class="auth-form" on:submit|preventDefault={e => send({type: 'SUBMIT'})} novalidate>
