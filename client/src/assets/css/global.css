@@ -19,6 +19,7 @@
 	--text-small: 1.2rem;
 	--text-normal: 1.6rem;
 	--text-big: 2rem;
+	--text-title: 3rem;
 
 	/* Border */
 	--border-thin: 1px solid;
@@ -56,4 +57,12 @@ section {
 table {
 	width: 100%;
 	border-collapse: collapse;
+}
+
+h1 {
+	font-size: var(--text-title);
+}
+
+h2 {
+	font-size: var(--text-big);
 }
