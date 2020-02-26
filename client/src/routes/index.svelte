@@ -4,40 +4,23 @@
   import Spinner from "@/components/UI/Spinner.svelte";
   import AppLoader from "@/components/UI/AppLoader.svelte";
   import FormBox from "@/components/index/FormBox.svelte";
+  import Title from "@/components/index/Title.svelte";
 </script>
 
 <style>
   section {
-    margin-top: 8rem;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
     text-align: center;
-  }
-
-  h2 {
-    margin-bottom: 3rem;
   }
 </style>
 
 <section>
-  <!-- Logo -->
-  <img src="/img/icons/icon.svg" alt="" width="144" height="144" />
-
   <!-- Title -->
-  <h1>The Strength Log</h1>
-  <h2>
-    Log your training,
-    <br />
-    Get the Results.
-  </h2>
-
-  <!-- Install btn -->
-  <Button variant="filled" color="primary-30">
-    <i class="material-icons">save_alt</i>
-    Install
-  </Button>
-
+  <Title />
   <!-- Forms -->
   <FormBox />
 </section>

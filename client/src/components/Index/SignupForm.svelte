@@ -1,23 +1,67 @@
 <script>
+  // FSM
+  import { formMachine } from "@/fsm/formMachine.js";
+  import { useMachine } from "@/fsm/useMachine.js";
+
+  // js
+  import { requiredPasswordLength } from "@/assets/js/utils.js";
+
+  // Components
   import FormLayout from "./FormLayout.svelte";
   import Input from "../UI/Input.svelte";
   import Button from "../UI/Button.svelte";
 
-  export let name = "";
-  export let email = "";
-  export let password = "";
+  const { state, send } = useMachine(formMachine);
+
+  let nameError = "";
+  let emailError = "";
+  let passwordError = "";
+
+  $: nameError = $state.name.invalid.empty ? "Name is required." : "";
+  $: emailError = $state.email.invalid.empty ? "Email is required." : "";
+  $: emailError = $state.email.invalid.badFormat
+    ? "Please provide a valid email."
+    : "";
+  $: passwordError = $state.password.invalid.empty
+    ? "Passord is required."
+    : "";
+  $: passwordError = $state.password.invalid.tooShort
+    ? "Password must have at least " + requiredPasswordLength + " characters."
+    : "";
 </script>
 
 <FormLayout>
   <!-- Name -->
-  <Input name="name" label="Name" bind:value={name} />
+  <Input
+    name="name"
+    label="Name"
+    value={$state.context.name}
+    errorMessage={nameError}
+    on:input={e => send({
+        type: 'INPUT_NAME',
+        params: { value: e.target.value }
+      })} />
   <!-- Email -->
-  <Input type="email" name="email" label="Email" bind:value={email} />
+  <Input
+    type="email"
+    name="email"
+    label="Email"
+    value={$state.context.email}
+    errorMessage={emailError}
+    on:input={e => send({
+        type: 'INPUT_EMAIL',
+        params: { value: e.target.value }
+      })} />
   <!-- Password -->
   <Input
     type="password"
     name="password"
     label="Password"
-    bind:value={password} />
+    value={$state.context.password}
+    errorMessage={passwordError}
+    on:input={e => send({
+        type: 'INPUT_PASSWORD',
+        params: { value: e.target.value }
+      })} />
   <Button size="big" color="info">Sign Up</Button>
 </FormLayout>

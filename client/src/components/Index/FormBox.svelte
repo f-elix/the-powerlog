@@ -1,7 +1,7 @@
 <script>
   // Svelte
-  import { slide, scale, fly } from "svelte/transition";
-  import { expoInOut } from "svelte/easing";
+  import { fly, slide, blur, scale } from "svelte/transition";
+  import { expoOut } from "svelte/easing";
   // Components
   import SignupForm from "./SignupForm.svelte";
   import LoginForm from "./LoginForm.svelte";
@@ -33,39 +33,33 @@
 <style>
   .ctn {
     width: 100%;
+    height: 44rem;
     position: relative;
-    /* overflow: hidden; */
+    overflow: hidden;
   }
+
   .form-ctn {
     position: absolute;
-    width: 100%;
-    height: 100%;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .signup {
+    padding: 0 1rem;
+    background-color: var(--color-fg);
+    border-radius: var(--radius-default);
   }
 </style>
 
 <div class="ctn">
-  <!-- Sign up -->
-  {#if $state.matches('idle.signup')}
-    <div
-      class="form-ctn"
-      transition:fly={{y: -400}}>
-      <SignupForm />
-      <p>Already have an account?</p>
-      <Button
-        size="big"
-        variant="filled"
-        color="info"
-        on:click={() => send({ type: 'LOGIN' })}>
-        Login here
-      </Button>
-    </div>
+  {#if $state.matches('idle.displayLogin')}
     <!-- Login -->
-  {:else if $state.matches('idle.login')}
     <div
       class="form-ctn"
-      transition:fly={{y: -400}}>
+      in:scale={{ y: -450, delay: 500, easing: expoOut, duration: 600, opacity: 0 }}
+      out:scale={{ y: -450, easing: expoOut, duration: 600, opacity: 0 }}>
       <LoginForm />
       <p>Don't have an account yet?</p>
       <Button
@@ -74,6 +68,22 @@
         color="info"
         on:click={() => send({ type: 'SIGNUP' })}>
         Sign up here
+      </Button>
+    </div>
+  {:else if $state.matches('idle.displaySignup')}
+    <!-- Sign up -->
+    <div
+      class="form-ctn signup"
+      in:fly={{ y: -450, delay: 500, easing: expoOut, duration: 600, opacity: 0 }}
+      out:fly={{ y: -450, easing: expoOut, duration: 600, opacity: 0 }}>
+      <SignupForm />
+      <p>Already have an account?</p>
+      <Button
+        size="big"
+        variant="filled"
+        color="info"
+        on:click={() => send({ type: 'LOGIN' })}>
+        Login here
       </Button>
     </div>
   {/if}
