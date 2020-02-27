@@ -1,4 +1,8 @@
 <script>
+  // Svelte
+  import { fly, fade } from "svelte/transition";
+  import { elasticOut, bounceOut, bounceIn } from "svelte/easing";
+  // Components
   import Ripple from "./Ripple.svelte";
 
   export let type = "text";
@@ -105,33 +109,41 @@
 
   .error-message {
     margin: 0;
+    text-align: left;
     font-size: var(--text-small);
     color: var(--color-error);
   }
 </style>
 
-<label>
-  {#if type !== 'textarea'}
-    <input
-      {type}
-      {name}
-      class:label-padding={label}
-      {placeholder}
-      {value}
-      on:input />
-    <span class="label">{label}</span>
-    <div class="underline" />
-  {:else}
-    <textarea
-      {name}
-      {cols}
-      {rows}
-      {value}
-      class:label-padding-textarea={label}
-      {placeholder} />
-    <span class="label textarea-label">{label}</span>
+<div>
+  <label>
+    {#if type !== 'textarea'}
+      <input
+        {type}
+        {name}
+        class:label-padding={label}
+        {placeholder}
+        {value}
+        on:input />
+      <span class="label">{label}</span>
+      <div class="underline" />
+    {:else}
+      <textarea
+        {name}
+        {cols}
+        {rows}
+        {value}
+        class:label-padding-textarea={label}
+        {placeholder} />
+      <span class="label textarea-label">{label}</span>
+    {/if}
+  </label>
+  {#if errorMessage}
+    <p
+      class="error-message"
+      in:fly={{ x: 30, duration: 700, easing: elasticOut, opacity: 1 }}
+      out:fade={{ duration: 200 }}>
+      {errorMessage}
+    </p>
   {/if}
-</label>
-{#if errorMessage}
-  <p class="error-message">{errorMessage}</p>
-{/if}
+</div>

@@ -5,6 +5,11 @@
   import AppLoader from "@/components/UI/AppLoader.svelte";
   import FormBox from "@/components/index/FormBox.svelte";
   import Title from "@/components/index/Title.svelte";
+
+  // import { useMachine } from "@/fsm/useMachine.js";
+  // import { authMachine } from "@/fsm/authMachine.js";
+
+  // const { authState, authSend } = useMachine(authMachine);
 </script>
 
 <style>

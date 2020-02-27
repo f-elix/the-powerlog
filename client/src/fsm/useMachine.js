@@ -19,7 +19,7 @@ export function useMachine(machine, options) {
 	});
 
 	return {
-		state: currentState,
-		send: service.send
+		[`${machine.id}State`]: currentState,
+		[`${machine.id}Send`]: service.send
 	};
 }

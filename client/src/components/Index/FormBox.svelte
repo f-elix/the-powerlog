@@ -1,16 +1,24 @@
 <script>
   // Svelte
+  import { setContext } from "svelte";
   import { fly, slide, blur, scale } from "svelte/transition";
   import { expoOut } from "svelte/easing";
+  // FSM
+  import { useMachine } from "@/fsm/useMachine.js";
+  import { authMachine } from "@/fsm/authMachine.js";
+  import { validationMachine } from "@/fsm/validationMachine.js";
   // Components
   import SignupForm from "./SignupForm.svelte";
   import LoginForm from "./LoginForm.svelte";
   import Button from "../UI/Button.svelte";
-  // FSM
-  import { useMachine } from "@/fsm/useMachine.js";
-  import { authMachine } from "@/fsm/authMachine.js";
-  
-  const { state, send } = useMachine(authMachine);
+
+  const { authState, authSend } = useMachine(authMachine);
+  const { validationState, validationSend } = useMachine(validationMachine);
+
+  setContext("validation", {
+    validationState,
+    validationSend
+  });
 </script>
 
 <style>
@@ -35,7 +43,7 @@
 </style>
 
 <div class="ctn">
-  {#if $state.matches('idle.displayLogin')}
+  {#if $authState.matches('idle.displayLogin')}
     <!-- Login -->
     <div
       class="form-ctn"
@@ -47,11 +55,11 @@
         size="big"
         variant="filled"
         color="info"
-        on:click={() => send({ type: 'SIGNUP' })}>
+        on:click={() => authSend({ type: 'SIGNUP' })}>
         Sign up here
       </Button>
     </div>
-  {:else if $state.matches('idle.displaySignup')}
+  {:else if $authState.matches('idle.displaySignup')}
     <!-- Sign up -->
     <div
       class="form-ctn signup"
@@ -63,7 +71,7 @@
         size="big"
         variant="filled"
         color="info"
-        on:click={() => send({ type: 'LOGIN' })}>
+        on:click={() => authSend({ type: 'LOGIN' })}>
         Login here
       </Button>
     </div>
