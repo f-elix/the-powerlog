@@ -48,7 +48,7 @@
       class="form-ctn"
       in:scale={{ y: -450, easing: expoOut, opacity: 0 }}
       out:scale={{ y: -450, easing: expoOut, opacity: 0 }}
-      on:outroend={() => formboxSend({ type: 'TRANSITIONEND' })}>
+      on:outroend={() => formboxSend({ type: 'LOGIN_TRANSITIONEND' })}>
       <LoginForm />
       <p>Don't have an account yet?</p>
       <Button
@@ -65,7 +65,7 @@
       class="form-ctn signup"
       in:fly={{ y: -450, easing: expoOut, opacity: 0 }}
       out:fly={{ y: -450, easing: expoOut, opacity: 0 }}
-      on:outroend={() => formboxSend({ type: 'TRANSITIONEND' })}>
+      on:outroend={() => formboxSend({ type: 'SIGNUP_TRANSITIONEND' })}>
       <SignupForm />
       <p>Already have an account?</p>
       <Button

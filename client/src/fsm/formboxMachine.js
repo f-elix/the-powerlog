@@ -7,28 +7,24 @@ export const formboxMachine = Machine({
 		displayLogin: {
 			on: {
 				SIGNUP: {
-					target: 'transitionToSignup'
+					target: 'transitioning'
 				}
 			}
 		},
-		transitionToSignup: {
+		transitioning: {
 			on: {
-				TRANSITIONEND: {
+				LOGIN_TRANSITIONEND: {
 					target: 'displaySignup'
-				}
+				},
+				SIGNUP_TRANSITIONEND: {
+					target: 'displayLogin'
+				},
 			}
 		},
 		displaySignup: {
 			on: {
-				LOGIN: 'transitionToLogin'
+				LOGIN: 'transitioning'
 			}
 		},
-		transitionToLogin: {
-			on: {
-				TRANSITIONEND: {
-					target: 'displayLogin'
-				}
-			}
-		}
 	}
 });
