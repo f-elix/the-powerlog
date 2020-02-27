@@ -7,7 +7,7 @@ const utils = {
 	emailErrorEmpty: 'Email is required.',
 	emailErrorBadFormat: 'Please provide a valid email.',
 	passwordErrorEmpty: 'Password is required.',
-	passwordErrorTooShort: function() {
+	passwordErrorTooShort: function () {
 		return 'Password must have at least ' + this.requiredPasswordLength + ' characters.';
 	}
 };

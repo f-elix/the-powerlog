@@ -6,8 +6,8 @@
 
   // FSM
   import { useMachine } from "@/fsm/useMachine.js";
-  import { formboxMachine } from "@/fsm/formboxMachine.js";
-  import { validationMachine } from "@/fsm/validationMachine.js";
+  import { formboxMachine } from "@/fsm/auth/formboxMachine.js";
+  import { validationMachine } from "@/fsm/auth/validationMachine.js";
 
   // Components
   import SignupForm from "./SignupForm.svelte";
@@ -15,12 +15,12 @@
   import Button from "../UI/Button.svelte";
 
   const { formboxState, formboxSend } = useMachine(formboxMachine);
-  const { validationState, validationSend } = useMachine(validationMachine);
+  // const { validationState, validationSend } = useMachine(validationMachine);
 
-  setContext("validation", {
-    validationState,
-    validationSend
-  });
+  // setContext("validation", {
+  //   validationState,
+  //   validationSend
+  // });
 </script>
 
 <style>

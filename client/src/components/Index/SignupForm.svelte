@@ -6,7 +6,8 @@
   import Input from "../UI/Input.svelte";
   import Button from "../UI/Button.svelte";
 
-  const { validationState, validationSend } = getContext("validation");
+  const { validationState, validationSend } = getContext("validationFromAuth");
+  $: console.log(validationState)
 </script>
 
 <form

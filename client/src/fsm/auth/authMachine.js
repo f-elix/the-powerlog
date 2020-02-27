@@ -1,4 +1,5 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, spawn } from 'xstate';
+import { validationMachine } from './validationMachine.js'
 
 const services = {
 	isAuth: async () => {
@@ -46,28 +47,32 @@ const services = {
 		}
 	},
 	authUser: async (_, event) => {
-		const { authQuery, queryName } = event.params;
-		try {
-			const res = await fetch(process.env.VUE_APP_API, {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(authQuery)
-			});
-			const data = await res.json();
-			if (data.errors) {
-				const error = new Error();
-				error.message = data.errors[0].message;
-				error.statusCode = data.errors[0].extensions.exception.statusCode;
-				throw error;
-			}
-			const token = data.data[queryName].token;
-			return token;
-		} catch (err) {
-			console.error(err);
-			throw err;
-		}
+		console.log('AUTHENTICATING...');
+		setTimeout(() => {
+			throw new Error()
+		}, 500);
+		// const { authQuery, queryName } = event.params;
+		// try {
+		// 	const res = await fetch(process.env.VUE_APP_API, {
+		// 		method: 'POST',
+		// 		headers: {
+		// 			'content-type': 'application/json'
+		// 		},
+		// 		body: JSON.stringify(authQuery)
+		// 	});
+		// 	const data = await res.json();
+		// 	if (data.errors) {
+		// 		const error = new Error();
+		// 		error.message = data.errors[0].message;
+		// 		error.statusCode = data.errors[0].extensions.exception.statusCode;
+		// 		throw error;
+		// 	}
+		// 	const token = data.data[queryName].token;
+		// 	return token;
+		// } catch (err) {
+		// 	console.error(err);
+		// 	throw err;
+		// }
 	},
 	getUserData: async (_, event) => {
 		const token = event.data;
@@ -131,37 +136,28 @@ export const authMachine = Machine(
 	{
 		id: 'auth',
 		context: {
+			validation: null,
 			userData: {},
 			error: '',
 			loading: false
 		},
-		initial: 'loading',
+		initial: 'idle',
 		states: {
 			idle: {
 				id: 'idle',
-				initial: 'displayLogin',
-				states: {
-					displayLogin: {
-						on: {
-							SIGNUP: 'displaySignup',
-							LOGIN: '#loading.authenticatingUser'
-						},
-						exit: ['clearError']
-					},
-					displaySignup: {
-						on: {
-							LOGIN: 'displayLogin',
-							SIGNUP: '#loading.authenticatingUser'
-						},
-						exit: ['clearError']
-					},
-					last: {
-						type: 'history'
-					}
-				}
+				entry: assign({
+					validation: () => spawn(validationMachine, { sync: true })
+				}),
+				// invoke: {
+				// 	src: validationMachine,
+				// 	onDone: 'loading.authenticatingUser'
+				// },
+				// on: {
+				// 	SIGNUP: 'loading.authenticatingUser',
+				// 	LOGIN: 'loading.authenticatingUser'
+				// }
 			},
 			loading: {
-				id: 'loading',
 				initial: 'checkingForAuth',
 				states: {
 					checkingForAuth: {
@@ -184,7 +180,7 @@ export const authMachine = Machine(
 								actions: ['storeToken']
 							},
 							onError: {
-								target: '#idle.last',
+								target: '#idle',
 								actions: ['showError']
 							}
 						}
@@ -197,7 +193,7 @@ export const authMachine = Machine(
 								actions: ['updateUserData', 'routeDashboard']
 							},
 							onError: {
-								target: '#idle.last',
+								target: '#idle',
 								actions: ['showError']
 							}
 						}
