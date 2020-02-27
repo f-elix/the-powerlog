@@ -2,12 +2,16 @@
   // Svelte
   import { getContext } from "svelte";
 
+  // FSM
+  import { useService } from "@/fsm/useService.js";
+
   // Components
   import Input from "../UI/Input.svelte";
   import Button from "../UI/Button.svelte";
 
-  const { validationState, validationSend } = getContext("validationFromAuth");
-  $: console.log(validationState)
+  const { authState } = getContext("auth");
+  const validationService = $authState.context.validation;
+  const { validationState, validationSend } = useService(validationService);
 </script>
 
 <form

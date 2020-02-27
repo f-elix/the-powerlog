@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { setContext } from "svelte";
+  import { getContext } from "svelte";
   import { fly, scale } from "svelte/transition";
   import { expoOut } from "svelte/easing";
 
@@ -15,7 +15,6 @@
   import Button from "../UI/Button.svelte";
 
   const { formboxState, formboxSend } = useMachine(formboxMachine);
-
 </script>
 
 <style>

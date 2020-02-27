@@ -22,18 +22,18 @@
     authSend
   });
 
-  const { validationState, validationSend } = useMachine(
-    validationMachine.withConfig({
-      actions: {
-        notifyAuth: (context, event) => authSend({ type: "LOGIN" })
-      }
-    })
-  );
+  // const { validationState, validationSend } = useMachine(
+  //   validationMachine.withConfig({
+  //     actions: {
+  //       notifyAuth: (context, event) => authSend({ type: "LOGIN" })
+  //     }
+  //   })
+  // );
 
-  setContext("validation", {
-    validationState,
-    validationSend
-  });
+  // setContext("validation", {
+  //   validationState,
+  //   validationSend
+  // });
 </script>
 
 <style>
@@ -51,5 +51,7 @@
   <!-- Title -->
   <Title />
   <!-- Forms -->
-  <!-- <FormBox /> -->
+  {#if $authState.matches('idle')}
+  <FormBox />
+  {/if}
 </section>
