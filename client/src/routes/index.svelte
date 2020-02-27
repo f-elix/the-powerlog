@@ -1,10 +1,11 @@
 <script>
-// Svelte
-import {setContext} from 'svelte';
+  // Svelte
+  import { setContext, onMount } from "svelte";
 
-// FSM
+  // FSM
   import { useMachine } from "@/fsm/useMachine.js";
   import { authMachine } from "@/fsm/auth/authMachine.js";
+  import { validationMachine } from "@/fsm/auth/validationMachine.js";
 
   // Components
   import Button from "@/components/UI/Button.svelte";
@@ -14,13 +15,25 @@ import {setContext} from 'svelte';
   import FormBox from "@/components/index/FormBox.svelte";
   import Title from "@/components/index/Title.svelte";
 
-
-
   const { authState, authSend } = useMachine(authMachine);
 
-  setContext('validationFromAuth', {
-    validationState: $authState.context.validation.state
-  })
+  setContext("auth", {
+    authState,
+    authSend
+  });
+
+  const { validationState, validationSend } = useMachine(
+    validationMachine.withConfig({
+      actions: {
+        notifyAuth: (context, event) => authSend({ type: "LOGIN" })
+      }
+    })
+  );
+
+  setContext("validation", {
+    validationState,
+    validationSend
+  });
 </script>
 
 <style>
@@ -38,5 +51,5 @@ import {setContext} from 'svelte';
   <!-- Title -->
   <Title />
   <!-- Forms -->
-  <FormBox />
+  <!-- <FormBox /> -->
 </section>

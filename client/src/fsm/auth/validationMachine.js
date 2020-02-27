@@ -183,6 +183,7 @@ export const validationMachine = Machine(
 				}
 			},
 			valid: {
+				entry: ['notifyAuth'],
 				type: 'final'
 			}
 		}

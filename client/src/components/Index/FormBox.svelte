@@ -15,12 +15,7 @@
   import Button from "../UI/Button.svelte";
 
   const { formboxState, formboxSend } = useMachine(formboxMachine);
-  // const { validationState, validationSend } = useMachine(validationMachine);
 
-  // setContext("validation", {
-  //   validationState,
-  //   validationSend
-  // });
 </script>
 
 <style>

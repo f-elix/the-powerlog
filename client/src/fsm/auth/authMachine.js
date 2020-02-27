@@ -1,5 +1,4 @@
 import { Machine, assign, spawn } from 'xstate';
-import { validationMachine } from './validationMachine.js'
 
 const services = {
 	isAuth: async () => {
@@ -136,26 +135,18 @@ export const authMachine = Machine(
 	{
 		id: 'auth',
 		context: {
-			validation: null,
 			userData: {},
 			error: '',
 			loading: false
 		},
-		initial: 'idle',
+		initial: 'loading',
 		states: {
 			idle: {
 				id: 'idle',
-				entry: assign({
-					validation: () => spawn(validationMachine, { sync: true })
-				}),
-				// invoke: {
-				// 	src: validationMachine,
-				// 	onDone: 'loading.authenticatingUser'
-				// },
-				// on: {
-				// 	SIGNUP: 'loading.authenticatingUser',
-				// 	LOGIN: 'loading.authenticatingUser'
-				// }
+				on: {
+					SIGNUP: 'loading.authenticatingUser',
+					LOGIN: 'loading.authenticatingUser'
+				}
 			},
 			loading: {
 				initial: 'checkingForAuth',
