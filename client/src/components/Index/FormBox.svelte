@@ -1,18 +1,20 @@
 <script>
   // Svelte
   import { setContext } from "svelte";
-  import { fly, slide, blur, scale } from "svelte/transition";
+  import { fly, scale } from "svelte/transition";
   import { expoOut } from "svelte/easing";
+
   // FSM
   import { useMachine } from "@/fsm/useMachine.js";
-  import { authMachine } from "@/fsm/authMachine.js";
+  import { formboxMachine } from "@/fsm/formboxMachine.js";
   import { validationMachine } from "@/fsm/validationMachine.js";
+
   // Components
   import SignupForm from "./SignupForm.svelte";
   import LoginForm from "./LoginForm.svelte";
   import Button from "../UI/Button.svelte";
 
-  const { authState, authSend } = useMachine(authMachine);
+  const { formboxState, formboxSend } = useMachine(formboxMachine);
   const { validationState, validationSend } = useMachine(validationMachine);
 
   setContext("validation", {
@@ -25,16 +27,13 @@
   .ctn {
     width: 100%;
     height: 44rem;
-    position: relative;
     overflow: hidden;
   }
+
   .form-ctn {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
   }
+
   .signup {
     padding: 0 1rem;
     background-color: var(--color-fg);
@@ -43,35 +42,37 @@
 </style>
 
 <div class="ctn">
-  {#if $authState.matches('idle.displayLogin')}
+  {#if $formboxState.matches('displayLogin')}
     <!-- Login -->
     <div
       class="form-ctn"
-      in:scale={{ y: -450, delay: 500, easing: expoOut, duration: 600, opacity: 0 }}
-      out:scale={{ y: -450, easing: expoOut, duration: 600, opacity: 0 }}>
+      in:scale={{ y: -450, easing: expoOut, opacity: 0 }}
+      out:scale={{ y: -450, easing: expoOut, opacity: 0 }}
+      on:outroend={() => formboxSend({ type: 'TRANSITIONEND' })}>
       <LoginForm />
       <p>Don't have an account yet?</p>
       <Button
         size="big"
         variant="filled"
         color="info"
-        on:click={() => authSend({ type: 'SIGNUP' })}>
+        on:click={() => formboxSend({ type: 'SIGNUP' })}>
         Sign up here
       </Button>
     </div>
-  {:else if $authState.matches('idle.displaySignup')}
+  {:else if $formboxState.matches('displaySignup')}
     <!-- Sign up -->
     <div
       class="form-ctn signup"
-      in:fly={{ y: -450, delay: 500, easing: expoOut, duration: 600, opacity: 0 }}
-      out:fly={{ y: -450, easing: expoOut, duration: 600, opacity: 0 }}>
+      in:fly={{ y: -450, easing: expoOut, opacity: 0 }}
+      out:fly={{ y: -450, easing: expoOut, opacity: 0 }}
+      on:outroend={() => formboxSend({ type: 'TRANSITIONEND' })}>
       <SignupForm />
       <p>Already have an account?</p>
       <Button
         size="big"
         variant="filled"
         color="info"
-        on:click={() => authSend({ type: 'LOGIN' })}>
+        on:click={() => formboxSend({ type: 'LOGIN' })}>
         Login here
       </Button>
     </div>
