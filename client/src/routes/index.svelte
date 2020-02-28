@@ -21,19 +21,6 @@
     authState,
     authSend
   });
-
-  // const { validationState, validationSend } = useMachine(
-  //   validationMachine.withConfig({
-  //     actions: {
-  //       notifyAuth: (context, event) => authSend({ type: "LOGIN" })
-  //     }
-  //   })
-  // );
-
-  // setContext("validation", {
-  //   validationState,
-  //   validationSend
-  // });
 </script>
 
 <style>
@@ -52,6 +39,6 @@
   <Title />
   <!-- Forms -->
   {#if $authState.matches('idle')}
-  <FormBox />
+    <FormBox />
   {/if}
 </section>

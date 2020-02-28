@@ -1,5 +1,5 @@
 import { Machine, assign, spawn } from 'xstate';
-import { validationMachine } from './validationMachine.js'
+import { validationMachine } from './validationMachine.js';
 
 const services = {
 	isAuth: async () => {
@@ -21,7 +21,7 @@ const services = {
 			}
 		};
 		try {
-			const res = await fetch(process.env.VUE_APP_API, {
+			const res = await fetch(process.env.SAPPER_APP_API, {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json'
@@ -46,33 +46,82 @@ const services = {
 			throw err;
 		}
 	},
-	authUser: async (_, event) => {
-		console.log('AUTHENTICATING...');
-		setTimeout(() => {
-			throw new Error()
-		}, 500);
-		// const { authQuery, queryName } = event.params;
-		// try {
-		// 	const res = await fetch(process.env.VUE_APP_API, {
-		// 		method: 'POST',
-		// 		headers: {
-		// 			'content-type': 'application/json'
-		// 		},
-		// 		body: JSON.stringify(authQuery)
-		// 	});
-		// 	const data = await res.json();
-		// 	if (data.errors) {
-		// 		const error = new Error();
-		// 		error.message = data.errors[0].message;
-		// 		error.statusCode = data.errors[0].extensions.exception.statusCode;
-		// 		throw error;
-		// 	}
-		// 	const token = data.data[queryName].token;
-		// 	return token;
-		// } catch (err) {
-		// 	console.error(err);
-		// 	throw err;
-		// }
+	signUpUser: async (context, _) => {
+		const { name, email, password } = context.validation.state.context;
+		const queryName = 'signupUser';
+		const query = {
+			query: `
+				mutation signupUser($name: String!, $email: String!, $password: String!) {
+					signupUser(name: $name, email: $email, password: $password) {
+						token
+					}
+				}
+			`,
+			variables: {
+				name,
+				email,
+				password
+			}
+		};
+		try {
+			const res = await fetch(process.env.APP_API, {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(query)
+			});
+			const data = await res.json();
+			if (data.errors) {
+				const error = new Error();
+				error.message = data.errors[0].message;
+				error.statusCode = data.errors[0].extensions.exception.statusCode;
+				throw error;
+			}
+			const token = data.data[queryName].token;
+			return token;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+	},
+	loginUser: async (context, _) => {
+		const { email, password } = context.validation.state.context;
+		const queryName = 'loginUser';
+		const query = {
+			query: `
+			mutation loginUser($email: String!, $password: String!) {
+				loginUser(email: $email, password: $password) {
+				token
+				}
+			}
+			`,
+			variables: {
+				email,
+				password
+			}
+		};
+		try {
+			const res = await fetch(process.env.APP_API, {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(query)
+			});
+			const data = await res.json();
+			if (data.errors) {
+				const error = new Error();
+				error.message = data.errors[0].message;
+				error.statusCode = data.errors[0].extensions.exception.statusCode;
+				throw error;
+			}
+			const token = data.data[queryName].token;
+			return token;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
 	},
 	getUserData: async (_, event) => {
 		const token = event.data;
@@ -87,7 +136,7 @@ const services = {
 			`
 		};
 		try {
-			const res = await fetch(process.env.VUE_APP_API, {
+			const res = await fetch(process.env.APP_API, {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json',
@@ -124,8 +173,8 @@ const actions = {
 	clearToken: () => {
 		localStorage.removeItem('token');
 	},
-	showError: assign({
-		error: (_, event) => event.data.errorMsg || event.data.message
+	updateAuthError: assign({
+		authError: (_, event) => event.data.message
 	}),
 	clearError: assign({ error: '' }),
 	updateUserData: assign({ userData: (_, event) => event.data }),
@@ -137,7 +186,7 @@ export const authMachine = Machine(
 		id: 'auth',
 		context: {
 			userData: {},
-			error: '',
+			authError: '',
 			loading: false,
 			validation: null
 		},
@@ -149,8 +198,8 @@ export const authMachine = Machine(
 					validation: () => spawn(validationMachine, { sync: true })
 				}),
 				on: {
-					SIGNUP: 'loading.authenticatingUser',
-					LOGIN: 'loading.authenticatingUser'
+					SIGNUP: 'loading.signingUpUser',
+					LOGIN: 'loading.loggingUser'
 				}
 			},
 			loading: {
@@ -167,21 +216,33 @@ export const authMachine = Machine(
 							}
 						}
 					},
-					authenticatingUser: {
-						id: 'authenticatingUser',
+					signingUpUser: {
 						invoke: {
-							src: 'authUser',
+							src: 'signUpUser',
 							onDone: {
-								target: 'loggingUser',
+								target: 'gettingUserData',
 								actions: ['storeToken']
 							},
 							onError: {
 								target: '#idle',
-								actions: ['showError']
+								actions: ['updateAuthError']
 							}
 						}
 					},
 					loggingUser: {
+						invoke: {
+							src: 'loginUser',
+							onDone: {
+								target: 'gettingUserData',
+								actions: ['storeToken']
+							},
+							onError: {
+								target: '#idle',
+								actions: ['updateAuthError']
+							}
+						}
+					},
+					gettingUserData: {
 						invoke: {
 							src: 'getUserData',
 							onDone: {
@@ -190,7 +251,7 @@ export const authMachine = Machine(
 							},
 							onError: {
 								target: '#idle',
-								actions: ['showError']
+								actions: ['updateAuthError']
 							}
 						}
 					}

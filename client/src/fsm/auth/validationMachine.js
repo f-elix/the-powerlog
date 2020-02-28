@@ -1,4 +1,4 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, sendParent } from 'xstate';
 import isEmail from 'validator/es/lib/isEmail';
 
 const utils = {
@@ -106,7 +106,7 @@ export const validationMachine = Machine(
 							target: 'idle.password.invalid.tooShort'
 						},
 						{
-							target: 'valid'
+							target: 'signupValid'
 						}
 					],
 					SUBMIT_LOGIN: [
@@ -127,7 +127,7 @@ export const validationMachine = Machine(
 							target: 'idle.password.invalid.tooShort'
 						},
 						{
-							target: 'valid'
+							target: 'loginValid'
 						}
 					]
 				},
@@ -182,7 +182,12 @@ export const validationMachine = Machine(
 					}
 				}
 			},
-			valid: {
+			signupValid: {
+				entry: sendParent({ type: 'SIGNUP' }),
+				type: 'final'
+			},
+			loginValid: {
+				entry: sendParent({ type: 'LOGIN' }),
 				type: 'final'
 			}
 		}
