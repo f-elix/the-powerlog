@@ -2,6 +2,7 @@
   // Svelte
   import { fly, fade } from "svelte/transition";
   import { elasticOut, bounceOut, bounceIn } from "svelte/easing";
+
   // Components
   import Ripple from "./Ripple.svelte";
 
@@ -69,6 +70,7 @@
     top: 1rem;
     color: var(--color-primary);
     transition: transform 0.2s, color 0.2s;
+    transform-origin: 0 0;
   }
 
   .label.textarea-label {
@@ -78,7 +80,7 @@
   label:focus-within .label,
   input:not(:placeholder-shown) + .label,
   textarea:not(:placeholder-shown) + .label {
-    transform: translate(calc(var(--padding) * -1), -50%) scale(0.75);
+    transform: translateY(-40%) scale(0.75);
     color: var(--color-greyedout);
   }
 
