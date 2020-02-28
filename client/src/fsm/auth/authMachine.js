@@ -1,5 +1,6 @@
 import { Machine, assign, spawn } from 'xstate';
 import { validationMachine } from './validationMachine.js';
+import { goto } from '@sapper/app';
 
 const services = {
 	isAuth: async () => {
@@ -162,10 +163,10 @@ const services = {
 
 const actions = {
 	routeDashboard: () => {
-		// router.push('/dashboard').catch(err => console.log(err));
+		goto('/dashboard').catch(err => console.log(err));
 	},
 	routeAuth: () => {
-		// router.push('/').catch(err => console.log(err));
+		goto('/').catch(err => console.log(err));
 	},
 	storeToken: (_, event) => {
 		localStorage.setItem('token', event.data);
