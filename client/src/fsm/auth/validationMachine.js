@@ -7,17 +7,17 @@ const utils = {
 	emailErrorEmpty: 'Email is required.',
 	emailErrorBadFormat: 'Please provide a valid email.',
 	passwordErrorEmpty: 'Password is required.',
-	passwordErrorTooShort: function () {
+	passwordErrorTooShort: function() {
 		return 'Password must have at least ' + this.requiredPasswordLength + ' characters.';
 	}
 };
 
 const guards = {
-	isNameEmpty: (context, _) => context.name.length === 0,
-	isEmailEmpty: (context, _) => context.email.length === 0,
-	isBadEmail: (context, _) => context.email.length > 0 && !isEmail(context.email),
-	isPasswordEmpty: (context, _) => context.password.length === 0,
-	isPasswordShort: (context, _) => context.password.length < utils.requiredPasswordLength
+	isNameEmpty: (context, _) => context.name.trim().length === 0,
+	isEmailEmpty: (context, _) => context.email.trim().length === 0,
+	isBadEmail: (context, _) => context.email.trim().length > 0 && !isEmail(context.email),
+	isPasswordEmpty: (context, _) => context.password.trim().length === 0,
+	isPasswordShort: (context, _) => context.password.trim().length < utils.requiredPasswordLength
 };
 
 const actions = {
@@ -34,7 +34,7 @@ const actions = {
 		nameError: utils.nameErrorEmpty
 	}),
 	emailErrorEmpty: assign({
-		emailError: utils.passwordErrorEmpty
+		emailError: utils.emailErrorEmpty
 	}),
 	emailErrorBadFormat: assign({
 		emailError: utils.emailErrorBadFormat
