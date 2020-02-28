@@ -1,3 +1,4 @@
+const dotenv = require('dotenv');
 import path from 'path';
 import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
@@ -17,7 +18,7 @@ const onwarn = (warning, onwarn) =>
 	(warning.code === 'CIRCULAR_DEPENDENCY' && /[/\\]@sapper[/\\]/.test(warning.message)) || onwarn(warning);
 
 const aliases = () => ({
-	resolve: ['.js', '.svelte', 'scss', '.css'],
+	resolve: ['.js', '.svelte', '.css'],
 	entries: [
 		{
 			find: '@',
@@ -28,6 +29,17 @@ const aliases = () => ({
 
 const dedupe = importee => importee === 'svelte' || importee.startsWith('svelte/');
 
+const envVars = (excluded = [], dotEnvOptions) => {
+	dotenv.config(dotEnvOptions);
+	const ENV_VARS = {};
+	for (let key in process.env) {
+		if (!excluded.includes(key)) {
+			ENV_VARS[`process.env.${key}`] = JSON.stringify(process.env[key]);
+		}
+	}
+	return ENV_VARS;
+};
+
 export default {
 	client: {
 		input: config.client.input(),
@@ -35,6 +47,7 @@ export default {
 		plugins: [
 			alias(aliases()),
 			replace({
+				...envVars(),
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode)
 			}),
@@ -50,33 +63,33 @@ export default {
 			}),
 			commonjs(),
 			legacy &&
-				babel({
-					extensions: ['.js', '.mjs', '.html', '.svelte'],
-					runtimeHelpers: true,
-					exclude: ['node_modules/@babel/**'],
-					presets: [
-						[
-							'@babel/preset-env',
-							{
-								targets: '> 0.25%, not dead'
-							}
-						]
-					],
-					plugins: [
-						'@babel/plugin-syntax-dynamic-import',
-						[
-							'@babel/plugin-transform-runtime',
-							{
-								useESModules: true
-							}
-						]
+			babel({
+				extensions: ['.js', '.mjs', '.html', '.svelte'],
+				runtimeHelpers: true,
+				exclude: ['node_modules/@babel/**'],
+				presets: [
+					[
+						'@babel/preset-env',
+						{
+							targets: '> 0.25%, not dead'
+						}
 					]
-				}),
+				],
+				plugins: [
+					'@babel/plugin-syntax-dynamic-import',
+					[
+						'@babel/plugin-transform-runtime',
+						{
+							useESModules: true
+						}
+					]
+				]
+			}),
 
 			!dev &&
-				terser({
-					module: true
-				})
+			terser({
+				module: true
+			})
 		],
 
 		onwarn

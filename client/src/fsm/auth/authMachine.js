@@ -21,7 +21,7 @@ const services = {
 			}
 		};
 		try {
-			const res = await fetch(process.env.SAPPER_APP_API, {
+			const res = await fetch(process.env.APP_API, {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json'
