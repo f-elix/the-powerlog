@@ -21,6 +21,7 @@
     authState,
     authSend
   });
+
 </script>
 
 <style>

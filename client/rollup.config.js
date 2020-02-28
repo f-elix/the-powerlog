@@ -1,4 +1,4 @@
-const dotenv = require('dotenv');
+const sapperEnv = require('sapper-environment');
 import path from 'path';
 import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
@@ -29,17 +29,6 @@ const aliases = () => ({
 
 const dedupe = importee => importee === 'svelte' || importee.startsWith('svelte/');
 
-const envVars = (excluded = [], dotEnvOptions) => {
-	dotenv.config(dotEnvOptions);
-	const ENV_VARS = {};
-	for (let key in process.env) {
-		if (!excluded.includes(key)) {
-			ENV_VARS[`process.env.${key}`] = JSON.stringify(process.env[key]);
-		}
-	}
-	return ENV_VARS;
-};
-
 export default {
 	client: {
 		input: config.client.input(),
@@ -47,7 +36,7 @@ export default {
 		plugins: [
 			alias(aliases()),
 			replace({
-				...envVars(),
+				...sapperEnv('APP'),
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode)
 			}),
