@@ -8,8 +8,6 @@
   import { validationMachine } from "@/fsm/auth/validationMachine.js";
 
   // Components
-  import Button from "@/components/UI/Button.svelte";
-  import Input from "@/components/UI/Input.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
   import AppLoader from "@/components/UI/AppLoader.svelte";
   import FormBox from "@/components/index/FormBox.svelte";
@@ -35,6 +33,9 @@
   }
 </style>
 
+{#if $authState.matches('loading')}
+  <AppLoader />
+{/if}
 <section>
   <!-- Title -->
   <Title />

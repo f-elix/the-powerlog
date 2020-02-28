@@ -1,5 +1,5 @@
 <script>
-
+  import {fade} from 'svelte/transition';
 </script>
 
 <style>
@@ -34,6 +34,6 @@
   }
 </style>
 
-<div class="dimmer">
+<div class="dimmer" transition:fade={{duration: 200}} >
   <div class="donut" />
 </div>
