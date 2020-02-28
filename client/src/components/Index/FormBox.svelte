@@ -1,7 +1,7 @@
 <script>
   // Svelte
   import { getContext } from "svelte";
-  import { fly, scale } from "svelte/transition";
+  import { fly, scale, fade } from "svelte/transition";
   import { expoOut } from "svelte/easing";
 
   // FSM
@@ -36,7 +36,7 @@
   }
 </style>
 
-<div class="ctn">
+<div class="ctn" transition:fade={{duration: 200}} >
   {#if $formboxState.matches('displayLogin')}
     <!-- Login -->
     <div

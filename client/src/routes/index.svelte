@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { setContext, onMount } from "svelte";
+  import { fade } from "svelte/transition";
 
   // FSM
   import { useMachine } from "@/fsm/useMachine.js";
@@ -19,7 +20,6 @@
     authState,
     authSend
   });
-
 </script>
 
 <style>
@@ -36,11 +36,11 @@
 {#if $authState.matches('loading')}
   <AppLoader />
 {/if}
-<section>
-  <!-- Title -->
-  <Title />
-  <!-- Forms -->
-  {#if $authState.matches('idle')}
+{#if $authState.matches('idle')}
+  <section transition:fade={{ duration: 200 }}>
+    <!-- Title -->
+    <Title />
+    <!-- Forms -->
     <FormBox />
-  {/if}
-</section>
+  </section>
+{/if}
