@@ -18,13 +18,13 @@ export const formboxMachine = Machine({
 				},
 				SIGNUP_TRANSITIONEND: {
 					target: 'displayLogin'
-				},
+				}
 			}
 		},
 		displaySignup: {
 			on: {
 				LOGIN: 'transitioning'
 			}
-		},
+		}
 	}
 });
