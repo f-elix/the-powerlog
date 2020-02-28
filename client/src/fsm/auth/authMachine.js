@@ -176,7 +176,7 @@ const actions = {
 	updateAuthError: assign({
 		authError: (_, event) => event.data.message
 	}),
-	clearError: assign({ error: '' }),
+	clearAuthError: assign({ authError: '' }),
 	updateUserData: assign({ userData: (_, event) => event.data }),
 	clearUserData: assign({ userData: '' })
 };
@@ -199,7 +199,10 @@ export const authMachine = Machine(
 				}),
 				on: {
 					SIGNUP: 'loading.signingUpUser',
-					LOGIN: 'loading.loggingUser'
+					LOGIN: 'loading.loggingUser',
+					CLEAR_ERROR: {
+						actions: ['clearAuthError']
+					}
 				}
 			},
 			loading: {

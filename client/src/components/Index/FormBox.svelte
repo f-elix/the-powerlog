@@ -15,6 +15,22 @@
   import Button from "../UI/Button.svelte";
 
   const { formboxState, formboxSend } = useMachine(formboxMachine);
+
+  const { authState, authSend } = getContext("auth");
+
+  function clearAuthError() {
+    authSend({ type: "CLEAR_ERROR" });
+  }
+
+  function onSignUpClick() {
+    formboxSend({ type: "SIGNUP" });
+    clearAuthError();
+  }
+
+  function onLoginClick() {
+    formboxSend({ type: "LOGIN" });
+    clearAuthError();
+  }
 </script>
 
 <style>
@@ -29,6 +45,13 @@
     height: 100%;
   }
 
+  .auth-error {
+    margin-bottom: 0;
+    color: var(--color-error);
+    text-align: center;
+    font-weight: bold;
+  }
+
   .signup {
     padding: 0 1rem;
     background-color: var(--color-fg);
@@ -36,7 +59,10 @@
   }
 </style>
 
-<div class="ctn" transition:fade={{duration: 200}} >
+{#if $authState.context.authError}
+  <p class="auth-error">{$authState.context.authError}</p>
+{/if}
+<div class="ctn" transition:fade={{ duration: 200 }}>
   {#if $formboxState.matches('displayLogin')}
     <!-- Login -->
     <div
@@ -46,11 +72,7 @@
       on:outroend={() => formboxSend({ type: 'LOGIN_TRANSITIONEND' })}>
       <LoginForm />
       <p>Don't have an account yet?</p>
-      <Button
-        size="big"
-        variant="filled"
-        color="info"
-        on:click={() => formboxSend({ type: 'SIGNUP' })}>
+      <Button size="big" variant="filled" color="info" on:click={onSignUpClick}>
         Sign up here
       </Button>
     </div>
@@ -63,11 +85,7 @@
       on:outroend={() => formboxSend({ type: 'SIGNUP_TRANSITIONEND' })}>
       <SignupForm />
       <p>Already have an account?</p>
-      <Button
-        size="big"
-        variant="filled"
-        color="info"
-        on:click={() => formboxSend({ type: 'LOGIN' })}>
+      <Button size="big" variant="filled" color="info" on:click={onLoginClick}>
         Login here
       </Button>
     </div>
