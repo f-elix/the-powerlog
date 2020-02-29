@@ -9,7 +9,6 @@
   import { validationMachine } from "@/fsm/auth/validationMachine.js";
 
   // Components
-  import Spinner from "@/components/UI/Spinner.svelte";
   import AppLoader from "@/components/UI/AppLoader.svelte";
   import FormBox from "@/components/index/FormBox.svelte";
   import Title from "@/components/index/Title.svelte";
