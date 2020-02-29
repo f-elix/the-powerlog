@@ -6,6 +6,9 @@
   import { useMachine } from "@/fsm/useMachine.js";
   import { authMachine } from "@/fsm/auth/authMachine.js";
 
+  // Components
+  import Header from "@/components/layout/Header.svelte";
+
   const { authState, authSend } = useMachine(authMachine);
 
   setContext("auth", {
@@ -19,5 +22,8 @@
 </style>
 
 <main>
+  <!-- {#if $authState.matches('authenticated')} -->
+  <Header />
+  <!-- {/if} -->
   <slot />
 </main>

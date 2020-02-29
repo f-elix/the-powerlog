@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { getContext } from "svelte";
+  import { getContext, onMount } from "svelte";
 
   // FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
@@ -23,5 +23,5 @@
     on:click={() => authSend({ type: 'LOGOUT' })}>
     Logout
   </Button>
-  <h1>Dashboard</h1>
+  <h1>{$authState.context.userData.name}'s log</h1>
 </section>
