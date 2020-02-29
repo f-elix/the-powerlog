@@ -4,14 +4,14 @@ import { goto } from '@sapper/app';
 
 const services = {
 	isAuth: async () => {
-		const token = localStorage.getItem('token');
+		const token = localStorage.getItem(process.env.APP_TOKEN);
 		if (!token) {
 			const error = new Error();
 			error.errorMsg = 'Not authenticated';
 			console.warn(error);
 			throw error;
 		}
-		const isAuthQuery = {
+		const query = {
 			query: `
 				query isAuthenticated($token: String!) {
 					isAuth(token: $token)
@@ -27,7 +27,7 @@ const services = {
 				headers: {
 					'content-type': 'application/json'
 				},
-				body: JSON.stringify(isAuthQuery)
+				body: JSON.stringify(query)
 			});
 			const data = await res.json();
 			if (data.errors) {
@@ -169,10 +169,10 @@ const actions = {
 		goto('/').catch(err => console.log(err));
 	},
 	storeToken: (_, event) => {
-		localStorage.setItem('token', event.data);
+		localStorage.setItem(process.env.APP_TOKEN, event.data);
 	},
 	clearToken: () => {
-		localStorage.removeItem('token');
+		localStorage.removeItem(process.env.APP_TOKEN);
 	},
 	updateAuthError: assign({
 		authError: (_, event) => event.data.message
@@ -213,7 +213,7 @@ export const authMachine = Machine(
 						invoke: {
 							src: 'isAuth',
 							onDone: {
-								target: 'loggingUser'
+								target: 'gettingUserData'
 							},
 							onError: {
 								target: '#idle'
