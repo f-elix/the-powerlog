@@ -1,11 +1,11 @@
 <script>
-  import {fade} from 'svelte/transition';
+  import { fade } from "svelte/transition";
 </script>
 
 <style>
   .dimmer {
     position: fixed;
-    z-index: 10;
+    z-index: 100;
     top: 0;
     left: 0;
     width: 100%;
@@ -34,6 +34,6 @@
   }
 </style>
 
-<div class="dimmer" transition:fade={{duration: 200}} >
+<div class="dimmer" transition:fade={{ duration: 200 }}>
   <div class="donut" />
 </div>
