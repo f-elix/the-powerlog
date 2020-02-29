@@ -8,6 +8,7 @@
 
   // Components
   import Button from "@/components/UI/Button.svelte";
+  import CardSearchResult from "@/components/log/CardSearchResult.svelte";
 
   const { authState, authSend } = getContext("auth");
 </script>
@@ -24,4 +25,11 @@
     Logout
   </Button>
   <h1>{$authState.context.userData.name}'s log</h1>
+  <div class="result-ctn">
+    <CardSearchResult sessionName="Squat" date="2020-02-02" />
+    <CardSearchResult sessionName="Squat" date="2020-02-02" />
+    <CardSearchResult sessionName="Squat" date="2020-02-02" />
+    <CardSearchResult sessionName="Squat" date="2020-02-02" />
+    <CardSearchResult sessionName="Squat" date="2020-02-02" />
+  </div>
 </section>

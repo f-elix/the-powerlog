@@ -27,10 +27,18 @@
     width: 100%;
     padding: 0 1rem;
     background-color: var(--color-fg-light);
+    box-shadow: var(--shadow-default);
   }
 </style>
 
 <header>
+  <!-- Logo + username's log -->
+  <!-- <img src="" alt="" />  -->
   <MenuButton on:click={toggleMenu} state={isOpen} />
-  <Drawer state={isOpen} />
+  <Drawer state={isOpen}>
+    <!-- @TODO links -->
+    <ul>
+      <li />
+    </ul>
+  </Drawer>
 </header>
