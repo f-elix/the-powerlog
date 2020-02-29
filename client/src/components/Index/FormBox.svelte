@@ -1,11 +1,12 @@
 <script>
   // Svelte
-  import { getContext } from "svelte";
+  import { getContext, setContext } from "svelte";
   import { fly, scale, fade } from "svelte/transition";
   import { expoOut } from "svelte/easing";
 
   // FSM
   import { useMachine } from "@/fsm/useMachine.js";
+  import { useService } from "@/fsm/useService.js";
   import { formboxMachine } from "@/fsm/auth/formboxMachine.js";
   import { validationMachine } from "@/fsm/auth/validationMachine.js";
 
@@ -17,6 +18,15 @@
   const { formboxState, formboxSend } = useMachine(formboxMachine);
 
   const { authState, authSend } = getContext("auth");
+
+  const { validationState, validationSend } = useService(
+    $authState.context.validation
+  );
+
+  setContext("validation", {
+    validationState,
+    validationSend
+  });
 
   function clearAuthError() {
     authSend({ type: "CLEAR_ERROR" });

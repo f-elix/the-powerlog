@@ -106,7 +106,8 @@ export const validationMachine = Machine(
 							target: 'idle.password.invalid.tooShort'
 						},
 						{
-							target: 'signupValid'
+							target: 'valid',
+							actions: sendParent({ type: 'SIGNUP' })
 						}
 					],
 					SUBMIT_LOGIN: [
@@ -127,7 +128,8 @@ export const validationMachine = Machine(
 							target: 'idle.password.invalid.tooShort'
 						},
 						{
-							target: 'loginValid'
+							target: 'valid',
+							actions: sendParent({ type: 'LOGIN' })
 						}
 					]
 				},
@@ -182,13 +184,12 @@ export const validationMachine = Machine(
 					}
 				}
 			},
-			signupValid: {
-				entry: sendParent({ type: 'SIGNUP' }),
-				type: 'final'
-			},
-			loginValid: {
-				entry: sendParent({ type: 'LOGIN' }),
-				type: 'final'
+			valid: {
+				on: {
+					RESET: {
+						target: 'idle'
+					}
+				}
 			}
 		}
 	},

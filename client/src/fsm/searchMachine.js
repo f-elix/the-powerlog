@@ -1,16 +1,14 @@
-import { Machine, assign } from "xstate";
-
-import router from "../router";
+import { Machine, assign } from 'xstate';
 
 const services = {
 	getSessions: async (_, event) => {
 		const { params } = event;
-		const token = localStorage.getItem("token");
+		const token = localStorage.getItem('token');
 		try {
 			const res = await fetch(process.env.VUE_APP_API, {
-				method: "POST",
+				method: 'POST',
 				headers: {
-					"content-type": "application/json",
+					'content-type': 'application/json',
 					authorization: token
 				},
 				body: JSON.stringify(params.query)
@@ -26,7 +24,7 @@ const services = {
 			const sessions = data.data[queryName];
 			if (!sessions.length) {
 				const error = new Error();
-				error.message = "No results found";
+				error.message = 'No results found';
 				error.statusCode = 404;
 				throw error;
 			}
@@ -51,10 +49,10 @@ const services = {
 
 const actions = {
 	routeDashboard: () => {
-		router.push("/dashboard").catch(err => console.log(err));
+		router.push('/dashboard').catch(err => console.log(err));
 	},
 	routeSearch: () => {
-		router.push("/search-results").catch(err => console.log(err));
+		router.push('/search-results').catch(err => console.log(err));
 	},
 	updateSessions: assign({ sessions: (_, event) => event.data.sessions }),
 	updateQuery: assign({ currentQuery: (_, event) => event.data.queryName }),
@@ -63,7 +61,7 @@ const actions = {
 
 export const searchMachine = Machine(
 	{
-		id: "search",
+		id: 'search',
 		context: {
 			sessions: [],
 			searchParams: {
@@ -71,49 +69,49 @@ export const searchMachine = Machine(
 				dates: null,
 				sessionName: null
 			},
-			currentQuery: ""
+			currentQuery: ''
 		},
-		initial: "idle",
+		initial: 'idle',
 		states: {
 			idle: {
 				on: {
-					SEARCH: "fetching",
+					SEARCH: 'fetching',
 					BACK_TO_MENU: {
-						actions: ["routeDashboard"]
+						actions: ['routeDashboard']
 					}
 				}
 			},
 			fetching: {
-				entry: ["routeSearch"],
+				entry: ['routeSearch'],
 				invoke: {
-					src: "getSessions",
+					src: 'getSessions',
 					onDone: {
-						target: "success",
-						actions: ["updateSessions", "updateQuery", "updateSearchParams"]
+						target: 'success',
+						actions: ['updateSessions', 'updateQuery', 'updateSearchParams']
 					},
 					onError: {
-						target: "error"
+						target: 'error'
 					}
 				},
 				on: {
 					BACK_TO_MENU: {
-						actions: ["routeDashboard"]
+						actions: ['routeDashboard']
 					}
 				}
 			},
 			success: {
 				on: {
-					SEARCH: "fetching",
+					SEARCH: 'fetching',
 					BACK_TO_MENU: {
-						actions: ["routeDashboard"]
+						actions: ['routeDashboard']
 					}
 				}
 			},
 			error: {
 				on: {
-					SEARCH: "fetching",
+					SEARCH: 'fetching',
 					BACK_TO_MENU: {
-						actions: ["routeDashboard"]
+						actions: ['routeDashboard']
 					}
 				}
 			}

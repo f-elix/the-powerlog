@@ -1,4 +1,4 @@
-import { Machine, assign, spawn } from 'xstate';
+import { Machine, assign, spawn, send } from 'xstate';
 import { validationMachine } from './validationMachine.js';
 import { goto } from '@sapper/app';
 
@@ -179,7 +179,13 @@ const actions = {
 	}),
 	clearAuthError: assign({ authError: '' }),
 	updateUserData: assign({ userData: (_, event) => event.data }),
-	clearUserData: assign({ userData: '' })
+	clearUserData: assign({ userData: '' }),
+	notifyResetValidation: send('RESET', {
+		to: context => context.validation
+	}),
+	setValidation: assign({
+		validation: () => spawn(validationMachine, { sync: true })
+	})
 };
 
 export const authMachine = Machine(
@@ -195,18 +201,33 @@ export const authMachine = Machine(
 		states: {
 			idle: {
 				id: 'idle',
-				entry: assign({
-					validation: () => spawn(validationMachine, { sync: true })
-				}),
-				on: {
-					SIGNUP: 'loading.signingUpUser',
-					LOGIN: 'loading.loggingUser',
-					CLEAR_ERROR: {
-						actions: ['clearAuthError']
+				initial: 'init',
+				states: {
+					init: {
+						entry: ['setValidation'],
+						on: {
+							'': {
+								target: 'ready'
+							}
+						}
+					},
+					ready: {
+						on: {
+							SIGNUP: {
+								target: '#loading.signingUpUser'
+							},
+							LOGIN: {
+								target: '#loading.loggingUser'
+							},
+							CLEAR_ERROR: {
+								actions: ['clearAuthError']
+							}
+						}
 					}
 				}
 			},
 			loading: {
+				id: 'loading',
 				initial: 'checkingForAuth',
 				states: {
 					checkingForAuth: {
@@ -228,8 +249,8 @@ export const authMachine = Machine(
 								actions: ['storeToken']
 							},
 							onError: {
-								target: '#idle',
-								actions: ['updateAuthError']
+								target: '#idle.ready',
+								actions: ['updateAuthError', 'notifyResetValidation']
 							}
 						}
 					},
@@ -241,8 +262,8 @@ export const authMachine = Machine(
 								actions: ['storeToken']
 							},
 							onError: {
-								target: '#idle',
-								actions: ['updateAuthError']
+								target: '#idle.ready',
+								actions: ['updateAuthError', 'notifyResetValidation']
 							}
 						}
 					},
@@ -254,8 +275,8 @@ export const authMachine = Machine(
 								actions: ['updateUserData', 'routeDashboard']
 							},
 							onError: {
-								target: '#idle',
-								actions: ['updateAuthError']
+								target: '#idle.ready',
+								actions: ['updateAuthError', 'notifyResetValidation']
 							}
 						}
 					}
@@ -267,9 +288,6 @@ export const authMachine = Machine(
 					LOGOUT: {
 						target: 'idle',
 						actions: ['clearToken', 'clearUserData', 'routeAuth']
-					},
-					LOADED: {
-						actions: ['routeDashboard']
 					}
 				}
 			}
