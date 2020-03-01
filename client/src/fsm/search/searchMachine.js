@@ -2,16 +2,16 @@ import { Machine, assign } from 'xstate';
 
 const services = {
 	getSessions: async (_, event) => {
-		const { params } = event;
-		const token = localStorage.getItem('token');
+		const { query, queryName } = event.params;
+		const token = localStorage.getItem(process.env.APP_TOKEN);
 		try {
-			const res = await fetch(process.env.VUE_APP_API, {
+			const res = await fetch(process.env.APP_API, {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json',
 					authorization: token
 				},
-				body: JSON.stringify(params.query)
+				body: JSON.stringify(query)
 			});
 			const data = await res.json();
 			if (data.errors) {
@@ -20,7 +20,6 @@ const services = {
 				error.statusCode = data.errors[0].extensions.exception.statusCode;
 				throw error;
 			}
-			const queryName = params.queryName;
 			const sessions = data.data[queryName];
 			if (!sessions.length) {
 				const error = new Error();
@@ -32,12 +31,12 @@ const services = {
 				sessions,
 				queryName,
 				searchParams: {
-					date: params.query.variables.date,
+					date: query.variables.date,
 					dates: {
-						fromDate: params.query.variables.fromDate,
-						toDate: params.query.variables.toDate
+						fromDate: query.variables.fromDate,
+						toDate: query.variables.toDate
 					},
-					sessionName: params.query.variables.title
+					sessionName: query.variables.title
 				}
 			};
 		} catch (err) {
@@ -49,10 +48,10 @@ const services = {
 
 const actions = {
 	routeDashboard: () => {
-		router.push('/dashboard').catch(err => console.log(err));
+		// router.push('/dashboard').catch(err => console.log(err));
 	},
 	routeSearch: () => {
-		router.push('/search-results').catch(err => console.log(err));
+		// router.push('/search-results').catch(err => console.log(err));
 	},
 	updateSessions: assign({ sessions: (_, event) => event.data.sessions }),
 	updateQuery: assign({ currentQuery: (_, event) => event.data.queryName }),
@@ -75,14 +74,10 @@ export const searchMachine = Machine(
 		states: {
 			idle: {
 				on: {
-					SEARCH: 'fetching',
-					BACK_TO_MENU: {
-						actions: ['routeDashboard']
-					}
+					SEARCH: 'fetching'
 				}
 			},
 			fetching: {
-				entry: ['routeSearch'],
 				invoke: {
 					src: 'getSessions',
 					onDone: {
@@ -92,27 +87,16 @@ export const searchMachine = Machine(
 					onError: {
 						target: 'error'
 					}
-				},
-				on: {
-					BACK_TO_MENU: {
-						actions: ['routeDashboard']
-					}
 				}
 			},
 			success: {
 				on: {
-					SEARCH: 'fetching',
-					BACK_TO_MENU: {
-						actions: ['routeDashboard']
-					}
+					SEARCH: 'fetching'
 				}
 			},
 			error: {
 				on: {
-					SEARCH: 'fetching',
-					BACK_TO_MENU: {
-						actions: ['routeDashboard']
-					}
+					SEARCH: 'fetching'
 				}
 			}
 		}

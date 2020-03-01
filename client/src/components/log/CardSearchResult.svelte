@@ -1,4 +1,7 @@
 <script>
+  // Svelte
+  import { fly } from "svelte/transition";
+
   // Components
   import Button from "@/components/UI/Button.svelte";
 
@@ -27,7 +30,7 @@
   }
 </style>
 
-<article class="search-result">
+<article class="search-result" in:fly={{ x: 30 }}>
   <div class="info">
     <h2>{sessionName}</h2>
     <p>{date}</p>
