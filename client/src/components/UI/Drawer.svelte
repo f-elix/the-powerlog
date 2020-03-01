@@ -5,6 +5,7 @@
 <style>
   .drawer {
     position: absolute;
+    top: 100%;
     right: -100%;
     width: 100%;
     height: 100rem;
@@ -17,6 +18,6 @@
   }
 </style>
 
-<nav class="drawer" data-state={state}>
+<nav class="drawer" data-state={state} on:click>
   <slot />
 </nav>

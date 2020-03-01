@@ -18,12 +18,14 @@
 </script>
 
 <style>
-
+  .header-padding {
+    padding-top: var(--header-height);
+  }
 </style>
 
-<main>
-  <!-- {#if $authState.matches('authenticated')} -->
-  <Header />
-  <!-- {/if} -->
+<main class:header-padding={$authState.matches('authenticated')}>
+  {#if $authState.matches('authenticated')}
+    <Header />
+  {/if}
   <slot />
 </main>

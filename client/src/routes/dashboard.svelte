@@ -18,18 +18,15 @@
 </style>
 
 <section>
-  <Button
-    variant="filled"
-    color="primary-30"
-    on:click={() => authSend({ type: 'LOGOUT' })}>
-    Logout
+  <Button size="fab" variant="filled" color="action">
+    <i class="material-icons">add</i>
   </Button>
-  <h1>{$authState.context.userData.name}'s log</h1>
   <div class="result-ctn">
+    <h1>This Week's Sessions</h1>
     <CardSearchResult sessionName="Squat" date="2020-02-02" />
     <CardSearchResult sessionName="Squat" date="2020-02-02" />
     <CardSearchResult sessionName="Squat" date="2020-02-02" />
     <CardSearchResult sessionName="Squat" date="2020-02-02" />
-    <CardSearchResult sessionName="Squat" date="2020-02-02" />
+    <Button size="big" color="info">View Last Week</Button>
   </div>
 </section>

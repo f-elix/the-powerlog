@@ -7,10 +7,15 @@
   let outlinedColor;
 
   export let size = "small";
+  // Small, big, fab
   export let color = "primary";
+  // All colors
   export let variant = "outlined";
+  // Outlined, filled
   export let type = "button";
+  // Button, submit
   export let position = "bottom-right";
+  // Bottom-right, bottom-left, center
 </script>
 
 <style>
