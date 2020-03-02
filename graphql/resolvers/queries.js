@@ -60,7 +60,7 @@ const queries = {
 			throw error;
 		}
 		// Find sessions in user log
-		const sessions = user.log.filter(session => {
+		const sessions = user.log.reverse().filter(session => {
 			return session.sessionDate.getTime() === sessionDate.getTime();
 		});
 		// Return session
@@ -82,7 +82,7 @@ const queries = {
 			throw error;
 		}
 		// Filter log by title
-		const filteredSessions = user.log.filter(session => {
+		const filteredSessions = user.log.reverse().filter(session => {
 			return session.title.toLowerCase().includes(title.toLowerCase());
 		});
 		// Return filtered array of sessions
@@ -104,7 +104,7 @@ const queries = {
 			throw error;
 		}
 		// Filter log by sessionDate
-		const filteredSessions = user.log.filter(session => {
+		const filteredSessions = user.log.reverse().filter(session => {
 			return session.sessionDate >= fromDate && session.sessionDate <= toDate;
 		});
 		// Return filtered array of sessions
