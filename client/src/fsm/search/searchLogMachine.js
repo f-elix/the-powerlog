@@ -27,18 +27,7 @@ const services = {
 				error.statusCode = 404;
 				throw error;
 			}
-			return {
-				sessions,
-				queryName,
-				searchParams: {
-					date: query.variables.date,
-					dates: {
-						fromDate: query.variables.fromDate,
-						toDate: query.variables.toDate
-					},
-					sessionName: query.variables.title
-				}
-			};
+			return sessions;
 		} catch (err) {
 			console.log(err);
 			throw err;
@@ -53,7 +42,7 @@ const actions = {
 	routeSearch: () => {
 		// router.push('/search-results').catch(err => console.log(err));
 	},
-	updateSessions: assign({ sessions: (_, event) => event.data.sessions }),
+	updateSessions: assign({ sessions: (_, event) => event.sessions }),
 };
 
 export const searchLogMachine = Machine(

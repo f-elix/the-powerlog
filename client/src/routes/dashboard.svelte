@@ -17,7 +17,7 @@
 
   // Components
   import Button from "@/components/UI/Button.svelte";
-  import ModuleSearchSessions from "@/components/log/ModuleSearchSessions.svelte";
+  import ModuleDashboardResults from "@/components/log/ModuleDashboardResults.svelte";
 
   const { authState, authSend } = getContext("auth");
   const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
@@ -103,7 +103,7 @@
       <!-- </div> -->
     </div>
     <!-- Search results -->
-    <ModuleSearchSessions
+    <ModuleDashboardResults
       isLoading={$searchLogState.matches('fetching')}
       isSuccess={$searchLogState.matches('success')}
       isError={$searchLogState.matches('error')}

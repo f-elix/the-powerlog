@@ -11,13 +11,11 @@
   import { sessionRangeQuery } from "@/assets/js/session-queries.js";
 
   // Components
-  import ModuleSearchSessions from "@/components/log/ModuleSearchSessions.svelte";
+  import CardSearchResult from "@/components/log/CardSearchResult.svelte";
   import ModuleSearchFilters from "@/components/log/ModuleSearchFilters.svelte";
   import Button from "@/components/UI/Button.svelte";
 
   const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
-
-  $: console.log($searchLogState.context);
 
   const range = 10;
 
@@ -80,13 +78,9 @@
 </style>
 
 <ModuleSearchFilters />
-<ModuleSearchSessions
-  isLoading={$searchLogState.matches('fetching')}
-  isSuccess={$searchLogState.matches('success')}
-  isError={$searchLogState.matches('error')}
-  errorMessage={noResultMessage}
-  {sessions} />
-
+{#each sessions as session (session._id)}
+<CardSearchResult />
+{/each}
 <div class="load-more-btn">
   <Button color="action" on:click={onLoadMore}>Load more</Button>
 </div>
