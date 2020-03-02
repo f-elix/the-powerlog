@@ -54,5 +54,27 @@ export const lastWeekQuery = {
 			fromDate: lastWeekDates().monday,
 			toDate: lastWeekDates().sunday
 		}
-	}
+	},
+	queryName: 'getSessionsFromTo'
 };
+
+export function sessionRangeQuery(from, to) {
+	return {
+		query: {
+			query: `
+				query getSessionRange($from: Int!, $to: Int!) {
+					getSessionRange(from: $from, to: $to){
+					sessionDate
+					title
+					_id
+					}
+				}
+			`,
+			variables: {
+				from,
+				to
+			}
+		},
+		queryName: 'getSessionRange'
+	};
+}
