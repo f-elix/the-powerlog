@@ -116,6 +116,29 @@ const queries = {
 				updatedAt: session.updatedAt.toISOString().split('T')[0]
 			};
 		});
+	},
+	getSessionRange: async (_, { from, to }, { currentUser }) => {
+		// Find user by ID and populate user's log
+		const user = await User.findById(currentUser.userId).populate('log');
+		if (!user) {
+			const error = new Error('Your session has ended. Please sign in again.');
+			error.statusCode = 401;
+			throw error;
+		}
+		// Filter session range
+		const filteredSessions = user.log.reverse().filter((session, i) => {
+			const position = i + 1;
+			return position >= from && position <= to;
+		});
+		// Return filtered array of sessions
+		return filteredSessions.map(session => {
+			return {
+				...session._doc,
+				_id: session._id.toString(),
+				createdAt: session.createdAt.toISOString().split('T')[0],
+				updatedAt: session.updatedAt.toISOString().split('T')[0]
+			};
+		});
 	}
 };
 

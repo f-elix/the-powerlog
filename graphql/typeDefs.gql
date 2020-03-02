@@ -84,6 +84,7 @@ type Query {
 	getSessionsByDate(sessionDate: Date!): [Session]
 	getSessionsByTitle(title: String!): [Session]
 	getSessionsFromTo(fromDate: Date!, toDate: Date!): [Session]
+	getSessionRange(from: Int!, to: Int!): [Session]
 	isAuth(token: String!): Boolean
 }
 
