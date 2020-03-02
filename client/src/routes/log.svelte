@@ -8,7 +8,7 @@
   import { useMachine } from "@/fsm/useMachine.js";
 
   // Utils
-  import { sessionRangeQuery } from "@/assets/js/utils.js";
+  import { sessionRangeQuery } from "@/assets/js/session-queries.js";
 
   // Components
   import ModuleSearchSessions from "@/components/log/ModuleSearchSessions.svelte";

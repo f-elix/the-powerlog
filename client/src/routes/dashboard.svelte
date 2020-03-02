@@ -8,8 +8,12 @@
   import { searchMachine } from "@/fsm/search/searchMachine.js";
   import { useMachine } from "@/fsm/useMachine.js";
 
-  // Utils
-  import { currentWeekQuery, lastWeekQuery } from "@/assets/js/utils.js";
+  // js
+  import { currentWeekDates, lastWeekDates } from "@/assets/js/utils.js";
+  import {
+    currentWeekQuery,
+    lastWeekQuery
+  } from "@/assets/js/session-queries.js";
 
   // Components
   import Button from "@/components/UI/Button.svelte";
@@ -18,17 +22,8 @@
   const { authState, authSend } = getContext("auth");
   const { searchState, searchSend } = useMachine(searchMachine);
 
-  onMount(() => {
-    searchSend({
-      type: "SEARCH",
-      params: {
-        query: currentWeekQuery.query,
-        queryName: currentWeekQuery.queryName
-      }
-    });
-  });
-
-  $: currentWeekSessions = $searchState.context.sessions;
+  const { currentMonday, currentSunday } = currentWeekDates();
+  const { lastMonday, lastSunday } = lastWeekDates();
 
   const currentWeek = {
     label: "This",
@@ -44,27 +39,41 @@
 
   let week = currentWeek;
 
+  function getCurrentWeek({ query, queryName }) {
+    searchSend({
+      type: "SEARCH",
+      params: {
+        query,
+        queryName
+      }
+    });
+    week = currentWeek;
+  }
+
+  function getLastWeek({ query, queryName }) {
+    searchSend({
+      type: "SEARCH",
+      params: {
+        query: lastWeekQuery.query,
+        queryName: lastWeekQuery.queryName
+      }
+    });
+    week = lastWeek;
+  }
+
   function toggleWeek() {
     if (week === currentWeek) {
-      searchSend({
-        type: "SEARCH",
-        params: {
-          query: lastWeekQuery.query,
-          queryName: lastWeekQuery.queryName
-        }
-      });
-      week = lastWeek;
+      getLastWeek(lastWeekQuery(lastMonday, lastSunday));
     } else {
-      searchSend({
-        type: "SEARCH",
-        params: {
-          query: currentWeekQuery.query,
-          queryName: currentWeekQuery.queryName
-        }
-      });
-      week = currentWeek;
+      getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
     }
   }
+
+  onMount(() => {
+    getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
+  });
+
+  $: currentWeekSessions = $searchState.context.sessions;
 </script>
 
 <style>
