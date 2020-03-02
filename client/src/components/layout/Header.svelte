@@ -5,7 +5,6 @@
   //   Components
   import MenuButton from "@/components/UI/MenuButton.svelte";
   import Drawer from "@/components/UI/Drawer.svelte";
-  import Ripple from "@/components/UI/Ripple.svelte";
 
   const { authState, authSend } = getContext("auth");
 
@@ -47,6 +46,11 @@
     color: var(--color-primary);
     font-size: var(--text-big);
     text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .nav-link:active {
+    background-color: var(--color-primary-10);
   }
 
   .logout {
@@ -56,20 +60,21 @@
 
 <header>
   <!-- Logo -->
-  <img src="/img/icons/icon.svg" alt="" width="30" height="30" />
+  <a href="/dashboard">
+    <img src="/img/icons/icon.svg" alt="" width="30" height="30" />
+  </a>
   <!-- Username -->
   <p class="username">{$authState.context.userData.name}'s log</p>
   <!-- Hamburger -->
   <MenuButton on:click={toggleMenu} state={isOpen} />
   <!-- Mobile nav -->
   <Drawer state={isOpen} on:click={toggleMenu}>
-    <!-- @TODO links -->
     <ul class="nav">
-      <!-- {#each links as link}
-      {/each} -->
+      <li>
+        <a href="/log" class="nav-link">full log</a>
+      </li>
       <li on:click={() => authSend({ type: 'LOGOUT' })}>
         <a href="/" class="nav-link logout">logout</a>
-        <Ripple />
       </li>
     </ul>
   </Drawer>

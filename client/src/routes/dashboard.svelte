@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { getContext, onMount } from "svelte";
+  import { goto } from "@sapper/app";
 
   // FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
@@ -12,9 +13,7 @@
 
   // Components
   import Button from "@/components/UI/Button.svelte";
-  import Spinner from "@/components/UI/Spinner.svelte";
-  import CardSearchResult from "@/components/log/CardSearchResult.svelte";
-  import SearchForm from "@/components/log/SearchForm.svelte";
+  import ModuleSearchSessions from "@/components/log/ModuleSearchSessions.svelte";
 
   const { authState, authSend } = getContext("auth");
   const { searchState, searchSend } = useMachine(searchMachine);
@@ -69,25 +68,15 @@
 </script>
 
 <style>
-  .result-ctn {
+  .heading {
     display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    min-height: 12rem;
-    padding: 1rem;
-    background-color: var(--color-fg-light);
-    overflow: hidden;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 3rem;
   }
 
-  .switch-week-btn {
-    display: flex;
-    justify-content: flex-end;
-    margin: 3rem 0;
-  }
-
-  .error-message {
-    color: var(--color-primary-50);
-    text-align: center;
+  .heading h1 {
+    margin: 0;
   }
 </style>
 
@@ -96,32 +85,24 @@
   <Button size="fab" variant="filled" color="action">
     <i class="material-icons">add</i>
   </Button>
-  <!-- Search ctn -->
+  <!-- Sessions ctn -->
   <div>
-    <h1>{week.label} Week's Sessions</h1>
-    <!-- Search results -->
-    <div class="result-ctn">
-      <!-- Spinner -->
-      {#if $searchState.matches('fetching')}
-        <Spinner />
-      {/if}
-      {#if $searchState.matches('success')}
-        {#each currentWeekSessions as session (session._id)}
-          <CardSearchResult
-            sessionName={session.title}
-            date={session.sessionDate} />
-        {/each}
-      {/if}
-      {#if $searchState.matches('error')}
-        <h2 class="error-message">{week.noResultMessage}</h2>
-      {/if}
-    </div>
-    <div class="switch-week-btn">
+    <div class="heading">
+      <h1>{week.label} Week's Sessions</h1>
+      <!-- <div> -->
       <Button color="info" on:click={toggleWeek}>{week.switchBtnLabel}</Button>
+      <!-- </div> -->
     </div>
-  </div>
-</section>
+    <!-- Search results -->
+    <ModuleSearchSessions
+      isLoading={$searchState.matches('fetching')}
+      isSuccess={$searchState.matches('success')}
+      isError={$searchState.matches('error')}
+      errorMessage={week.noResultMessage}
+      sessions={currentWeekSessions} />
 
-<section>
-  <SearchForm />
+    <Button color="info" size="big" on:click={() => goto('/log')}>
+      View full log
+    </Button>
+  </div>
 </section>
