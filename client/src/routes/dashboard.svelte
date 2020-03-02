@@ -5,7 +5,7 @@
 
   // FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
-  import { searchMachine } from "@/fsm/search/searchMachine.js";
+  import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
   import { useMachine } from "@/fsm/useMachine.js";
 
   // js
@@ -20,7 +20,7 @@
   import ModuleSearchSessions from "@/components/log/ModuleSearchSessions.svelte";
 
   const { authState, authSend } = getContext("auth");
-  const { searchState, searchSend } = useMachine(searchMachine);
+  const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
 
   const { currentMonday, currentSunday } = currentWeekDates();
   const { lastMonday, lastSunday } = lastWeekDates();
@@ -40,7 +40,7 @@
   let week = currentWeek;
 
   function getCurrentWeek({ query, queryName }) {
-    searchSend({
+    searchLogSend({
       type: "SEARCH",
       params: {
         query,
@@ -51,11 +51,11 @@
   }
 
   function getLastWeek({ query, queryName }) {
-    searchSend({
+    searchLogSend({
       type: "SEARCH",
       params: {
-        query: lastWeekQuery.query,
-        queryName: lastWeekQuery.queryName
+        query,
+        queryName
       }
     });
     week = lastWeek;
@@ -73,7 +73,7 @@
     getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
   });
 
-  $: currentWeekSessions = $searchState.context.sessions;
+  $: currentWeekSessions = $searchLogState.context.sessions;
 </script>
 
 <style>
@@ -104,9 +104,9 @@
     </div>
     <!-- Search results -->
     <ModuleSearchSessions
-      isLoading={$searchState.matches('fetching')}
-      isSuccess={$searchState.matches('success')}
-      isError={$searchState.matches('error')}
+      isLoading={$searchLogState.matches('fetching')}
+      isSuccess={$searchLogState.matches('success')}
+      isError={$searchLogState.matches('error')}
       errorMessage={week.noResultMessage}
       sessions={currentWeekSessions} />
 

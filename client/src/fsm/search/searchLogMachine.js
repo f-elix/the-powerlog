@@ -54,21 +54,13 @@ const actions = {
 		// router.push('/search-results').catch(err => console.log(err));
 	},
 	updateSessions: assign({ sessions: (_, event) => event.data.sessions }),
-	updateQuery: assign({ currentQuery: (_, event) => event.data.queryName }),
-	updateSearchParams: assign({ searchParams: (_, event) => event.data.searchParams })
 };
 
-export const searchMachine = Machine(
+export const searchLogMachine = Machine(
 	{
-		id: 'search',
+		id: 'searchLog',
 		context: {
 			sessions: [],
-			searchParams: {
-				date: null,
-				dates: null,
-				sessionName: null
-			},
-			currentQuery: ''
 		},
 		initial: 'idle',
 		states: {
@@ -82,7 +74,7 @@ export const searchMachine = Machine(
 					src: 'getSessions',
 					onDone: {
 						target: 'success',
-						actions: ['updateSessions', 'updateQuery', 'updateSearchParams']
+						actions: ['updateSessions']
 					},
 					onError: {
 						target: 'error'

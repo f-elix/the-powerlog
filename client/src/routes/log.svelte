@@ -4,7 +4,7 @@
 
   //   FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
-  import { searchMachine } from "@/fsm/search/searchMachine.js";
+  import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
   import { useMachine } from "@/fsm/useMachine.js";
 
   // Utils
@@ -15,9 +15,9 @@
   import ModuleSearchFilters from "@/components/log/ModuleSearchFilters.svelte";
   import Button from "@/components/UI/Button.svelte";
 
-  const { searchState, searchSend } = useMachine(searchMachine);
+  const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
 
-  $: console.log($searchState.context);
+  $: console.log($searchLogState.context);
 
   const range = 10;
 
@@ -30,7 +30,7 @@
 
   let sessions = [];
 
-  $: sessions = [sessions, ...$searchState.context.sessions];
+  $: sessions = [sessions, ...$searchLogState.context.sessions];
 
   onMount(() => {
     const { query, queryName } = sessionRangeQuery(
@@ -81,9 +81,9 @@
 
 <ModuleSearchFilters />
 <ModuleSearchSessions
-  isLoading={$searchState.matches('fetching')}
-  isSuccess={$searchState.matches('success')}
-  isError={$searchState.matches('error')}
+  isLoading={$searchLogState.matches('fetching')}
+  isSuccess={$searchLogState.matches('success')}
+  isError={$searchLogState.matches('error')}
   errorMessage={noResultMessage}
   {sessions} />
 
