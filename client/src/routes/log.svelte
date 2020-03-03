@@ -28,7 +28,9 @@
 
   let sessions = $searchLogState.context.sessions;
 
-  $: sessions = [sessions, ...$searchLogState.context.sessions];
+  console.log($searchLogState.context)
+
+  // $: sessions = [sessions, ...$searchLogState.context.sessions];
 
   function onLoadMore() {
     sessionRange = {
@@ -47,7 +49,6 @@
       }
     });
   }
-
   
   onMount(() => {
     const { query, queryName } = sessionRangeQuery(
