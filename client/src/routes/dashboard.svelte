@@ -73,8 +73,6 @@
     getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
   });
 
-  $: console.log($searchLogState.context)
-
   $: sessions = $searchLogState.context.sessions;
 </script>
 
