@@ -3,17 +3,17 @@
   import { onMount } from "svelte";
 
   //   FSM
-  import { authMachine } from "@/fsm/auth/authMachine.js";
   import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
   import { useMachine } from "@/fsm/useMachine.js";
 
-  // Utils
+  // js
   import { sessionRangeQuery } from "@/assets/js/session-queries.js";
 
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
   import ModuleSearchFilters from "@/components/log/ModuleSearchFilters.svelte";
   import Button from "@/components/UI/Button.svelte";
+  import Spinner from "@/components/UI/Spinner.svelte";
 
   const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
 
@@ -26,23 +26,9 @@
 
   const noResultMessage = "No sessions found";
 
-  let sessions = [];
+  let sessions = $searchLogState.context.sessions;
 
   $: sessions = [sessions, ...$searchLogState.context.sessions];
-
-  onMount(() => {
-    const { query, queryName } = sessionRangeQuery(
-      sessionRange.from,
-      sessionRange.to
-    );
-    searchSend({
-      type: "SEARCH",
-      params: {
-        query,
-        queryName
-      }
-    });
-  });
 
   function onLoadMore() {
     sessionRange = {
@@ -53,7 +39,7 @@
       sessionRange.from,
       sessionRange.to
     );
-    searchSend({
+    searchLogSend({
       type: "SEARCH",
       params: {
         query,
@@ -61,6 +47,21 @@
       }
     });
   }
+
+  
+  onMount(() => {
+    const { query, queryName } = sessionRangeQuery(
+      sessionRange.from,
+      sessionRange.to
+    );
+    searchLogSend({
+      type: "SEARCH",
+      params: {
+        query,
+        queryName
+      }
+    });
+  });
   /* @TODO
     Load 20 last sessions, then load more with a button
     Load server filtered sessions when filter is applied
@@ -82,5 +83,9 @@
 <CardSearchResult />
 {/each}
 <div class="load-more-btn">
+  {#if $searchLogState.matches('fetching')}
+  <Spinner />
+  {:else}
   <Button color="action" on:click={onLoadMore}>Load more</Button>
+  {/if}
 </div>

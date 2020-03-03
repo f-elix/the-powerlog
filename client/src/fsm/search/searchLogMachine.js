@@ -42,7 +42,7 @@ const actions = {
 	routeSearch: () => {
 		// router.push('/search-results').catch(err => console.log(err));
 	},
-	updateSessions: assign({ sessions: (_, event) => event.sessions }),
+	updateSessions: assign({ sessions: (_, event) => event.data }),
 };
 
 export const searchLogMachine = Machine(

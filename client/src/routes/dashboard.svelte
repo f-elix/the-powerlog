@@ -73,6 +73,8 @@
     getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
   });
 
+  $: console.log($searchLogState.context)
+
   $: sessions = $searchLogState.context.sessions;
 </script>
 
@@ -109,7 +111,6 @@
       isError={$searchLogState.matches('error')}
       errorMessage={week.noResultMessage}
       {sessions} />
-
     <Button color="info" size="big" on:click={() => goto('/log')}>
       View full log
     </Button>
