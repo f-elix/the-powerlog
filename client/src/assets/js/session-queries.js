@@ -60,3 +60,42 @@ export function sessionRangeQuery(from, to) {
         queryName: 'getSessionRange'
     };
 }
+
+export function sessionNameQuery(title) {
+    return {
+        query: {
+            query: `
+                query searchByTitle($title: String!) {
+                    getSessionsByTitle(title: $title) {
+                        _id
+                        title
+                        sessionDate
+                    }
+                }
+            `,
+            variables: {
+                title
+            }
+        },
+        queryName: 'getSessionsByTitle'
+    }
+}
+
+export function sessionDateQuery(date) {
+    return {
+        query: {
+            query: `
+                query searchByDate($date: Date!) {
+                    getSessionsByDate(sessionDate: $date) {
+                    _id
+                    title
+                    sessionDate
+                    }
+                }
+            `,
+            variables: {
+                date
+            }
+        }
+    }
+}

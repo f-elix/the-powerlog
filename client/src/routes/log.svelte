@@ -7,7 +7,11 @@
   import { useMachine } from "@/fsm/useMachine.js";
 
   // js
-  import { sessionRangeQuery } from "@/assets/js/session-queries.js";
+  import {
+    sessionRangeQuery,
+    sessionNameQuery,
+    sessionDateQuery
+  } from "@/assets/js/session-queries.js";
 
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
@@ -26,10 +30,12 @@
 
   let sessions = [];
 
+  $: sessions = $searchLogState.context.sessions;
+
   let errorMessage = "No sessions found";
 
-  $: if ($searchLogState.matches("success")) {
-    sessions = [...sessions, ...$searchLogState.context.sessions];
+  $: if ($searchLogState.matches('error')) {
+    errorMessage = $searchLogState.context.error;
   }
 
   $: errorMessage =
@@ -45,7 +51,7 @@
       sessionRange.to
     );
     searchLogSend({
-      type: "SEARCH",
+      type: "LOAD_MORE",
       params: {
         query,
         queryName
@@ -66,13 +72,30 @@
       }
     });
   });
-  /* @TODO
-    Load 20 last sessions, then load more with a button
-    Load server filtered sessions when filter is applied
-    Apply filter as user types, debouncing with Xstate
-  */
+
+  function onNameFilterInput(event) {
+    const { query, queryName } = sessionNameQuery(event.detail);
+    searchLogSend({
+      type: "SEARCH",
+      params: {
+        query,
+        queryName
+      }
+    });
+  }
+
+  function onDateFilterInput(event) {
+    const { query, queryName } = sessionDateQuery(event.detail);
+    searchLogSend({
+      type: "SEARCH",
+      params: {
+        query,
+        queryName
+      }
+    });
+  }
+
   function onTimePeriodFilterInput() {}
-  function onFilterInput() {}
 </script>
 
 <style>
@@ -85,8 +108,9 @@
 </style>
 
 <ModuleSearchFilters
-  on:timeperiodfilter={onTimePeriodFilterInput}
-  on:input={onFilterInput} />
+  on:timeperiodfilterinput={onTimePeriodFilterInput}
+  on:datefilterinput={onDateFilterInput}
+  on:namefilterinput={onNameFilterInput} />
 <section>
   {#each sessions as session, i (session._id)}
     <!-- Date title -->
@@ -105,7 +129,7 @@
       date={session.sessionDate} />
   {/each}
   <div class="load-more-btn">
-    {#if $searchLogState.matches('fetching')}
+    {#if $searchLogState.matches('loadingmore')}
       <!-- Spinner -->
       <Spinner />
     {:else if $searchLogState.matches('success')}

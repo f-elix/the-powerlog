@@ -10,14 +10,30 @@
 
   const selectOptions = ["session name", "time period", "date"];
   let selectedOption = selectOptions[0];
+
+  // Session name form
+  function onNameInput(e) {
+    dispatch('namefilterinput', e.target.value)
+  }
+
+  // Date form
+  function onDateInput(e) {
+    dispatch('datefilterinput', e.target.value)
+  }
+
+  // Time period form
   let fromDate;
   let toDate;
   let isDatesValid = false;
-
+  let timePeriodError = null;
   $: isDatesValid = fromDate < toDate;
-
-  $: if (isDatesValid) {
-    dispatch("timeperiodfilter", { fromDate, toDate });
+  $: if (fromDate && toDate) {
+    if (isDatesValid) {
+      timePeriodError = null;
+      dispatch("timeperiodfilter", { fromDate, toDate });
+    } else {
+      timePeriodError = 'The second date must be later than the first';
+    }
   }
 </script>
 
@@ -44,8 +60,10 @@
     name="filter-selection" />
   <!-- Filter forms -->
   <form novalidate>
+    <!-- Name form -->
     {#if selectedOption === 'session name'}
-      <Input label="session name" name="session name" on:input />
+      <Input label="session name" name="session name" on:input={onNameInput} />
+    <!-- Time period form -->
     {:else if selectedOption === 'time period'}
       <Input
         type="date"
@@ -56,9 +74,11 @@
         type="date"
         label="to"
         name="to date"
+        errorMessage={timePeriodError}
         on:input={e => (toDate = e.target.value)} />
+    <!-- Date form -->
     {:else if selectedOption === 'date'}
-      <Input type="date" label="date" name="date date" on:input />
+      <Input type="date" label="date" name="date date" on:input={onDateInput} />
     {/if}
   </form>
 </section>

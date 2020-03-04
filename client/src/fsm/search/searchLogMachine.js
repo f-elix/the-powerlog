@@ -43,6 +43,9 @@ const actions = {
 		// router.push('/search-results').catch(err => console.log(err));
 	},
 	updateSessions: assign({ sessions: (_, event) => event.data }),
+	addSessions: assign({ sessions: (context, event) => [...context.sessions, ...event.data] }),
+	clearSessions: assign({ sessions: [] }),
+	updateError: assign({ error: (_, event) => event.data })
 };
 
 export const searchLogMachine = Machine(
@@ -50,6 +53,7 @@ export const searchLogMachine = Machine(
 		id: 'searchLog',
 		context: {
 			sessions: [],
+			error: ''
 		},
 		initial: 'idle',
 		states: {
@@ -66,13 +70,27 @@ export const searchLogMachine = Machine(
 						actions: ['updateSessions']
 					},
 					onError: {
+						target: 'error',
+						actions: ['updateError', 'clearSessions']
+					}
+				}
+			},
+			loadingmore: {
+				invoke: {
+					src: 'getSessions',
+					onDone: {
+						target: 'success',
+						actions: ['addSessions']
+					},
+					onError: {
 						target: 'error'
 					}
 				}
 			},
 			success: {
 				on: {
-					SEARCH: 'fetching'
+					SEARCH: 'fetching',
+					LOAD_MORE: 'loadingmore'
 				}
 			},
 			error: {
