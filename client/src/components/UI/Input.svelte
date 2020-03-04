@@ -24,6 +24,7 @@
     max-width: 40rem;
     font-size: var(--text-normal);
     cursor: text;
+    text-transform: capitalize;
   }
 
   input,
@@ -71,6 +72,7 @@
     color: var(--color-primary);
     transition: transform 0.2s, color 0.2s;
     transform-origin: 0 0;
+    text-transform: capitalize;
   }
 
   .label.textarea-label {
@@ -135,6 +137,7 @@
         {cols}
         {rows}
         {value}
+        on:input
         class:label-padding-textarea={label}
         {placeholder} />
       <span class="label textarea-label">{label}</span>
