@@ -12,9 +12,6 @@
 
 <style>
   .result-ctn {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
     min-height: 12rem;
     overflow: hidden;
   }
