@@ -1,6 +1,12 @@
 <script>
   // Svelte
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, getContext } from "svelte";
+
+  // js
+  import {
+    sessionNameQuery,
+    sessionDateQuery
+  } from "@/assets/js/session-queries.js";
 
   // Components
   import Select from "@/components/UI/Select.svelte";
@@ -8,18 +14,38 @@
 
   const dispatch = createEventDispatcher();
 
+  const { searchLogState, searchLogSend } = getContext("search");
+
   const selectOptions = ["session name", "time period", "date"];
   let selectedOption = selectOptions[0];
 
-  // Session name form
-  function onNameInput(e) {
-    dispatch("namefilterinput", e.target.value);
+  function onNameFilterInput(e) {
+    const value = e.target.value;
+    const { query, queryName } = sessionNameQuery(value);
+    searchLogSend({
+      type: "NAME_INPUT",
+      params: {
+        value,
+        query,
+        queryName
+      }
+    });
   }
 
-  // Date form
-  function onDateInput(e) {
-    dispatch("datefilterinput", e.target.value);
+  function onDateFilterInput(e) {
+    const value = e.target.value;
+    const { query, queryName } = sessionDateQuery(value);
+    searchLogSend({
+      type: "DATE_INPUT",
+      params: {
+        value,
+        query,
+        queryName
+      }
+    });
   }
+
+  function onTimePeriodFilterInput(e) {}
 
   // Time period form
   let fromDate;
@@ -61,7 +87,10 @@
   <form novalidate>
     <!-- Name form -->
     {#if selectedOption === 'session name'}
-      <Input label="session name" name="session name" on:input={onNameInput} />
+      <Input
+        label="session name"
+        name="session name"
+        on:input={onNameFilterInput} />
       <!-- Time period form -->
     {:else if selectedOption === 'time period'}
       <Input
@@ -77,7 +106,7 @@
         on:input={e => (toDate = e.target.value)} />
       <!-- Date form -->
     {:else if selectedOption === 'date'}
-      <Input type="date" label="date" name="date date" on:input={onDateInput} />
+      <Input type="date" label="date" name="date date" on:input={onDateFilterInput} />
     {/if}
   </form>
 </section>

@@ -1,17 +1,13 @@
 <script>
   // Svelte
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
 
   //   FSM
   import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
   import { useMachine } from "@/fsm/useMachine.js";
 
   // js
-  import {
-    sessionRangeQuery,
-    sessionNameQuery,
-    sessionDateQuery
-  } from "@/assets/js/session-queries.js";
+  import { sessionRangeQuery } from "@/assets/js/session-queries.js";
 
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
@@ -20,6 +16,11 @@
   import Spinner from "@/components/UI/Spinner.svelte";
 
   const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
+
+  setContext("search", {
+    searchLogState,
+    searchLogSend
+  });
 
   const range = 10;
 
@@ -72,30 +73,6 @@
       }
     });
   });
-
-  function onNameFilterInput(event) {
-    const { query, queryName } = sessionNameQuery(event.detail);
-    searchLogSend({
-      type: "SEARCH",
-      params: {
-        query,
-        queryName
-      }
-    });
-  }
-
-  function onDateFilterInput(event) {
-    const { query, queryName } = sessionDateQuery(event.detail);
-    searchLogSend({
-      type: "SEARCH",
-      params: {
-        query,
-        queryName
-      }
-    });
-  }
-
-  function onTimePeriodFilterInput() {}
 </script>
 
 <style>
@@ -107,10 +84,7 @@
   }
 </style>
 
-<ModuleSearchFilters
-  on:timeperiodfilterinput={onTimePeriodFilterInput}
-  on:datefilterinput={onDateFilterInput}
-  on:namefilterinput={onNameFilterInput} />
+<ModuleSearchFilters />
 <section>
   {#each sessions as session, i (session._id)}
     <!-- Date title -->

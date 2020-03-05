@@ -43,7 +43,6 @@ const guards = {
 	isDatesInvalid: (context, _) => context.periodFilter.from > context.periodFilter.to,
 	isNameEmpty: (context, _) => context.nameFilter.trim().length === 0,
 	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0,
-	isLoadMore: (_, event) => console.log(event),
 	alreadyHasSessions: (context, _) => context.sessions.length > 0
 };
 
@@ -86,26 +85,19 @@ export const searchLogMachine = Machine(
 					NAME_INPUT: [
 						{
 							actions: ['updateNameFilter', 'clearFilterError'],
-							cond: 'isNameEmpty',
-							target: 'idle.nameFilter.invalid.empty'
+							target: 'idle.nameFilter.validating'
 						},
-						{
-							target: 'fetching'
-						}
 					],
 					DATE_INPUT: [
 						{
 							actions: ['updateDateFilter', 'clearFilterError'],
-							cond: 'isDateEmpty',
-							target: 'idle.dateFilter.invalid.empty'
+							target: 'idle.dateFilter.validating'
 						},
-						{
-							target: 'fetching'
-						}
+
 					],
 					PERIOD_INPUT: [
 						{
-							actions: ['updatePerioFilter', 'clearFilterError'],
+							actions: ['updatePeriodFilter', 'clearFilterError'],
 							cond: 'isMissingInput',
 							target: 'idle.periodFilter.invalid.missingInput'
 						},
@@ -128,6 +120,19 @@ export const searchLogMachine = Machine(
 						initial: 'valid',
 						states: {
 							valid: {},
+							validating: {
+								on: {
+									'': [
+										{
+											cond: 'isNameEmpty',
+											target: 'invalid.empty'
+										},
+										{
+											target: '#fetching'
+										}
+									]
+								}
+							},
 							invalid: {
 								initial: 'empty',
 								states: {
@@ -140,6 +145,19 @@ export const searchLogMachine = Machine(
 						initial: 'valid',
 						states: {
 							valid: {},
+							validating: {
+								on: {
+									'': [
+										{
+											cond: 'isDateEmpty',
+											target: 'invalid.empty'
+										},
+										{
+											target: '#fetching'
+										}
+									]
+								}
+							},
 							invalid: {
 								initial: 'empty',
 								states: {
@@ -166,6 +184,7 @@ export const searchLogMachine = Machine(
 				}
 			},
 			fetching: {
+				id: 'fetching',
 				initial: 'firstload',
 				states: {
 					firstload: {

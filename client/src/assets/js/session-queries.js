@@ -96,6 +96,7 @@ export function sessionDateQuery(date) {
             variables: {
                 date
             }
-        }
+        },
+        queryName: 'getSessionsByDate'
     }
 }
