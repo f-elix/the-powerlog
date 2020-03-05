@@ -13,12 +13,12 @@
 
   // Session name form
   function onNameInput(e) {
-    dispatch('namefilterinput', e.target.value)
+    dispatch("namefilterinput", e.target.value);
   }
 
   // Date form
   function onDateInput(e) {
-    dispatch('datefilterinput', e.target.value)
+    dispatch("datefilterinput", e.target.value);
   }
 
   // Time period form
@@ -32,17 +32,16 @@
       timePeriodError = null;
       dispatch("timeperiodfilter", { fromDate, toDate });
     } else {
-      timePeriodError = 'The second date must be later than the first';
+      timePeriodError = "The second date must be later than the first";
     }
   }
 </script>
 
 <style>
   section {
-    padding: 1rem;
+    padding: 3rem 1rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
 
   form {
@@ -63,7 +62,7 @@
     <!-- Name form -->
     {#if selectedOption === 'session name'}
       <Input label="session name" name="session name" on:input={onNameInput} />
-    <!-- Time period form -->
+      <!-- Time period form -->
     {:else if selectedOption === 'time period'}
       <Input
         type="date"
@@ -76,7 +75,7 @@
         name="to date"
         errorMessage={timePeriodError}
         on:input={e => (toDate = e.target.value)} />
-    <!-- Date form -->
+      <!-- Date form -->
     {:else if selectedOption === 'date'}
       <Input type="date" label="date" name="date date" on:input={onDateInput} />
     {/if}

@@ -34,7 +34,7 @@
 
   let errorMessage = "No sessions found";
 
-  $: if ($searchLogState.matches('error')) {
+  $: if ($searchLogState.matches("error")) {
     errorMessage = $searchLogState.context.error;
   }
 
@@ -129,10 +129,10 @@
       date={session.sessionDate} />
   {/each}
   <div class="load-more-btn">
-    {#if $searchLogState.matches('loadingmore')}
+    {#if $searchLogState.matches('fetching')}
       <!-- Spinner -->
       <Spinner />
-    {:else if $searchLogState.matches('success')}
+    {:else if $searchLogState.matches('idle')}
       <!-- Load more btn -->
       <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
     {:else if $searchLogState.matches('error')}

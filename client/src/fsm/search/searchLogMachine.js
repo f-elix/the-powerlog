@@ -43,7 +43,7 @@ const guards = {
 	isDatesInvalid: (context, _) => context.periodFilter.from > context.periodFilter.to,
 	isNameEmpty: (context, _) => context.nameFilter.trim().length === 0,
 	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0,
-	isLoadMore: (_, event) => event.type === 'LOAD_MORE',
+	isLoadMore: (_, event) => console.log(event),
 	alreadyHasSessions: (context, _) => context.sessions.length > 0
 };
 
@@ -80,6 +80,7 @@ export const searchLogMachine = Machine(
 		initial: 'idle',
 		states: {
 			idle: {
+				id: 'idle',
 				type: 'parallel',
 				on: {
 					NAME_INPUT: [
@@ -119,7 +120,7 @@ export const searchLogMachine = Machine(
 					SEARCH: 'fetching',
 					LOAD_MORE: {
 						cond: 'alreadyHasSessions',
-						target: 'fetching'
+						target: 'fetching.loadmore'
 					}
 				},
 				states: {
@@ -165,26 +166,42 @@ export const searchLogMachine = Machine(
 				}
 			},
 			fetching: {
-				invoke: {
-					src: 'getSessions',
-					onDone: [
-						{
-							cond: 'isLoadMore',
-							target: 'idle',
-							actions: ['addSessions']
-						},
-						{
-							target: 'idle',
-							actions: ['updateSessions']
+				initial: 'firstload',
+				states: {
+					firstload: {
+						invoke: {
+							src: 'getSessions',
+							onDone: [
+								{
+									target: '#idle',
+									actions: ['updateSessions']
+								}
+							],
+							onError: {
+								target: '#error',
+								actions: ['updateFetchError', 'clearSessions']
+							}
 						}
-					],
-					onError: {
-						target: 'error',
-						actions: ['updateFetchError', 'clearSessions']
+					},
+					loadmore: {
+						invoke: {
+							src: 'getSessions',
+							onDone: [
+								{
+									target: '#idle',
+									actions: ['addSessions']
+								}
+							],
+							onError: {
+								target: '#error',
+								actions: ['updateFetchError', 'clearSessions']
+							}
+						}
 					}
 				}
 			},
 			error: {
+				id: 'error',
 				on: {
 					SEARCH: 'fetching'
 				}
