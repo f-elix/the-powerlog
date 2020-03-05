@@ -45,7 +45,35 @@
     });
   }
 
-  function onTimePeriodFilterInput(e) {}
+  function onTimePeriodFilterFromInput(e) {
+    const value = e.target.value;
+    const { query, queryName } = sessionDateQuery(value);
+    searchLogSend({
+      type: "PERIOD_INPUT",
+      params: {
+        value: {
+          from: value
+        },
+        query,
+        queryName
+      }
+    });
+  }
+
+  function onTimePeriodFilterToInput(e) {
+    const value = e.target.value;
+    const { query, queryName } = sessionDateQuery(value);
+    searchLogSend({
+      type: "PERIOD_INPUT",
+      params: {
+        value: {
+          to: value
+        },
+        query,
+        queryName
+      }
+    });
+  }
 
   // Time period form
   let fromDate;
