@@ -1,5 +1,7 @@
 import { Machine, assign } from 'xstate';
 
+const invalidDatesError = 'The second date must be later than the first';
+
 const services = {
 	getSessions: async (_, event) => {
 		const { query, queryName } = event.params;
@@ -35,17 +37,30 @@ const services = {
 	}
 };
 
+const guards = {
+	isMissingInput: (context, _) =>
+		context.periodFilter.from.trim().length === 0 || context.periodFilter.to.trim().length === 0,
+	isDatesInvalid: (context, _) => context.periodFilter.from > context.periodFilter.to,
+	isNameEmpty: (context, _) => context.nameFilter.trim().length === 0,
+	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0,
+	isLoadMore: (_, event) => event.type === 'LOAD_MORE',
+	alreadyHasSessions: (context, _) => context.sessions.length > 0
+};
+
 const actions = {
-	routeDashboard: () => {
-		// router.push('/dashboard').catch(err => console.log(err));
-	},
-	routeSearch: () => {
-		// router.push('/search-results').catch(err => console.log(err));
-	},
 	updateSessions: assign({ sessions: (_, event) => event.data }),
 	addSessions: assign({ sessions: (context, event) => [...context.sessions, ...event.data] }),
 	clearSessions: assign({ sessions: [] }),
-	updateError: assign({ error: (_, event) => event.data })
+	updateFetchError: assign({ fetchError: (_, event) => event.data }),
+	filterErrorInvalidDates: assign({ filterError: invalidDatesError }),
+	clearFilterError: assign({ filterError: null }),
+	updateNameFilter: assign({ nameFilter: (_, event) => event.params.value }),
+	updateDateFilter: assign({ dateFilter: (_, event) => event.params.value }),
+	updatePeriodFilter: assign({
+		periodFilter: (context, event) => {
+			return { ...context.periodFilter, ...event.params.value };
+		}
+	})
 };
 
 export const searchLogMachine = Machine(
@@ -53,44 +68,120 @@ export const searchLogMachine = Machine(
 		id: 'searchLog',
 		context: {
 			sessions: [],
-			error: ''
+			fetchError: '',
+			filterError: '',
+			nameFilter: '',
+			dateFilter: '',
+			periodFilter: {
+				from: '',
+				to: ''
+			}
 		},
 		initial: 'idle',
 		states: {
 			idle: {
+				type: 'parallel',
 				on: {
-					SEARCH: 'fetching'
+					NAME_INPUT: [
+						{
+							actions: ['updateNameFilter', 'clearFilterError'],
+							cond: 'isNameEmpty',
+							target: 'idle.nameFilter.invalid.empty'
+						},
+						{
+							target: 'fetching'
+						}
+					],
+					DATE_INPUT: [
+						{
+							actions: ['updateDateFilter', 'clearFilterError'],
+							cond: 'isDateEmpty',
+							target: 'idle.dateFilter.invalid.empty'
+						},
+						{
+							target: 'fetching'
+						}
+					],
+					PERIOD_INPUT: [
+						{
+							actions: ['updatePerioFilter', 'clearFilterError'],
+							cond: 'isMissingInput',
+							target: 'idle.periodFilter.invalid.missingInput'
+						},
+						{
+							cond: 'isDatesInvalid',
+							target: 'idle.periodFilter.invalid.invalidDates'
+						},
+						{
+							target: 'fetching'
+						}
+					],
+					SEARCH: 'fetching',
+					LOAD_MORE: {
+						cond: 'alreadyHasSessions',
+						target: 'fetching'
+					}
+				},
+				states: {
+					nameFilter: {
+						initial: 'valid',
+						states: {
+							valid: {},
+							invalid: {
+								initial: 'empty',
+								states: {
+									empty: {}
+								}
+							}
+						}
+					},
+					dateFilter: {
+						initial: 'valid',
+						states: {
+							valid: {},
+							invalid: {
+								initial: 'empty',
+								states: {
+									empty: {}
+								}
+							}
+						}
+					},
+					periodFilter: {
+						initial: 'valid',
+						states: {
+							valid: {},
+							invalid: {
+								initial: 'missingInput',
+								states: {
+									missingInput: {},
+									invalidDates: {
+										entry: ['filterErrorInvalidDates']
+									}
+								}
+							}
+						}
+					}
 				}
 			},
 			fetching: {
 				invoke: {
 					src: 'getSessions',
-					onDone: {
-						target: 'success',
-						actions: ['updateSessions']
-					},
+					onDone: [
+						{
+							cond: 'isLoadMore',
+							target: 'idle',
+							actions: ['addSessions']
+						},
+						{
+							target: 'idle',
+							actions: ['updateSessions']
+						}
+					],
 					onError: {
 						target: 'error',
-						actions: ['updateError', 'clearSessions']
+						actions: ['updateFetchError', 'clearSessions']
 					}
-				}
-			},
-			loadingmore: {
-				invoke: {
-					src: 'getSessions',
-					onDone: {
-						target: 'success',
-						actions: ['addSessions']
-					},
-					onError: {
-						target: 'error'
-					}
-				}
-			},
-			success: {
-				on: {
-					SEARCH: 'fetching',
-					LOAD_MORE: 'loadingmore'
 				}
 			},
 			error: {
@@ -102,6 +193,7 @@ export const searchLogMachine = Machine(
 	},
 	{
 		services,
-		actions
+		actions,
+		guards
 	}
 );
