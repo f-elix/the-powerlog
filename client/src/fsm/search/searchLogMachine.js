@@ -51,7 +51,8 @@ const actions = {
 	addSessions: assign({ sessions: (context, event) => [...context.sessions, ...event.data] }),
 	updateFilteredSessions: assign({ filteredSessions: (_, event) => event.data }),
 	clearSessions: assign({ sessions: [] }),
-	updateFetchError: assign({ fetchError: (_, event) => event.data }),
+	updateFetchError: assign({ fetchError: (_, event) => event.data.message }),
+	clearFetchError: assign({ fetchError: '' }),
 	filterErrorInvalidDates: assign({ filterError: invalidDatesError }),
 	clearFilterError: assign({ filterError: null }),
 	updateNameFilter: assign({ nameFilter: (_, event) => event.params.value }),
@@ -103,10 +104,14 @@ export const searchLogMachine = Machine(
 							target: 'idle.periodFilter.validating'
 						}
 					],
-					SEARCH: 'fetching',
+					SEARCH: {
+						target: 'fetching',
+						actions: ['clearFetchError']
+					},
 					LOAD_MORE: {
 						cond: 'alreadyHasSessions',
-						target: 'fetching.loadingmore'
+						target: 'fetching.loadingmore',
+						actions: ['clearFetchError']
 					}
 				},
 				states: {

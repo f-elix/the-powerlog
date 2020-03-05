@@ -71,6 +71,7 @@
   });
 
   $: sessions = $searchLogState.context.sessions;
+  $: error = $searchLogState.context.fetchError.length > 0;
 </script>
 
 <style>
@@ -103,7 +104,7 @@
     <ModuleDashboardResults
       isLoading={$searchLogState.matches('fetching')}
       isSuccess={$searchLogState.matches('idle')}
-      isError={$searchLogState.matches('error')}
+      isError={error}
       errorMessage={week.noResultMessage}
       {sessions} />
     <Button color="info" size="big" on:click={() => goto('/log')}>
