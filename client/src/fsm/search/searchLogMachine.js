@@ -98,15 +98,7 @@ export const searchLogMachine = Machine(
 					PERIOD_INPUT: [
 						{
 							actions: ['updatePeriodFilter', 'clearFilterError'],
-							cond: 'isMissingInput',
-							target: 'idle.periodFilter.invalid.missingInput'
-						},
-						{
-							cond: 'isDatesInvalid',
-							target: 'idle.periodFilter.invalid.invalidDates'
-						},
-						{
-							target: 'fetching'
+							target: 'idle.periodFilter.validating'
 						}
 					],
 					SEARCH: 'fetching',
@@ -170,6 +162,23 @@ export const searchLogMachine = Machine(
 						initial: 'valid',
 						states: {
 							valid: {},
+							validating: {
+								on: {
+									'': [
+										{
+											cond: 'isMissingInput',
+											target: 'invalid.missingInput'
+										},
+										{
+											cond: 'isDatesInvalid',
+											target: 'invalid.invalidDates',
+										},
+										{
+											target: '#fetching'
+										}
+									]
+								}
+							},
 							invalid: {
 								initial: 'missingInput',
 								states: {

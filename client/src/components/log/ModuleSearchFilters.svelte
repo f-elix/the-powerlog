@@ -5,7 +5,8 @@
   // js
   import {
     sessionNameQuery,
-    sessionDateQuery
+    sessionDateQuery,
+    sessionPeriodQuery
   } from "@/assets/js/session-queries.js";
 
   // Components
@@ -47,7 +48,7 @@
 
   function onTimePeriodFilterFromInput(e) {
     const value = e.target.value;
-    const { query, queryName } = sessionDateQuery(value);
+    const { query, queryName } = sessionPeriodQuery(value);
     searchLogSend({
       type: "PERIOD_INPUT",
       params: {
@@ -62,7 +63,7 @@
 
   function onTimePeriodFilterToInput(e) {
     const value = e.target.value;
-    const { query, queryName } = sessionDateQuery(value);
+    const { query, queryName } = sessionPeriodQuery(value);
     searchLogSend({
       type: "PERIOD_INPUT",
       params: {
@@ -125,13 +126,13 @@
         type="date"
         label="from"
         name="from date"
-        on:input={e => (fromDate = e.target.value)} />
+        on:input={onTimePeriodFilterFromInput} />
       <Input
         type="date"
         label="to"
         name="to date"
         errorMessage={timePeriodError}
-        on:input={e => (toDate = e.target.value)} />
+        on:input={onTimePeriodFilterToInput} />
       <!-- Date form -->
     {:else if selectedOption === 'date'}
       <Input type="date" label="date" name="date date" on:input={onDateFilterInput} />

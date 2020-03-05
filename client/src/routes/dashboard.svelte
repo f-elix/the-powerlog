@@ -10,10 +10,7 @@
 
   // js
   import { currentWeekDates, lastWeekDates } from "@/assets/js/utils.js";
-  import {
-    currentWeekQuery,
-    lastWeekQuery
-  } from "@/assets/js/session-queries.js";
+  import { sessionPeriodQuery } from "@/assets/js/session-queries.js";
 
   // Components
   import Button from "@/components/UI/Button.svelte";
@@ -63,14 +60,14 @@
 
   function toggleWeek() {
     if (week === currentWeek) {
-      getLastWeek(lastWeekQuery(lastMonday, lastSunday));
+      getLastWeek(sessionPeriodQuery(lastMonday, lastSunday));
     } else {
-      getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
+      getCurrentWeek(sessionPeriodQuery(currentMonday, currentSunday));
     }
   }
 
   onMount(() => {
-    getCurrentWeek(currentWeekQuery(currentMonday, currentSunday));
+    getCurrentWeek(sessionPeriodQuery(currentMonday, currentSunday));
   });
 
   $: sessions = $searchLogState.context.sessions;

@@ -1,8 +1,8 @@
-export const currentWeekQuery = (monday, sunday) => {
+export function sessionPeriodQuery(from, to) {
     return {
         query: {
             query: `
-            query getCurrentWeek($fromDate: Date!, $toDate: Date!) {
+            query getSessionsFromTo($fromDate: Date!, $toDate: Date!) {
                 getSessionsFromTo(fromDate: $fromDate, toDate: $toDate) {
                     _id
                     title
@@ -11,34 +11,13 @@ export const currentWeekQuery = (monday, sunday) => {
             }
         `,
             variables: {
-                fromDate: monday,
-                toDate: sunday
+                fromDate: from,
+                toDate: to
             }
         },
         queryName: 'getSessionsFromTo'
     }
-};
-
-export const lastWeekQuery = (monday, sunday) => {
-    return {
-        query: {
-            query: `
-            query getLastWeek($fromDate: Date!, $toDate: Date!) {
-                getSessionsFromTo(fromDate: $fromDate, toDate: $toDate) {
-                    _id
-                    title
-                    sessionDate
-                }
-            }
-        `,
-            variables: {
-                fromDate: monday,
-                toDate: sunday
-            }
-        },
-        queryName: 'getSessionsFromTo'
-    }
-};
+}
 
 export function sessionRangeQuery(from, to) {
     return {
