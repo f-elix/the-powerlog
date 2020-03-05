@@ -105,7 +105,7 @@
     <!-- Search results -->
     <ModuleDashboardResults
       isLoading={$searchLogState.matches('fetching')}
-      isSuccess={$searchLogState.matches('success')}
+      isSuccess={$searchLogState.matches('idle')}
       isError={$searchLogState.matches('error')}
       errorMessage={week.noResultMessage}
       {sessions} />
