@@ -32,6 +32,9 @@
   let sessions = [];
 
   $: sessions = $searchLogState.context.sessions;
+  $: filteredSessions = $searchLogState.context.filteredSessions;
+
+  $: displayedSessions = filteredSessions ? filteredSessions : sessions;
 
   let errorMessage = "No sessions found";
 
@@ -86,9 +89,9 @@
 
 <ModuleSearchFilters />
 <section>
-  {#each sessions as session, i (session._id)}
+  {#each displayedSessions as session, i (session._id)}
     <!-- Date title -->
-    {#if !sessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(sessions[i - 1].sessionDate).getMonth()}
+    {#if !displayedSessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(displayedSessions[i - 1].sessionDate).getMonth()}
       <h3>
         {new Date(session.sessionDate).toLocaleString('default', {
           month: 'long'
@@ -109,7 +112,7 @@
     {:else if $searchLogState.matches('idle')}
       <!-- Load more btn -->
       <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
-    {:else if $searchLogState.matches('error')}
+    {:else if errorMessage}
       <!-- Error message -->
       <h3>{errorMessage}</h3>
     {/if}

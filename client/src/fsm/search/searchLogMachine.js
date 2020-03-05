@@ -49,6 +49,7 @@ const guards = {
 const actions = {
 	updateSessions: assign({ sessions: (_, event) => event.data }),
 	addSessions: assign({ sessions: (context, event) => [...context.sessions, ...event.data] }),
+	updateFilteredSessions: assign({ filteredSessions: (_, event) => event.data }),
 	clearSessions: assign({ sessions: [] }),
 	updateFetchError: assign({ fetchError: (_, event) => event.data }),
 	filterErrorInvalidDates: assign({ filterError: invalidDatesError }),
@@ -67,6 +68,7 @@ export const searchLogMachine = Machine(
 		id: 'searchLog',
 		context: {
 			sessions: [],
+			filteredSessions: [],
 			fetchError: '',
 			filterError: '',
 			nameFilter: '',
@@ -104,7 +106,7 @@ export const searchLogMachine = Machine(
 					SEARCH: 'fetching',
 					LOAD_MORE: {
 						cond: 'alreadyHasSessions',
-						target: 'fetching.loadmore'
+						target: 'fetching.loadingmore'
 					}
 				},
 				states: {
@@ -194,9 +196,9 @@ export const searchLogMachine = Machine(
 			},
 			fetching: {
 				id: 'fetching',
-				initial: 'firstload',
+				initial: 'loading',
 				states: {
-					firstload: {
+					loading: {
 						invoke: {
 							src: 'getSessions',
 							onDone: [
@@ -206,12 +208,12 @@ export const searchLogMachine = Machine(
 								}
 							],
 							onError: {
-								target: '#error',
+								target: '#idle',
 								actions: ['updateFetchError', 'clearSessions']
 							}
 						}
 					},
-					loadmore: {
+					loadingmore: {
 						invoke: {
 							src: 'getSessions',
 							onDone: [
@@ -221,17 +223,26 @@ export const searchLogMachine = Machine(
 								}
 							],
 							onError: {
-								target: '#error',
+								target: '#idle',
+								actions: ['updateFetchError', 'clearSessions']
+							}
+						}
+					},
+					filtering: {
+						invoke: {
+							src: 'getSessions',
+							onDone: [
+								{
+									target: '#idle',
+									actions: ['updateFilteredSessions']
+								}
+							],
+							onError: {
+								target: '#idle',
 								actions: ['updateFetchError', 'clearSessions']
 							}
 						}
 					}
-				}
-			},
-			error: {
-				id: 'error',
-				on: {
-					SEARCH: 'fetching'
 				}
 			}
 		}

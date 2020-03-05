@@ -76,20 +76,8 @@
     });
   }
 
-  // Time period form
-  let fromDate;
-  let toDate;
-  let isDatesValid = false;
-  let timePeriodError = null;
-  $: isDatesValid = fromDate < toDate;
-  $: if (fromDate && toDate) {
-    if (isDatesValid) {
-      timePeriodError = null;
-      dispatch("timeperiodfilter", { fromDate, toDate });
-    } else {
-      timePeriodError = "The second date must be later than the first";
-    }
-  }
+  $: timePeriodError = $searchLogState.context.filterError;
+
 </script>
 
 <style>
