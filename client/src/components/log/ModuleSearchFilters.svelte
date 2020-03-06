@@ -13,71 +13,67 @@
   import Select from "@/components/UI/Select.svelte";
   import Input from "@/components/UI/Input.svelte";
 
-  const dispatch = createEventDispatcher();
+  const { filterLogState, filterLogSend } = getContext("filter");
 
-  const { searchLogState, searchLogSend } = getContext("search");
+  const dispatch = createEventDispatcher();
 
   const selectOptions = ["session name", "time period", "date"];
   let selectedOption = selectOptions[0];
 
+  $: timePeriodError = $filterLogState.context.filterError;
+
   function onNameFilterInput(e) {
     const value = e.target.value;
-    const { query, queryName } = sessionNameQuery(value);
-    searchLogSend({
+    filterLogSend({
       type: "NAME_INPUT",
       params: {
-        value,
-        query,
-        queryName
+        value
       }
     });
   }
 
   function onDateFilterInput(e) {
-    const value = e.target.value;
-    const { query, queryName } = sessionDateQuery(value);
-    searchLogSend({
-      type: "DATE_INPUT",
-      params: {
-        value,
-        query,
-        queryName
-      }
-    });
+    // const value = e.target.value;
+    // const { query, queryName } = sessionDateQuery(value);
+    // searchLogSend({
+    //   type: "DATE_INPUT",
+    //   params: {
+    //     value,
+    //     query,
+    //     queryName
+    //   }
+    // });
   }
 
   function onTimePeriodFilterFromInput(e) {
-    const value = e.target.value;
-    const { query, queryName } = sessionPeriodQuery(value);
-    searchLogSend({
-      type: "PERIOD_INPUT",
-      params: {
-        value: {
-          from: value
-        },
-        query,
-        queryName
-      }
-    });
+    // const value = e.target.value;
+    // const { query, queryName } = sessionPeriodQuery(value);
+    // searchLogSend({
+    //   type: "PERIOD_INPUT",
+    //   params: {
+    //     value: {
+    //       from: value
+    //     },
+    //     query,
+    //     queryName
+    //   }
+    // });
   }
 
   function onTimePeriodFilterToInput(e) {
-    const value = e.target.value;
-    const { query, queryName } = sessionPeriodQuery(value);
-    searchLogSend({
-      type: "PERIOD_INPUT",
-      params: {
-        value: {
-          to: value
-        },
-        query,
-        queryName
-      }
-    });
+    // const value = e.target.value;
+    // const { query, queryName } = sessionPeriodQuery(value);
+    // searchLogSend({
+    //   type: "PERIOD_INPUT",
+    //   params: {
+    //     value: {
+    //       to: value
+    //     },
+    //     query,
+    //     queryName
+    //   }
+    // });
   }
-
-  $: timePeriodError = $searchLogState.context.filterError;
-
 </script>
 
 <style>
@@ -123,7 +119,11 @@
         on:input={onTimePeriodFilterToInput} />
       <!-- Date form -->
     {:else if selectedOption === 'date'}
-      <Input type="date" label="date" name="date date" on:input={onDateFilterInput} />
+      <Input
+        type="date"
+        label="date"
+        name="date date"
+        on:input={onDateFilterInput} />
     {/if}
   </form>
 </section>

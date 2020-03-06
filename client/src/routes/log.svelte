@@ -4,10 +4,8 @@
 
   //   FSM
   import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
+  import { filterLogMachine } from "@/fsm/search/filterLogMachine.js";
   import { useMachine } from "@/fsm/useMachine.js";
-
-  // js
-  import { sessionRangeQuery } from "@/assets/js/session-queries.js";
 
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
@@ -16,65 +14,34 @@
   import Spinner from "@/components/UI/Spinner.svelte";
 
   const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
+  const { filterLogState, filterLogSend } = useMachine(filterLogMachine);
 
-  setContext("search", {
-    searchLogState,
-    searchLogSend
+  setContext("filter", {
+    filterLogState,
+    filterLogSend
   });
 
-  const range = 10;
-
-  let sessionRange = {
-    from: 1,
-    to: range
-  };
-
+  let filteredSessions = [];
+  let loadedSessions = [];
   let sessions = [];
-
-  $: sessions = $searchLogState.context.sessions;
-  $: filteredSessions = $searchLogState.context.filteredSessions;
-
-  $: displayedSessions = filteredSessions ? filteredSessions : sessions;
-
   let errorMessage = "No sessions found";
+  let error = false;
 
-  $: if ($searchLogState.matches("error")) {
-    errorMessage = $searchLogState.context.error;
-  }
+  // @TODO show error if no filtered sessions and filter applied
 
+  $: filteredSessions = $filterLogState.context.sessions;
+  $: loadedSessions = $searchLogState.context.sessions;
+  $: sessions = filteredSessions.length > 0 ? filteredSessions : loadedSessions;
+  $: error = !!$searchLogState.context.error;
   $: errorMessage =
     sessions.length > 0 ? "No more sessions found" : errorMessage;
 
   function onLoadMore() {
-    sessionRange = {
-      from: sessionRange.from + range,
-      to: sessionRange.to + range
-    };
-    const { query, queryName } = sessionRangeQuery(
-      sessionRange.from,
-      sessionRange.to
-    );
-    searchLogSend({
-      type: "LOAD_MORE",
-      params: {
-        query,
-        queryName
-      }
-    });
+    searchLogSend({ type: "LOAD_MORE" });
   }
 
   onMount(() => {
-    const { query, queryName } = sessionRangeQuery(
-      sessionRange.from,
-      sessionRange.to
-    );
-    searchLogSend({
-      type: "SEARCH",
-      params: {
-        query,
-        queryName
-      }
-    });
+    onLoadMore();
   });
 </script>
 
@@ -89,9 +56,9 @@
 
 <ModuleSearchFilters />
 <section>
-  {#each displayedSessions as session, i (session._id)}
+  {#each sessions as session, i (session._id)}
     <!-- Date title -->
-    {#if !displayedSessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(displayedSessions[i - 1].sessionDate).getMonth()}
+    {#if !sessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(sessions[i - 1].sessionDate).getMonth()}
       <h3>
         {new Date(session.sessionDate).toLocaleString('default', {
           month: 'long'
@@ -109,7 +76,7 @@
     {#if $searchLogState.matches('fetching')}
       <!-- Spinner -->
       <Spinner />
-    {:else if $searchLogState.matches('idle')}
+    {:else if $searchLogState.matches('idle') && !error}
       <!-- Load more btn -->
       <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
     {:else if errorMessage}
