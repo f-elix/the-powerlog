@@ -27,14 +27,13 @@
   let errorMessage = "No sessions found";
   let error = false;
 
-  // @TODO show error if no filtered sessions and filter applied
-
   $: filteredSessions = $filterLogState.context.sessions;
   $: loadedSessions = $searchLogState.context.sessions;
   $: sessions = filteredSessions.length > 0 ? filteredSessions : loadedSessions;
-  $: error = !!$searchLogState.context.error;
-  $: errorMessage =
+  $: loadMoreError = !!$searchLogState.context.error;
+  $: loadMoreErrorMessage =
     sessions.length > 0 ? "No more sessions found" : errorMessage;
+  $: filterFetchError = !!$filterLogState.context.fetchError;
 
   function onLoadMore() {
     searchLogSend({ type: "LOAD_MORE" });
@@ -46,6 +45,10 @@
 </script>
 
 <style>
+  .sessions-ctn .error-message {
+    text-align: center;
+  }
+
   .load-more-btn {
     display: flex;
     justify-content: center;
@@ -55,23 +58,30 @@
 </style>
 
 <ModuleSearchFilters />
-<section>
-  {#each sessions as session, i (session._id)}
-    <!-- Date title -->
-    {#if !sessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(sessions[i - 1].sessionDate).getMonth()}
-      <h3>
-        {new Date(session.sessionDate).toLocaleString('default', {
-          month: 'long'
-        })}
-        {new Date(session.sessionDate).getFullYear()}
-      </h3>
-    {/if}
-    <!-- Search results -->
-    <CardSearchResult
-      sessionName={session.title}
-      sessionId={session._id}
-      date={session.sessionDate} />
-  {/each}
+<section class="sessions-ctn">
+  <!-- SESSIONS -->
+  {#if filterFetchError}
+    <h3 class="error-message">{errorMessage}</h3>
+  {:else}
+    {#each sessions as session, i (session._id)}
+      <!-- Date title -->
+      {#if !sessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(sessions[i - 1].sessionDate).getMonth()}
+        <h3>
+          {new Date(session.sessionDate).toLocaleString('default', {
+            month: 'long'
+          })}
+          {new Date(session.sessionDate).getFullYear()}
+        </h3>
+      {/if}
+      <!-- Search results -->
+      <CardSearchResult
+        sessionName={session.title}
+        sessionId={session._id}
+        date={session.sessionDate} />
+    {/each}
+  {/if}
+  <!-- LOAD MORE -->
+  {#if sessions === loadedSessions && !filterFetchError}
   <div class="load-more-btn">
     {#if $searchLogState.matches('fetching')}
       <!-- Spinner -->
@@ -79,9 +89,10 @@
     {:else if $searchLogState.matches('idle') && !error}
       <!-- Load more btn -->
       <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
-    {:else if errorMessage}
+    {:else if loadMoreError}
       <!-- Error message -->
-      <h3>{errorMessage}</h3>
+      <h3>{loadMoreErrorMessage}</h3>
     {/if}
   </div>
+  {/if}
 </section>

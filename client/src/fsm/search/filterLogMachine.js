@@ -1,49 +1,62 @@
 import { Machine, assign } from 'xstate';
-import { sessionNameQuery } from '@/assets/js/session-queries.js';
+import { sessionNameQuery, sessionDateQuery, sessionPeriodQuery } from '@/assets/js/session-queries.js';
 
 const invalidDatesError = 'The second date must be later than the first';
+
+const sessions = async (query, queryName) => {
+	const token = localStorage.getItem(process.env.APP_TOKEN);
+	try {
+		const res = await fetch(process.env.APP_API, {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json',
+				authorization: token
+			},
+			body: JSON.stringify(query)
+		});
+		const data = await res.json();
+		if (data.errors) {
+			const error = new Error();
+			error.message = data.errors[0].message;
+			error.statusCode = data.errors[0].extensions.exception.statusCode;
+			throw error;
+		}
+		const sessions = data.data[queryName];
+		if (!sessions.length) {
+			const error = new Error();
+			error.message = 'No results found';
+			error.statusCode = 404;
+			throw error;
+		}
+		return sessions;
+	} catch (err) {
+		console.log(err);
+		throw err;
+	}
+};
 
 const services = {
 	getSessionsByTitle: async (context, _) => {
 		const { query, queryName } = sessionNameQuery(context.nameFilter);
-		const token = localStorage.getItem(process.env.APP_TOKEN);
-		try {
-			const res = await fetch(process.env.APP_API, {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json',
-					authorization: token
-				},
-				body: JSON.stringify(query)
-			});
-			const data = await res.json();
-			if (data.errors) {
-				const error = new Error();
-				error.message = data.errors[0].message;
-				error.statusCode = data.errors[0].extensions.exception.statusCode;
-				throw error;
-			}
-			const sessions = data.data[queryName];
-			if (!sessions.length) {
-				const error = new Error();
-				error.message = 'No results found';
-				error.statusCode = 404;
-				throw error;
-			}
-			return sessions;
-		} catch (err) {
-			console.log(err);
-			throw err;
-		}
+		return sessions(query, queryName);
+	},
+	getSessionsByDate: async (context, _) => {
+		const { query, queryName } = sessionDateQuery(context.dateFilter);
+		return sessions(query, queryName);
+	},
+	getSessionsFromTo: async (context, _) => {
+		const { query, queryName } = sessionPeriodQuery(context.periodFilter.from, context.periodFilter.to);
+		return sessions(query, queryName);
 	}
 };
 
 const guards = {
+	isPeriodEmpty: (context, _) => context.periodFilter.from.trim().length === 0 && context.periodFilter.to.trim().length === 0,
 	isMissingInput: (context, _) =>
 		context.periodFilter.from.trim().length === 0 || context.periodFilter.to.trim().length === 0,
 	isDatesInvalid: (context, _) => context.periodFilter.from > context.periodFilter.to,
 	isNameEmpty: (context, _) => context.nameFilter.trim().length === 0,
-	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0
+	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0,
 };
 
 const actions = {
@@ -88,19 +101,19 @@ export const filterLogMachine = Machine(
 				on: {
 					NAME_INPUT: [
 						{
-							actions: ['updateNameFilter', 'clearFilterError'],
+							actions: ['updateNameFilter', 'clearFilterError', 'clearFetchError'],
 							target: 'idle.nameFilter.validating'
 						}
 					],
 					DATE_INPUT: [
 						{
-							actions: ['updateDateFilter', 'clearFilterError'],
+							actions: ['updateDateFilter', 'clearFilterError', 'clearFetchError'],
 							target: 'idle.dateFilter.validating'
 						}
 					],
 					PERIOD_INPUT: [
 						{
-							actions: ['updatePeriodFilter', 'clearFilterError'],
+							actions: ['updatePeriodFilter', 'clearFilterError', 'clearFetchError'],
 							target: 'idle.periodFilter.validating'
 						}
 					]
@@ -112,12 +125,10 @@ export const filterLogMachine = Machine(
 							valid: {},
 							validating: {
 								on: {
-									'': [
-										{
-											cond: 'isNameEmpty',
-											target: 'invalid.empty'
-										}
-									],
+									'': {
+										cond: 'isNameEmpty',
+										target: 'invalid.empty'
+									},
 									NAME_INPUT: {
 										actions: ['updateNameFilter', 'clearFilterError'],
 										target: 'validating'
@@ -149,7 +160,7 @@ export const filterLogMachine = Machine(
 											target: 'invalid.empty'
 										},
 										{
-											target: '#filtering'
+											target: '#filtering.byDate'
 										}
 									]
 								}
@@ -157,7 +168,9 @@ export const filterLogMachine = Machine(
 							invalid: {
 								initial: 'empty',
 								states: {
-									empty: {}
+									empty: {
+										entry: ['clearSessions']
+									}
 								}
 							}
 						}
@@ -170,6 +183,10 @@ export const filterLogMachine = Machine(
 								on: {
 									'': [
 										{
+											cond: 'isPeriodEmpty',
+											target: 'invalid.empty'
+										},
+										{
 											cond: 'isMissingInput',
 											target: 'invalid.missingInput'
 										},
@@ -178,14 +195,17 @@ export const filterLogMachine = Machine(
 											target: 'invalid.invalidDates'
 										},
 										{
-											target: '#filtering'
+											target: '#filtering.byPeriod'
 										}
 									]
 								}
 							},
 							invalid: {
-								initial: 'missingInput',
+								initial: 'empty',
 								states: {
+									empty: {
+										entry: ['clearSessions']
+									},
 									missingInput: {},
 									invalidDates: {
 										entry: ['filterErrorInvalidDates']
@@ -214,8 +234,36 @@ export const filterLogMachine = Machine(
 							}
 						}
 					},
-					byDate: {},
-					byPeriod: {}
+					byDate: {
+						invoke: {
+							src: 'getSessionsByDate',
+							onDone: [
+								{
+									target: '#idle',
+									actions: ['updateSessions']
+								}
+							],
+							onError: {
+								target: '#idle',
+								actions: ['updateFetchError', 'clearSessions']
+							}
+						}
+					},
+					byPeriod: {
+						invoke: {
+							src: 'getSessionsFromTo',
+							onDone: [
+								{
+									target: '#idle',
+									actions: ['updateSessions']
+								}
+							],
+							onError: {
+								target: '#idle',
+								actions: ['updateFetchError', 'clearSessions']
+							}
+						}
+					}
 				}
 			}
 		}

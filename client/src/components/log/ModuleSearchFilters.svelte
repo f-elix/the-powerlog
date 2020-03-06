@@ -33,46 +33,37 @@
   }
 
   function onDateFilterInput(e) {
-    // const value = e.target.value;
-    // const { query, queryName } = sessionDateQuery(value);
-    // searchLogSend({
-    //   type: "DATE_INPUT",
-    //   params: {
-    //     value,
-    //     query,
-    //     queryName
-    //   }
-    // });
+    const value = e.target.value;
+    filterLogSend({
+      type: "DATE_INPUT",
+      params: {
+        value
+      }
+    });
   }
 
   function onTimePeriodFilterFromInput(e) {
-    // const value = e.target.value;
-    // const { query, queryName } = sessionPeriodQuery(value);
-    // searchLogSend({
-    //   type: "PERIOD_INPUT",
-    //   params: {
-    //     value: {
-    //       from: value
-    //     },
-    //     query,
-    //     queryName
-    //   }
-    // });
+    const value = e.target.value;
+    filterLogSend({
+      type: "PERIOD_INPUT",
+      params: {
+        value: {
+          from: value
+        }
+      }
+    });
   }
 
   function onTimePeriodFilterToInput(e) {
-    // const value = e.target.value;
-    // const { query, queryName } = sessionPeriodQuery(value);
-    // searchLogSend({
-    //   type: "PERIOD_INPUT",
-    //   params: {
-    //     value: {
-    //       to: value
-    //     },
-    //     query,
-    //     queryName
-    //   }
-    // });
+    const value = e.target.value;
+    filterLogSend({
+      type: "PERIOD_INPUT",
+      params: {
+        value: {
+          to: value
+        }
+      }
+    });
   }
 </script>
 
