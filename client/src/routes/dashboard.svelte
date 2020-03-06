@@ -71,7 +71,7 @@
   });
 
   $: sessions = $searchLogState.context.sessions;
-  $: error = $searchLogState.context.fetchError.length > 0;
+  $: error = $searchLogState.context.error.length > 0;
 </script>
 
 <style>
