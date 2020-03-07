@@ -79,8 +79,6 @@
   function onOutroEnd() {
     filterDisplaySend({ type: "TRANSITIONEND" });
   }
-
-  $: console.log($filterLogState);
 </script>
 
 <style>
