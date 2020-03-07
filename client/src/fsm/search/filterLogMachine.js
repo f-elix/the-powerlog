@@ -51,12 +51,13 @@ const services = {
 };
 
 const guards = {
-	isPeriodEmpty: (context, _) => context.periodFilter.from.trim().length === 0 && context.periodFilter.to.trim().length === 0,
+	isPeriodEmpty: (context, _) =>
+		context.periodFilter.from.trim().length === 0 && context.periodFilter.to.trim().length === 0,
 	isMissingInput: (context, _) =>
 		context.periodFilter.from.trim().length === 0 || context.periodFilter.to.trim().length === 0,
 	isDatesInvalid: (context, _) => context.periodFilter.from > context.periodFilter.to,
 	isNameEmpty: (context, _) => context.nameFilter.trim().length === 0,
-	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0,
+	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0
 };
 
 const actions = {
@@ -65,7 +66,7 @@ const actions = {
 	updateFetchError: assign({ fetchError: (_, event) => event.data.message }),
 	clearFetchError: assign({ fetchError: '' }),
 	filterErrorInvalidDates: assign({ filterError: invalidDatesError }),
-	clearFilterError: assign({ filterError: null }),
+	clearFilterError: assign({ filterError: '' }),
 	updateNameFilter: assign({ nameFilter: (_, event) => event.params.value }),
 	updateDateFilter: assign({ dateFilter: (_, event) => event.params.value }),
 	updatePeriodFilter: assign({
@@ -122,7 +123,9 @@ export const filterLogMachine = Machine(
 					nameFilter: {
 						initial: 'valid',
 						states: {
-							valid: {},
+							valid: {
+								entry: ['clearFilterError']
+							},
 							validating: {
 								on: {
 									'': {
@@ -151,7 +154,9 @@ export const filterLogMachine = Machine(
 					dateFilter: {
 						initial: 'valid',
 						states: {
-							valid: {},
+							valid: {
+								entry: ['clearFilterError']
+							},
 							validating: {
 								on: {
 									'': [
@@ -178,7 +183,9 @@ export const filterLogMachine = Machine(
 					periodFilter: {
 						initial: 'valid',
 						states: {
-							valid: {},
+							valid: {
+								entry: ['clearFilterError']
+							},
 							validating: {
 								on: {
 									'': [
