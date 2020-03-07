@@ -1,4 +1,4 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, sendParent } from 'xstate';
 
 export const filters = {
 	name: 'name',
@@ -7,7 +7,8 @@ export const filters = {
 };
 
 const actions = {
-	updateCurrentFilter: assign({ currentFilter: (_, event) => event.params.filter })
+	updateCurrentFilter: assign({ currentFilter: (_, event) => event.params.filter }),
+	notifyParent: sendParent({ type: 'DISPLAY_CHANGE' })
 };
 
 export const filterDisplayMachine = Machine(
@@ -22,7 +23,7 @@ export const filterDisplayMachine = Machine(
 				on: {
 					CHANGE: {
 						target: 'transitioning',
-						actions: ['updateCurrentFilter']
+						actions: ['updateCurrentFilter', 'notifyParent']
 					}
 				}
 			},

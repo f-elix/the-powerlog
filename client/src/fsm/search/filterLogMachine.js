@@ -1,5 +1,6 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, spawn } from 'xstate';
 import { sessionNameQuery, sessionDateQuery, sessionPeriodQuery } from '@/assets/js/session-queries.js';
+import { filterDisplayMachine } from './filterDisplayMachine.js';
 
 const invalidDatesError = 'The second date must be later than the first';
 
@@ -73,6 +74,17 @@ const actions = {
 		periodFilter: (context, event) => {
 			return { ...context.periodFilter, ...event.params.value };
 		}
+	}),
+	resetFilters: assign({
+		nameFilter: '',
+		dateFilter: '',
+		periodFilter: {
+			from: '',
+			to: ''
+		}
+	}),
+	setFilterDisplay: assign({
+		filterDisplay: () => spawn(filterDisplayMachine, { sync: true })
 	})
 };
 
@@ -92,10 +104,17 @@ export const filterLogMachine = Machine(
 			periodFilter: {
 				from: '',
 				to: ''
-			}
+			},
+			filterDisplay: null
 		},
-		initial: 'idle',
+		initial: 'init',
 		states: {
+			init: {
+				entry: ['setFilterDisplay'],
+				on: {
+					'': 'idle'
+				}
+			},
 			idle: {
 				id: 'idle',
 				type: 'parallel',
@@ -117,7 +136,10 @@ export const filterLogMachine = Machine(
 							actions: ['updatePeriodFilter', 'clearFilterError', 'clearFetchError'],
 							target: 'idle.periodFilter.validating'
 						}
-					]
+					],
+					DISPLAY_CHANGE: {
+						actions: ['clearFilterError', 'resetFilters']
+					}
 				},
 				states: {
 					nameFilter: {
@@ -143,6 +165,9 @@ export const filterLogMachine = Machine(
 							},
 							invalid: {
 								initial: 'empty',
+								on: {
+									DISPLAY_CHANGE: 'valid'
+								},
 								states: {
 									empty: {
 										entry: ['clearSessions']
@@ -172,6 +197,9 @@ export const filterLogMachine = Machine(
 							},
 							invalid: {
 								initial: 'empty',
+								on: {
+									DISPLAY_CHANGE: 'valid'
+								},
 								states: {
 									empty: {
 										entry: ['clearSessions']
@@ -209,6 +237,9 @@ export const filterLogMachine = Machine(
 							},
 							invalid: {
 								initial: 'empty',
+								on: {
+									DISPLAY_CHANGE: 'valid'
+								},
 								states: {
 									empty: {
 										entry: ['clearSessions']

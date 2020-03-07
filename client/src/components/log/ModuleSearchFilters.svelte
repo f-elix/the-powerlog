@@ -4,11 +4,8 @@
   import { fly } from "svelte/transition";
 
   // FSM
-  import { useMachine } from "@/fsm/useMachine.js";
-  import {
-    filterDisplayMachine,
-    filters
-  } from "@/fsm/search/filterDisplayMachine.js";
+  import { useMachine, useService } from "@/fsm/machineStores.js";
+  import { filters } from "@/fsm/search/filterDisplayMachine.js";
 
   // js
   import {
@@ -22,15 +19,13 @@
   import Input from "@/components/UI/Input.svelte";
 
   const { filterLogState, filterLogSend } = getContext("filter");
-  const { filterDisplayState, filterDisplaySend } = useMachine(
-    filterDisplayMachine
+  const { filterDisplayState, filterDisplaySend } = useService(
+    $filterLogState.context.filterDisplay
   );
 
-  const dispatch = createEventDispatcher();
+  let currentFilter;
 
-  const selectOptions = ["session name", "time period", "date"];
-  let selectedOption = selectOptions[0];
-
+  $: currentFilter = $filterDisplayState.context.currentFilter;
   $: timePeriodError = $filterLogState.context.filterError;
 
   function onNameFilterInput(e) {
@@ -76,6 +71,16 @@
       }
     });
   }
+
+  function onFilterClick(filter) {
+    filterDisplaySend({ type: "CHANGE", params: { filter } });
+  }
+
+  function onOutroEnd() {
+    filterDisplaySend({ type: "TRANSITIONEND" });
+  }
+
+  $: console.log($filterLogState);
 </script>
 
 <style>
@@ -147,53 +152,42 @@
   <!-- Filter tab selection -->
   <h2>Filter log by</h2>
   <div class="btn-ctn">
-    <div
-      class="active-state"
-      data-filter={$filterDisplayState.context.currentFilter} />
+    <div class="active-state" data-filter={currentFilter} />
     <button
-      class:active={$filterDisplayState.context.currentFilter === filters.name}
-      on:click={() => filterDisplaySend({
-          type: 'CHANGE',
-          params: { filter: filters.name }
-        })}>
+      class:active={currentFilter === filters.name}
+      on:click={() => onFilterClick(filters.name)}>
       Name
     </button>
     <button
-      class:active={$filterDisplayState.context.currentFilter === filters.date}
-      on:click={() => filterDisplaySend({
-          type: 'CHANGE',
-          params: { filter: filters.date }
-        })}>
+      class:active={currentFilter === filters.date}
+      on:click={() => onFilterClick(filters.date)}>
       Date
     </button>
     <button
-      class:active={$filterDisplayState.context.currentFilter === filters.period}
-      on:click={() => filterDisplaySend({
-          type: 'CHANGE',
-          params: { filter: filters.period }
-        })}>
+      class:active={currentFilter === filters.period}
+      on:click={() => onFilterClick(filters.period)}>
       Time Period
     </button>
   </div>
   <!-- Filter forms -->
   <form novalidate>
     <!-- Name form -->
-    {#if $filterDisplayState.matches('idle') && $filterDisplayState.context.currentFilter === filters.name}
+    {#if $filterDisplayState.matches('idle') && currentFilter === filters.name}
       <div
         in:fly={{ x: 30, duration: 150 }}
         out:fly={{ x: -30, duration: 150 }}
-        on:outroend={() => filterDisplaySend({ type: 'TRANSITIONEND' })}>
+        on:outroend={onOutroEnd}>
         <Input
           label="session name"
           name="session name"
           on:input={onNameFilterInput} />
       </div>
-    {:else if $filterDisplayState.matches('idle') && $filterDisplayState.context.currentFilter === filters.date}
       <!-- Date form -->
+    {:else if $filterDisplayState.matches('idle') && currentFilter === filters.date}
       <div
         in:fly={{ x: 30, duration: 150 }}
         out:fly={{ x: -30, duration: 150 }}
-        on:outroend={() => filterDisplaySend({ type: 'TRANSITIONEND' })}>
+        on:outroend={onOutroEnd}>
         <Input
           type="date"
           label="date"
@@ -201,12 +195,12 @@
           on:input={onDateFilterInput} />
       </div>
       <!-- Time period form -->
-    {:else if $filterDisplayState.matches('idle') && $filterDisplayState.context.currentFilter === filters.period}
+    {:else if $filterDisplayState.matches('idle') && currentFilter === filters.period}
       <div
         class="period-inputs-ctn"
         in:fly={{ x: 30, duration: 150 }}
         out:fly={{ x: -30, duration: 150 }}
-        on:outroend={() => filterDisplaySend({ type: 'TRANSITIONEND' })}>
+        on:outroend={onOutroEnd}>
         <Input
           type="date"
           label="from"
