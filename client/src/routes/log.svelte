@@ -62,6 +62,8 @@
   <!-- SESSIONS -->
   {#if filterFetchError}
     <h3 class="error-message">{errorMessage}</h3>
+  {:else if $filterLogState.matches('filtering')}
+    <Spinner />
   {:else}
     {#each sessions as session, i (session._id)}
       <!-- Date title -->
@@ -82,17 +84,19 @@
   {/if}
   <!-- LOAD MORE -->
   {#if sessions === loadedSessions && !filterFetchError}
-  <div class="load-more-btn">
-    {#if $searchLogState.matches('fetching')}
-      <!-- Spinner -->
-      <Spinner />
-    {:else if $searchLogState.matches('idle') && !error}
-      <!-- Load more btn -->
-      <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
-    {:else if loadMoreError}
-      <!-- Error message -->
-      <h3>{loadMoreErrorMessage}</h3>
-    {/if}
-  </div>
+    <div class="load-more-btn">
+      {#if $searchLogState.matches('fetching')}
+        <!-- Spinner -->
+        <Spinner />
+      {:else if $searchLogState.matches('idle') && !error}
+        <!-- Load more btn -->
+        <Button color="action" size="big" on:click={onLoadMore}>
+          Load more
+        </Button>
+      {:else if loadMoreError}
+        <!-- Error message -->
+        <h3>{loadMoreErrorMessage}</h3>
+      {/if}
+    </div>
   {/if}
 </section>
