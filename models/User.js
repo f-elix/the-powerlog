@@ -26,6 +26,18 @@ const UserSchema = new mongoose.Schema(
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'Exercise'
 			}
+		],
+		exerciseGroups: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'ExerciseGroup'
+			}
+		],
+		templates: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Template'
+			}
 		]
 	},
 	{

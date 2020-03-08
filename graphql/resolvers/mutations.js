@@ -106,6 +106,18 @@ const mutations = {
 			error.statusCode = 403;
 			throw error;
 		}
+		// @TODO Update exercises history
+		// const user = await User.findById(currentUser.userId);
+		const movements = sessionData.exercises.map(exercise => exercise.movements).flat();
+		const exercisesToUpdate = movements.map(movement => movement.exercise._id);
+		const promises = exercisesToUpdate.map(async exerciseId => {
+			const exerciseToUpdate = await Exercise.findById(exerciseId);
+			if (exerciseToUpdate.creator.toString() === currentUser.userId) {
+				exerciseToUpdate.history.push(session);
+				return await exerciseToUpdate.save();
+			}
+		});
+		await Promise.all(promises);
 		// Update session
 		session.name = sessionData.name;
 		session.date = sessionData.date;
