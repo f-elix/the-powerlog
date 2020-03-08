@@ -1,6 +1,6 @@
 // Models
-const User = require("../models/User");
-const Session = require("../models/Session");
+const User = require('../models/User');
+const Session = require('../models/Session');
 
 const createSession = async (userId, sessionData) => {
 	const user = await User.findById(userId);
@@ -13,8 +13,7 @@ const createSession = async (userId, sessionData) => {
 	await user.save();
 	return {
 		...newSession._doc,
-		_id: newSession._id.toString(),
-		createdAt: newSession.createdAt.toISOString().split("T")[0]
+		_id: newSession._id.toString()
 	};
 };
 

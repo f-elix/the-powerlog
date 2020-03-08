@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 // Models
 const User = require('../../models/User');
 const Session = require('../../models/Session');
+const Exercise = require('../../models/Exercise');
 
 const queries = {
 	// USER QUERIES
@@ -46,9 +47,7 @@ const queries = {
 		// Return session
 		return {
 			...session._doc,
-			_id: session._id.toString(),
-			createdAt: session.createdAt.toISOString().split('T')[0],
-			updatedAt: session.updatedAt.toISOString().split('T')[0]
+			_id: session._id.toString()
 		};
 	},
 	getSessionsByDate: async (_, { sessionDate }, { currentUser }) => {
@@ -67,9 +66,7 @@ const queries = {
 		return sessions.map(session => {
 			return {
 				...session._doc,
-				_id: session._id.toString(),
-				createdAt: session.createdAt.toISOString().split('T')[0],
-				updatedAt: session.updatedAt.toISOString().split('T')[0]
+				_id: session._id.toString()
 			};
 		});
 	},
@@ -89,9 +86,7 @@ const queries = {
 		return filteredSessions.map(session => {
 			return {
 				...session._doc,
-				_id: session._id.toString(),
-				createdAt: session.createdAt.toISOString().split('T')[0],
-				updatedAt: session.updatedAt.toISOString().split('T')[0]
+				_id: session._id.toString()
 			};
 		});
 	},
@@ -111,9 +106,7 @@ const queries = {
 		return filteredSessions.map(session => {
 			return {
 				...session._doc,
-				_id: session._id.toString(),
-				createdAt: session.createdAt.toISOString().split('T')[0],
-				updatedAt: session.updatedAt.toISOString().split('T')[0]
+				_id: session._id.toString()
 			};
 		});
 	},
@@ -134,11 +127,30 @@ const queries = {
 		return filteredSessions.map(session => {
 			return {
 				...session._doc,
-				_id: session._id.toString(),
-				createdAt: session.createdAt.toISOString().split('T')[0],
-				updatedAt: session.updatedAt.toISOString().split('T')[0]
+				_id: session._id.toString()
 			};
 		});
+	},
+	// EXERCISE QUERIES
+	getExerciseById: async (_, { exerciseId }, { currentUser }) => {
+		// Find exercise
+		const exercise = await Exercise.findById(exerciseId);
+		if (!exercise) {
+			const error = new Error('Exercise not found.');
+			error.statusCode = 404;
+			throw error;
+		}
+		// Validate user
+		if (exercise.creator.toString() !== currentUser.userId) {
+			const error = new Error('Not authorized.');
+			error.statusCode = 403;
+			throw error;
+		}
+		// Return exercise
+		return {
+			...exercise._doc,
+			_id: exercise._id.toString()
+		};
 	}
 };
 

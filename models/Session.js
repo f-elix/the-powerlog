@@ -1,69 +1,57 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const SessionSchema = new mongoose.Schema(
-	{
-		title: {
-			type: String,
-			required: true
-		},
-		sessionDate: {
-			type: Date,
-			required: true
-		},
-		exercises: [
-			{
-				id: {
-					type: Number,
-					required: true
-				},
-				movements: [
-					{
-						id: {
-							type: Number,
-							required: true
-						},
-						name: {
-							type: String
-						},
-						sets: [
-							{
-								id: {
-									type: Number,
-									required: true
-								},
-								setQty: {
-									type: Number
-								},
-								repsOrTime: {
-									type: String
-								},
-								weight: {
-									type: String
-								}
-							}
-						]
-					}
-				]
-			}
-		],
-		bodyweigth: {
-			type: String
-		},
-		notes: {
-			type: String
-		},
-		newSession: {
-			type: Boolean
-		},
-		creator: {
-			type: mongoose.Schema.Types.ObjectId,
-			required: true,
-			ref: "User"
-		}
+const SessionSchema = new mongoose.Schema({
+	name: {
+		type: String,
+		required: true
 	},
-	{
-		timestamps: true
+	date: {
+		type: Date,
+		required: true
+	},
+	exercises: [
+		{
+			movements: [
+				{
+					exercise: {
+						type: mongoose.Schema.Types.ObjectId,
+						ref: 'Exercise'
+					},
+					executions: [
+						{
+							sets: {
+								type: Number
+							},
+							repsOrTime: {
+								amount: Number,
+								unit: String
+							},
+							weight: {
+								amount: Number,
+								unit: String
+							},
+							restTime: {
+								amount: Number,
+								unit: String
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	bodyweight: {
+		amount: Number,
+		unit: String
+	},
+	notes: {
+		type: String
+	},
+	creator: {
+		type: mongoose.Schema.Types.ObjectId,
+		required: true,
+		ref: 'User'
 	}
-);
+});
 
-module.exports = mongoose.model("Session", SessionSchema);
+module.exports = mongoose.model('Session', SessionSchema);

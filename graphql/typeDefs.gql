@@ -13,33 +13,66 @@ type User {
 
 type Session {
 	_id: ID!
-	newSession: Boolean
 	createdAt: String
 	updatedAt: String
 	title: String!
 	sessionDate: Date!
 	exercises: [Exercise]
 	notes: String
-	bodyweigth: String
+	bodyweigth: Bodyweight
 	creator: User
 }
 
-type Exercise {
-	id: Int!
+type Bodyweight {
+	amount: Int
+	unit: String
+}
+
+type SessionExercise {
 	movements: [Movement]
 }
 
 type Movement {
-	id: Int!
-	name: String
-	sets: [Set]
+	exercise: Exercise
+	executions: [Execution]
 }
 
-type Set {
-	id: Int!
-	setQty: Int
-	repsOrTime: String
-	weight: String
+type Execution {
+	sets: Int
+	repsOrTime: RepsOrTime
+	weight: Weight
+	restTime: RestTime
+}
+
+type RepsOrTime {
+	amount: Int
+	unit: String
+}
+
+type Weight {
+	amount: Int
+	unit: String
+}
+
+type RestTime {
+	amount: Int
+	unit: String
+}
+
+type Exercise {
+	_id: ID!
+	name: String
+	history: [Session]
+	group: ExerciseGroup
+	creator: User
+}
+
+type ExerciseGroup {
+	_id: ID!
+	name: String
+	color: String
+	exercises: [Exercise]
+	creator: User
 }
 
 type AuthData {
@@ -49,43 +82,72 @@ type AuthData {
 # INPUT TYPES
 input SessionInput {
 	_id: ID
-	newSession: Boolean
-	createdAt: String
-	updatedAt: String
-	title: String!
-	sessionDate: Date!
-	exercises: [ExerciseInput]
-	bodyweigth: String
+	name: String!
+	date: Date!
+	exercises: [SessionExerciseInput]
+	bodyweight: BodyweightInput
 	notes: String
 }
 
-input ExerciseInput {
-	id: Int!
+input BodyweightInput {
+	amount: Int
+	unit: String
+}
+
+input SessionExerciseInput {
 	movements: [MovementInput]
 }
 
 input MovementInput {
-	id: Int!
-	name: String
-	sets: [SetInput]
+	exercise: ExerciseInput
+	executions: [ExecutionInput]
 }
 
-input SetInput {
-	id: Int!
-	setQty: Int
-	repsOrTime: String
-	weight: String
+input ExerciseInput {
+	_id: ID
+	name: String
+	group: ExerciseGroupInput
+}
+
+input ExecutionInput {
+	sets: Int
+	repsOrTime: RepsOrTimeInput
+	weight: WeightInput
+	restTime: RestTimeInput
+}
+
+input RepsOrTimeInput {
+	amount: Int
+	unit: String
+}
+
+input WeightInput {
+	amount: Int
+	unit: String
+}
+
+input RestTimeInput {
+	amount: Int
+	unit: String
+}
+
+input ExerciseGroupInput {
+	_id: ID
+	name: String
+	color: String
+	exercises: [ExerciseInput]
 }
 
 # ROOT
 type Query {
+	isAuth(token: String!): Boolean
 	getUserData: User
 	getSessionById(sessionId: ID!): Session
 	getSessionsByDate(sessionDate: Date!): [Session]
 	getSessionsByTitle(title: String!): [Session]
 	getSessionsFromTo(fromDate: Date!, toDate: Date!): [Session]
 	getSessionRange(from: Int!, to: Int!): [Session]
-	isAuth(token: String!): Boolean
+	getExerciseById(exerciseId: ID!): Exercise
 }
 
 type Mutation {
@@ -93,4 +155,6 @@ type Mutation {
 	loginUser(email: String!, password: String!): AuthData!
 	saveSession(sessionData: SessionInput!): Session!
 	deleteSession(sessionId: ID!): Boolean
+	saveExercise(exerciseData: ExerciseInput!): Exercise!
+	deleteExercise(exerciseId: ID!): Boolean
 }
