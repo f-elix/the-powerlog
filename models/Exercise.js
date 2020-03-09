@@ -7,8 +7,30 @@ const ExerciseSchema = new mongoose.Schema({
 	},
 	history: [
 		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Session'
+			session: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Session'
+			},
+			date: Date,
+			executions: [
+				{
+					sets: {
+						type: Number
+					},
+					repsOrTime: {
+						amount: Number,
+						unit: String
+					},
+					weight: {
+						amount: Number,
+						unit: String
+					},
+					restTime: {
+						amount: Number,
+						unit: String
+					}
+				}
+			]
 		}
 	],
 	group: {

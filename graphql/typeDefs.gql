@@ -17,7 +17,7 @@ type Session {
 	updatedAt: String
 	title: String!
 	sessionDate: Date!
-	exercises: [Exercise]
+	exercises: [SessionExercise]
 	notes: String
 	bodyweigth: Bodyweight
 	creator: User
@@ -62,9 +62,15 @@ type RestTime {
 type Exercise {
 	_id: ID!
 	name: String
-	history: [Session]
+	history: [ExerciseHistory]
 	group: ExerciseGroup
 	creator: User
+}
+
+type ExerciseHistory {
+	session: Session!
+	date: Date
+	executions: [Execution]
 }
 
 type ExerciseGroup {
@@ -148,6 +154,8 @@ type Query {
 	getSessionsFromTo(fromDate: Date!, toDate: Date!): [Session]
 	getSessionRange(from: Int!, to: Int!): [Session]
 	getExerciseById(exerciseId: ID!): Exercise
+	getExercisesByName(name: String!): [Exercise]
+	getAllExercises: [Exercise]
 }
 
 type Mutation {

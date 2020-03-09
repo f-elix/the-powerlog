@@ -106,18 +106,6 @@ const mutations = {
 			error.statusCode = 403;
 			throw error;
 		}
-		// @TODO Update exercises history
-		// const user = await User.findById(currentUser.userId);
-		const movements = sessionData.exercises.map(exercise => exercise.movements).flat();
-		const exercisesToUpdate = movements.map(movement => movement.exercise._id);
-		const promises = exercisesToUpdate.map(async exerciseId => {
-			const exerciseToUpdate = await Exercise.findById(exerciseId);
-			if (exerciseToUpdate.creator.toString() === currentUser.userId) {
-				exerciseToUpdate.history.push(session);
-				return await exerciseToUpdate.save();
-			}
-		});
-		await Promise.all(promises);
 		// Update session
 		session.name = sessionData.name;
 		session.date = sessionData.date;
@@ -125,6 +113,19 @@ const mutations = {
 		session.bodyweight = sessionData.bodyweight;
 		session.notes = sessionData.notes;
 		const updatedSession = await session.save();
+		// Update exercises history
+		const movements = session.exercises.map(exercise => exercise.movements).flat();
+		for (const movement of movements) {
+			const newHistory = {
+				session,
+				date: session.date,
+				executions: movement.executions
+			};
+			const exerciseId = movement.exercise._id;
+			const exerciseToUpdate = await Exercise.findById(exerciseId);
+			exerciseToUpdate.history.push(newHistory);
+			await exerciseToUpdate.save();
+		}
 		// Return session
 		return {
 			...updatedSession._doc,

@@ -59,9 +59,11 @@ const queries = {
 			throw error;
 		}
 		// Find sessions in user log
-		const sessions = user.log.reverse().filter(session => {
-			return session.sessionDate.getTime() === sessionDate.getTime();
-		});
+		const sessions = user.log
+			.filter(session => {
+				return session.sessionDate.getTime() === sessionDate.getTime();
+			})
+			.reverse();
 		// Return session
 		return sessions.map(session => {
 			return {
@@ -70,7 +72,7 @@ const queries = {
 			};
 		});
 	},
-	getSessionsByTitle: async (_, { title }, { currentUser }) => {
+	getSessionsByTitle: async (_, { name }, { currentUser }) => {
 		// Find user by ID and populate user's log
 		const user = await User.findById(currentUser.userId).populate('log');
 		if (!user) {
@@ -78,10 +80,12 @@ const queries = {
 			error.statusCode = 401;
 			throw error;
 		}
-		// Filter log by title
-		const filteredSessions = user.log.reverse().filter(session => {
-			return session.title.toLowerCase().includes(title.toLowerCase());
-		});
+		// Filter log by name
+		const filteredSessions = user.log
+			.filter(session => {
+				return session.name.toLowerCase().includes(name.toLowerCase());
+			})
+			.reverse();
 		// Return filtered array of sessions
 		return filteredSessions.map(session => {
 			return {
@@ -99,9 +103,11 @@ const queries = {
 			throw error;
 		}
 		// Filter log by sessionDate
-		const filteredSessions = user.log.reverse().filter(session => {
-			return session.sessionDate >= fromDate && session.sessionDate <= toDate;
-		});
+		const filteredSessions = user.log
+			.filter(session => {
+				return session.sessionDate >= fromDate && session.sessionDate <= toDate;
+			})
+			.reverse();
 		// Return filtered array of sessions
 		return filteredSessions.map(session => {
 			return {
@@ -151,6 +157,44 @@ const queries = {
 			...exercise._doc,
 			_id: exercise._id.toString()
 		};
+	},
+	getExercisesByName: async (_, { name }, { currentUser }) => {
+		// Find user by ID and populate user's exercises
+		const user = await User.findById(currentUser.userId).populate('exercises');
+		if (!user) {
+			const error = new Error('Your session has ended. Please sign in again.');
+			error.statusCode = 401;
+			throw error;
+		}
+		// Find exercises in user exercises collection
+		const filteredExercises = user.exercises
+			.filter(ex => {
+				return ex.name.toLowerCase().includes(name.toLowerCase());
+			})
+			.reverse();
+		// Return filtered array of exercises
+		return filteredExercises.map(exercise => {
+			return {
+				...exercise._doc,
+				_id: exercise._id.toString()
+			};
+		});
+	},
+	getAllExercises: async (_, {}, { currentUser }) => {
+		// Find user by ID and populate user's exercises
+		const user = await User.findById(currentUser.userId).populate('exercises');
+		if (!user) {
+			const error = new Error('Your session has ended. Please sign in again.');
+			error.statusCode = 401;
+			throw error;
+		}
+		// Return array of exercises
+		return user.exercises.map(exercise => {
+			return {
+				...exercise._doc,
+				_id: exercise._id.toString()
+			};
+		});
 	}
 };
 
