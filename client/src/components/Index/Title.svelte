@@ -22,7 +22,7 @@
   <img src="/img/icons/icon.svg" alt="" width="144" height="144" />
 
   <!-- Title -->
-  <h1>The Strength Log</h1>
+  <h1>The Power Log</h1>
   <h2>
     Log your training,
     <br />
