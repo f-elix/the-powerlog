@@ -71,7 +71,13 @@
   <Drawer state={isOpen} on:click={toggleMenu}>
     <ul class="nav">
       <li>
+        <a href="/dashboard" class="nav-link">dashboard</a>
+      </li>
+      <li>
         <a href="/log" class="nav-link">full log</a>
+      </li>
+      <li>
+        <a href="/exercises" class="nav-link">your exercises</a>
       </li>
       <li on:click={() => authSend({ type: 'LOGOUT' })}>
         <a href="/" class="nav-link logout">logout</a>

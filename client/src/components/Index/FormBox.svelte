@@ -5,8 +5,7 @@
   import { expoOut } from "svelte/easing";
 
   // FSM
-  import { useMachine } from "@/fsm/useMachine.js";
-  import { useService } from "@/fsm/useService.js";
+  import { useMachine, useService } from "@/fsm/machineStores.js";
   import { formboxMachine } from "@/fsm/auth/formboxMachine.js";
   import { validationMachine } from "@/fsm/auth/validationMachine.js";
 
@@ -22,6 +21,8 @@
   const { validationState, validationSend } = useService(
     $authState.context.validation
   );
+
+  let valState = $validationState; // Not used, but necessary to keep the context from resetting between both forms
 
   setContext("validation", {
     validationState,
