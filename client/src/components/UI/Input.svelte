@@ -1,5 +1,6 @@
 <script>
   // Svelte
+  import { onMount } from "svelte";
   import { fly, fade } from "svelte/transition";
   import { elasticOut, bounceOut, bounceIn } from "svelte/easing";
 
@@ -14,6 +15,15 @@
   export let cols = 20;
   export let rows = 5;
   export let errorMessage = "";
+  export let autofocus = false;
+
+  let input;
+
+  onMount(() => {
+    if (autofocus) {
+      input.focus();
+    }
+  });
 </script>
 
 <style>
@@ -123,6 +133,7 @@
   <label>
     {#if type !== 'textarea'}
       <input
+        bind:this={input}
         {type}
         {name}
         class:label-padding={label}
@@ -133,6 +144,7 @@
       <div class="underline" />
     {:else}
       <textarea
+        bind:this={input}
         {name}
         {cols}
         {rows}
