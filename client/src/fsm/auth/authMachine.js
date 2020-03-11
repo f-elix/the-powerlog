@@ -1,16 +1,12 @@
 import { Machine, assign, spawn, send } from 'xstate';
 import { validationMachine } from './validationMachine.js';
 import { goto } from '@sapper/app';
+import { getData, getToken } from '@/assets/js/utils.js';
 
 const services = {
 	isAuth: async () => {
-		const token = localStorage.getItem(process.env.APP_TOKEN);
-		if (!token) {
-			const error = new Error();
-			error.errorMsg = 'Not authenticated';
-			console.warn(error);
-			throw error;
-		}
+		const token = getToken();
+		const queryName = 'isAuth';
 		const query = {
 			query: `
 				query isAuthenticated($token: String!) {
@@ -22,21 +18,8 @@ const services = {
 			}
 		};
 		try {
-			const res = await fetch(process.env.APP_API, {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(query)
-			});
-			const data = await res.json();
-			if (data.errors) {
-				const error = new Error();
-				error.message = data.errors[0].message;
-				error.statusCode = data.errors[0].extensions.exception.statusCode;
-				throw error;
-			}
-			if (!data.data.isAuth) {
+			const isAuth = await getData(query, queryName);
+			if (!isAuth) {
 				const error = new Error();
 				error.errorMsg = 'Not authenticated';
 				throw error;
@@ -65,22 +48,8 @@ const services = {
 			}
 		};
 		try {
-			const res = await fetch(process.env.APP_API, {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(query)
-			});
-			const data = await res.json();
-			if (data.errors) {
-				const error = new Error();
-				error.message = data.errors[0].message;
-				error.statusCode = data.errors[0].extensions.exception.statusCode;
-				throw error;
-			}
-			const token = data.data[queryName].token;
-			return token;
+			const data = await getData(query, queryName);
+			return data.token;
 		} catch (err) {
 			console.error(err);
 			throw err;
@@ -103,30 +72,17 @@ const services = {
 			}
 		};
 		try {
-			const res = await fetch(process.env.APP_API, {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(query)
-			});
-			const data = await res.json();
-			if (data.errors) {
-				const error = new Error();
-				error.message = data.errors[0].message;
-				error.statusCode = data.errors[0].extensions.exception.statusCode;
-				throw error;
-			}
-			const token = data.data[queryName].token;
-			return token;
+			const data = await getData(query, queryName);
+			return data.token;
 		} catch (err) {
 			console.error(err);
 			throw err;
 		}
 	},
 	getUserData: async (_, event) => {
-		const token = event.data;
-		const userQuery = {
+		const token = getToken();
+		const queryName = 'getUserData';
+		const query = {
 			query: `
 				{
 					getUserData {
@@ -137,22 +93,7 @@ const services = {
 			`
 		};
 		try {
-			const res = await fetch(process.env.APP_API, {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json',
-					authorization: token
-				},
-				body: JSON.stringify(userQuery)
-			});
-			const data = await res.json();
-			if (data.errors) {
-				const error = new Error();
-				error.message = data.errors[0].message;
-				error.statusCode = data.errors[0].extensions.exception.statusCode;
-				throw error;
-			}
-			const userData = data.data.getUserData;
+			const userData = await getData(query, queryName, token);
 			return userData;
 		} catch (err) {
 			console.log(err);
@@ -163,7 +104,7 @@ const services = {
 
 const actions = {
 	routeDashboard: () => {
-		goto('/dashboard').catch(err => console.log(err));
+		goto('/exercises').catch(err => console.log(err));
 	},
 	routeAuth: () => {
 		goto('/').catch(err => console.log(err));
