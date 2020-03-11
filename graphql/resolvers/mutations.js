@@ -169,7 +169,7 @@ const mutations = {
 		// Find exercise
 		const exercise = await (await Exercise.findById(exerciseData._id)).populate('history');
 		if (!exercise) {
-			const error = new Error('No exercise found.');
+			const error = new Error('No exercise created yet.');
 			error.statusCode = 404;
 			throw error;
 		}
