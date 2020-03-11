@@ -27,15 +27,17 @@ const services = {
 		const queryName = 'saveExercise';
 		const query = {
 			query: `
-                mutation createExercise($name: String!) {
-                    saveExercise(exerciseData: $name ) {
+                mutation createExercise($data: ExerciseInput!) {
+                    saveExercise(exerciseData: $data ) {
                         name
                         _id
                     }
                 }
             `,
 			variables: {
-				name: context.newExercise
+				data: {
+					name: context.newExercise
+				}
 			}
 		};
 		try {
@@ -54,12 +56,22 @@ const actions = {
 		exercises: (_, event) => event.data
 	}),
 	updateNewExercise: assign({
-		newExercise: (_, event) => event.params.value
+		newExercise: (_, event) => event.params ? event.params.value : event.data
+	}),
+	addNewExercise: assign({
+		exercises: (context, _) => [context.newExercise, ...context.exercises]
 	}),
 	clearNewExercise: assign({
 		newExercise: ''
+	}),
+	updateFetchError: assign({
+		fetchError: (_, event) => event.data.message
 	})
 };
+
+const guards = {
+	isInputEmpty: (context, _) => context.newExercise.trim().length === 0
+}
 
 export const exercisesMachine = Machine(
 	{
@@ -67,7 +79,8 @@ export const exercisesMachine = Machine(
 		context: {
 			exercises: [],
 			exercise: null,
-			newExercise: ''
+			newExercise: '',
+			fetchError: ''
 		},
 		initial: 'idle',
 		states: {
@@ -86,7 +99,8 @@ export const exercisesMachine = Machine(
 						actions: ['updateExercises']
 					},
 					onError: {
-						target: 'idle'
+						target: 'idle',
+						actions: ['updateFetchError']
 					}
 				}
 			},
@@ -98,9 +112,15 @@ export const exercisesMachine = Machine(
 							INPUT: {
 								actions: ['updateNewExercise']
 							},
-							CREATE: {
-								target: 'uploading'
-							},
+							CREATE: [
+								{
+									cond: 'isInputEmpty',
+									target: 'idle'
+								},
+								{
+									target: 'uploading'
+								}
+							],
 							DISCARD: {
 								target: '#idle',
 								actions: ['clearNewExercise']
@@ -109,13 +129,22 @@ export const exercisesMachine = Machine(
 					},
 					uploading: {
 						invoke: {
-							src: 'createExercise',
+							src: 'createNewExercise',
 							onDone: {
-								target: '#idle',
-								actions: ['clearNewExercise']
+								target: 'success',
+								actions: ['updateNewExercise']
 							},
 							onError: {
-								target: '#idle'
+								target: 'idle',
+								actions: ['updateFetchError']
+							}
+						}
+					},
+					success: {
+						after: {
+							1000: {
+								target: '#idle',
+								actions: ['addNewExercise', 'clearNewExercise']
 							}
 						}
 					}
@@ -125,6 +154,7 @@ export const exercisesMachine = Machine(
 	},
 	{
 		actions,
-		services
+		services,
+		guards
 	}
 );

@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { onMount } from "svelte";
+  import {flip} from 'svelte/animate'
 
   // FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
@@ -13,9 +14,11 @@
   import Spinner from "@/components/UI/Spinner.svelte";
   import ModalLayout from "@/components/UI/ModalLayout.svelte";
 
-  const exercises = ["squat", "bench", "deadlift", "overhead press"];
-
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
+
+  let exercises = [];
+
+  $: exercises = $exercisesState.context.exercises;
 
   onMount(() => {
     exercisesSend({ type: "LOAD" });
@@ -70,14 +73,24 @@
     justify-content: space-around;
     margin: 2rem auto;
   }
+
+  .message {
+    text-align: center;
+  }
+
+  .error {
+    color: var(--color-error);
+  }
 </style>
 
 <section>
+  <!-- Search form -->
   <form class="search-form" novalidate>
     <i class="material-icons search-icon">search</i>
     <Input type="search" label="Search Exercises" name="exercises" />
   </form>
   <h1>your exercises</h1>
+  <!-- Add button -->
   <Button
     size="big"
     variant="filled"
@@ -86,30 +99,52 @@
     <i class="material-icons">add</i>
     Add new exercise
   </Button>
+  <!-- Exercises list -->
   <ul>
-    {#each exercises as exercise (exercise)}
-      <li>
-        <CardExercise exerciseName={exercise} />
+    <!-- Spinner -->
+    {#if $exercisesState.matches('fetching')}
+      <Spinner />
+    <!-- No results message -->
+    {:else if $exercisesState.context.fetchError}
+      <h2 class="message">{$exercisesState.context.fetchError}</h2>
+    {/if}
+    {#each exercises as exercise (exercise._id)}
+      <li animate:flip={{duration: 200}}>
+        <CardExercise exerciseName={exercise.name} />
       </li>
     {/each}
   </ul>
+
   {#if $exercisesState.matches('creating')}
-  <!-- @TODO autofocus input on modal open, only allow close click on overlay, validate input before create -->
+    <!-- Modal -->
     <ModalLayout on:click={onDiscard}>
-      <form class="create-form" novalidate>
-        <Input
-          name="exerciseName"
-          label="Exercise Name"
-          on:input={onNewExerciseInput} />
-        <div class="btn-ctn">
-          <Button color="error" variant="filled" on:click={onDiscard}>
-            Discard
-          </Button>
-          <Button color="action" variant="filled" on:click={onCreate}>
-            Create
-          </Button>
-        </div>
-      </form>
+      <!-- Success message -->
+      {#if $exercisesState.matches('creating.success')}
+        <p class="message">
+          {$exercisesState.context.newExercise.name} was added to your exercises!
+        </p>
+      {:else}
+        <!-- Error message -->
+        {#if $exercisesState.context.fetchError}
+          <p class="message error">{$exercisesState.context.fetchError}</p>
+        {/if}
+        <!-- Exercise form -->
+        <form class="create-form" on:submit|preventDefault={onCreate} novalidate>
+          <Input
+            autofocus={true}
+            name="exerciseName"
+            label="Exercise Name"
+            on:input={onNewExerciseInput} />
+          <div class="btn-ctn">
+            <Button color="error" variant="filled" on:click={onDiscard}>
+              Discard
+            </Button>
+            <Button color="action" variant="filled" type="submit">
+              Create
+            </Button>
+          </div>
+        </form>
+      {/if}
     </ModalLayout>
   {/if}
 </section>

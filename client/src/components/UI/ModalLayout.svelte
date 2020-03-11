@@ -5,7 +5,7 @@
 </script>
 
 <style>
-  .overlay {
+  .modal-ctn {
     position: fixed;
     z-index: 1000;
     top: 0;
@@ -16,6 +16,14 @@
     justify-content: center;
     align-items: flex-start;
     padding-top: 15rem;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
   }
 
@@ -30,7 +38,8 @@
   }
 </style>
 
-<div class="overlay" transition:fade={{ duration: 200 }} on:click>
+<div class="modal-ctn">
+  <div class="overlay" transition:fade={{ duration: 200 }} on:click />
   <div class="modal" transition:scale={{ easing: quintOut, opacity: 0 }}>
     <slot />
   </div>
