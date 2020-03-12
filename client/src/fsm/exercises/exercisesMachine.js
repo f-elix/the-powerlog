@@ -1,4 +1,4 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, spawn, send } from 'xstate';
 import { getData, getToken } from '@/assets/js/utils.js';
 
 const services = {
@@ -48,6 +48,27 @@ const services = {
 			console.log(err);
 			throw err;
 		}
+	},
+	deleteExercise: async (_, event) => {
+		const queryName = 'deleteExercise';
+		const query = {
+			query: `
+				mutation deleteExercise($id: ID!) {
+					deleteExercise(exerciseId: $id) 
+				}
+			`,
+			variables: {
+				id: event.params.id
+			}
+		};
+		try {
+			const token = getToken();
+			await getData(query, queryName, token);
+			return event.params.id;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 
@@ -60,6 +81,13 @@ const actions = {
 	}),
 	addNewExercise: assign({
 		exercises: (context, _) => [context.newExercise, ...context.exercises]
+	}),
+	removeExercise: assign({
+		exercises: (context, event) => {
+			return context.exercises.filter(exercise => {
+				return exercise._id !== event.data
+			})
+		}
 	}),
 	clearNewExercise: assign({
 		newExercise: ''
@@ -88,7 +116,8 @@ export const exercisesMachine = Machine(
 				id: 'idle',
 				on: {
 					LOAD: 'fetching',
-					CREATE: 'creating'
+					CREATE: 'creating',
+					DELETE: 'deleting'
 				}
 			},
 			fetching: {
@@ -141,14 +170,26 @@ export const exercisesMachine = Machine(
 						}
 					},
 					success: {
-						after: {
-							1000: {
+						on: {
+							'': {
 								target: '#idle',
 								actions: ['addNewExercise', 'clearNewExercise']
 							}
 						}
 					}
 				}
+			},
+			deleting: {
+				invoke: {
+					src: 'deleteExercise',
+					onDone: {
+						target: 'idle',
+						actions: ['removeExercise']
+					},
+					onError: {
+						target: 'idle'
+					}
+				},
 			}
 		}
 	},
