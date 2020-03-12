@@ -85,7 +85,7 @@ const actions = {
 	removeExercise: assign({
 		exercises: (context, event) => {
 			return context.exercises.filter(exercise => {
-				return exercise._id !== event.data
+				return exercise._id !== event.params.id
 			})
 		}
 	}),
@@ -180,11 +180,11 @@ export const exercisesMachine = Machine(
 				}
 			},
 			deleting: {
+				entry: ['removeExercise'],
 				invoke: {
 					src: 'deleteExercise',
 					onDone: {
 						target: 'idle',
-						actions: ['removeExercise']
 					},
 					onError: {
 						target: 'idle'
