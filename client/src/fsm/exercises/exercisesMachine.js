@@ -70,6 +70,30 @@ const services = {
 			console.log(err);
 			throw err;
 		}
+	},
+	searchExercises: async (context, _) => {
+		const queryName = 'getExercisesByName';
+		const query = {
+			query: `
+				query searchExercises($name: String!) {
+					getExercisesByName(name: $name) {
+						name
+						_id
+					}
+				}
+			`,
+			variables: {
+				name: context.searchFilter
+			}
+		};
+		try {
+			const token = getToken();
+			await getData(query, queryName, token);
+			return event.data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 
@@ -99,7 +123,8 @@ const actions = {
 };
 
 const guards = {
-	isInputEmpty: (context, _) => context.newExercise.trim().length === 0
+	isInputEmpty: (context, _) => context.newExercise.trim().length === 0,
+	isSearchFilterEmpty: (context, _) => context.searchFilter.trim().length === 0
 };
 
 export const exercisesMachine = Machine(
@@ -109,6 +134,7 @@ export const exercisesMachine = Machine(
 			exercises: [],
 			newExercise: '',
 			editedExercise: null,
+			searchFilter: '',
 			fetchError: ''
 		},
 		initial: 'idle',
@@ -119,7 +145,16 @@ export const exercisesMachine = Machine(
 					LOAD: 'fetching',
 					CREATE: 'creating',
 					DELETE: 'deleting',
-					EDIT: 'editing'
+					EDIT: 'editing',
+					SEARCH: [
+						{
+							cond: 'isSearchFilterEmpty',
+							target: 'idle'
+						},
+						{
+							target: 'searching'
+						}
+					]
 				}
 			},
 			fetching: {
@@ -206,6 +241,16 @@ export const exercisesMachine = Machine(
 							editedExercise: null
 						})
 					}
+				}
+			},
+			searching: {
+				invoke: {
+					src: 'searchExercises',
+					onDone: {
+						target: 'idle',
+						actions: 'updateExercises'
+					},
+					onError: 'idle'
 				}
 			}
 		}

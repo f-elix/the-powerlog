@@ -53,6 +53,10 @@
   function onEdit(e) {
     exercisesSend({ type: "EDIT", params: { exercise: e.detail } });
   }
+
+  function onSearch(e) {
+    exercisesSend({ type: "SEARCH", params: { value: e.target.value } });
+  }
 </script>
 
 <style>
@@ -96,7 +100,11 @@
   <!-- Search form -->
   <form class="search-form" novalidate>
     <i class="material-icons search-icon">search</i>
-    <Input type="search" label="Search Exercises" name="exercises" />
+    <Input
+      type="search"
+      label="Search Exercises"
+      name="exercises"
+      on:input={onSearch} />
   </form>
 
   <h1>your exercises</h1>
@@ -110,7 +118,7 @@
     <i class="material-icons">add</i>
     Add new exercise
   </Button>
-  
+
   <!-- Exercises list -->
   <ul>
     <!-- Spinner -->
