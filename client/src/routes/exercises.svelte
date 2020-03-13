@@ -19,6 +19,7 @@
   let exercises = [];
 
   $: exercises = $exercisesState.context.exercises;
+  $: editService = $exercisesState.context.editedExercise;
 
   onMount(() => {
     exercisesSend({ type: "LOAD" });
@@ -47,6 +48,10 @@
 
   function onDelete(e) {
     exercisesSend({ type: "DELETE", params: { id: e.detail } });
+  }
+
+  function onEdit(e) {
+    exercisesSend({ type: "EDIT", params: { exercise: e.detail } });
   }
 </script>
 
@@ -115,8 +120,9 @@
     {#each exercises as exercise (exercise._id)}
       <li animate:flip={{ duration: 200 }}>
         <CardExercise
-          exerciseName={exercise.name}
-          exerciseId={exercise._id}
+          {exercise}
+          {editService}
+          on:edit={onEdit}
           on:delete={onDelete} />
       </li>
     {/each}

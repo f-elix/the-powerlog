@@ -185,7 +185,7 @@ const mutations = {
 		// Return exercise
 		return {
 			...updatedExercise._doc,
-			_id: updatedSession._id.toString()
+			_id: updatedExercise._id.toString()
 		};
 	},
 	deleteExercise: async (_, { exerciseId }, { currentUser }) => {

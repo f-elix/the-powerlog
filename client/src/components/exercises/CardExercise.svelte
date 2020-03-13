@@ -9,21 +9,27 @@
 
   const dispatch = createEventDispatcher();
 
-  export let exerciseName;
-  export let exerciseId;
-
-  let isEditing = false;
+  export let exercise;
+  export let editService;
 
   function onDelete() {
     dispatch("delete", exerciseId);
   }
 
   function onEdit() {
-    isEditing = true;
+    dispatch("edit", exercise);
   }
 
   function onSave() {
-    isEditing = false;
+    editService.send({ type: "SAVE" });
+  }
+
+  function onDiscard() {
+    editService.send({ type: "DISCARD" });
+  }
+
+  function onInput(e) {
+    editService.send({ type: "INPUT", params: { name: e.target.value } });
   }
 </script>
 
@@ -64,38 +70,54 @@
     color: var(--color-error);
   }
 
+  button.save {
+    color: var(--color-action);
+  }
+
   button span {
     display: none;
   }
 </style>
 
-<article in:fly={{ x: 30 }}>
-  {#if !isEditing}
-    <h3>{exerciseName}</h3>
+<article in:fly={{ x: 30 }} out:fly={{ x: 30, duration: 200 }}>
+  {#if editService && editService.state.context.exercise._id === exercise._id}
+    <Input
+      name="editExercise"
+      label="Exercise Name"
+      value={exercise.name}
+      on:input={onInput} />
   {:else}
-    <Input name="editExercise" label="Exercise Name" value={exerciseName} />
+    <h3>{exercise.name}</h3>
   {/if}
-  <div>
-    {#if !isEditing}
+  {#if editService && editService.state.context.exercise._id === exercise._id}
+    <div>
+      <!-- Save btn -->
+      <button class="save" on:click={onSave}>
+        <i class="material-icons">done</i>
+        <span>Save</span>
+        <Ripple />
+      </button>
+      <!-- Discard btn -->
+      <button class="delete" on:click={onDiscard}>
+        <i class="material-icons">cancel</i>
+        <span>Discard</span>
+        <Ripple />
+      </button>
+    </div>
+  {:else}
+    <div>
       <!-- Edit btn -->
       <button class="edit" on:click={onEdit}>
         <i class="material-icons">edit</i>
         <span>Edit</span>
         <Ripple />
       </button>
-    {:else}
-      <!-- Save btn -->
-      <button class="save" on:click={onSave}>
-        <i class="material-icons">save</i>
-        <span>Save</span>
+      <!-- Delete btn -->
+      <button class="delete" on:click={onDelete}>
+        <i class="material-icons">delete</i>
+        <span>Delete</span>
         <Ripple />
       </button>
-    {/if}
-    <!-- Delete btn -->
-    <button class="delete" on:click={onDelete}>
-      <i class="material-icons">delete</i>
-      <span>Delete</span>
-      <Ripple />
-    </button>
-  </div>
+    </div>
+  {/if}
 </article>
