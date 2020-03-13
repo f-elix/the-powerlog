@@ -59,7 +59,7 @@ const services = {
 				}
 			`,
 			variables: {
-				id: event.params.id
+				id: event.params.exercise._id
 			}
 		};
 		try {
@@ -86,7 +86,7 @@ const actions = {
 	removeExercise: assign({
 		exercises: (context, event) => {
 			return context.exercises.filter(exercise => {
-				return exercise._id !== event.data;
+				return exercise._id !== event.params.exercise._id;
 			});
 		}
 	}),

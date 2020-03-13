@@ -41,22 +41,32 @@ const actions = {
 	})
 };
 
+const guards = {
+	isInputEmpty: (context, _) => context.name.trim().length === 0
+}
+
 export const editExerciseMachine = exercise => {
 	return Machine(
 		{
 			id: 'editExercise',
 			context: {
 				exercise,
-				name: ''
+				name: exercise.name
 			},
 			initial: 'editing',
 			states: {
 				editing: {
 					on: {
-						SAVE: {
-							target: 'saving',
-							actions: ['updateExercise']
-						},
+						SAVE: [
+							{
+								cond: 'isInputEmpty',
+								target: 'editing'
+							},
+							{
+								target: 'saving',
+								actions: ['updateExercise']
+							},
+						],
 						DISCARD: 'success',
 						INPUT: {
 							actions: ['updateName']
@@ -78,7 +88,8 @@ export const editExerciseMachine = exercise => {
 		},
 		{
 			services,
-			actions
+			actions,
+			guards
 		}
 	);
 };

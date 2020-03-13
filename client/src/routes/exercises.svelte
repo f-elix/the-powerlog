@@ -47,7 +47,7 @@
   }
 
   function onDelete(e) {
-    exercisesSend({ type: "DELETE", params: { id: e.detail } });
+    exercisesSend({ type: "DELETE", params: { exercise: e.detail } });
   }
 
   function onEdit(e) {
@@ -98,7 +98,9 @@
     <i class="material-icons search-icon">search</i>
     <Input type="search" label="Search Exercises" name="exercises" />
   </form>
+
   <h1>your exercises</h1>
+
   <!-- Add button -->
   <Button
     size="big"
@@ -108,6 +110,7 @@
     <i class="material-icons">add</i>
     Add new exercise
   </Button>
+  
   <!-- Exercises list -->
   <ul>
     <!-- Spinner -->
@@ -127,8 +130,9 @@
       </li>
     {/each}
   </ul>
+
+  <!-- Modal -->
   {#if $exercisesState.matches('creating')}
-    <!-- Modal -->
     <ModalLayout on:click={onDiscard}>
       <!-- Error message -->
       {#if $exercisesState.context.fetchError}

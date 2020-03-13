@@ -13,7 +13,7 @@
   export let editService;
 
   function onDelete() {
-    dispatch("delete", exerciseId);
+    dispatch("delete", exercise);
   }
 
   function onEdit() {
@@ -45,6 +45,13 @@
     border-radius: var(--radius-default);
     background-color: var(--color-fg-light);
     box-shadow: var(--shadow-default);
+  }
+
+  form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
   }
 
   h3 {
@@ -81,30 +88,30 @@
 
 <article in:fly={{ x: 30 }} out:fly={{ x: 30, duration: 200 }}>
   {#if editService && editService.state.context.exercise._id === exercise._id}
-    <Input
-      name="editExercise"
-      label="Exercise Name"
-      value={exercise.name}
-      on:input={onInput} />
+    <form novalidate on:submit|preventDefault={onSave}>
+      <Input
+        name="editExercise"
+        label="Exercise Name"
+        autofocus={true}
+        value={exercise.name}
+        on:input={onInput} />
+      <div>
+        <!-- Save btn -->
+        <button class="save" type="submit">
+          <i class="material-icons">done</i>
+          <span>Save</span>
+          <Ripple />
+        </button>
+        <!-- Discard btn -->
+        <button class="delete" on:click={onDiscard}>
+          <i class="material-icons">cancel</i>
+          <span>Discard</span>
+          <Ripple />
+        </button>
+      </div>
+    </form>
   {:else}
     <h3>{exercise.name}</h3>
-  {/if}
-  {#if editService && editService.state.context.exercise._id === exercise._id}
-    <div>
-      <!-- Save btn -->
-      <button class="save" on:click={onSave}>
-        <i class="material-icons">done</i>
-        <span>Save</span>
-        <Ripple />
-      </button>
-      <!-- Discard btn -->
-      <button class="delete" on:click={onDiscard}>
-        <i class="material-icons">cancel</i>
-        <span>Discard</span>
-        <Ripple />
-      </button>
-    </div>
-  {:else}
     <div>
       <!-- Edit btn -->
       <button class="edit" on:click={onEdit}>
