@@ -1,5 +1,6 @@
 import { Machine, assign, spawn, send } from 'xstate';
 import { getData, getToken } from '@/assets/js/utils.js';
+import { editExerciseMachine } from './editExerciseMachine';
 
 const services = {
 	getAllExercises: async () => {
@@ -77,7 +78,7 @@ const actions = {
 		exercises: (_, event) => event.data
 	}),
 	updateNewExercise: assign({
-		newExercise: (_, event) => event.params ? event.params.value : event.data
+		newExercise: (_, event) => (event.params ? event.params.value : event.data)
 	}),
 	addNewExercise: assign({
 		exercises: (context, _) => [context.newExercise, ...context.exercises]
@@ -85,8 +86,8 @@ const actions = {
 	removeExercise: assign({
 		exercises: (context, event) => {
 			return context.exercises.filter(exercise => {
-				return exercise._id !== event.params.id
-			})
+				return exercise._id !== event.data;
+			});
 		}
 	}),
 	clearNewExercise: assign({
@@ -99,15 +100,15 @@ const actions = {
 
 const guards = {
 	isInputEmpty: (context, _) => context.newExercise.trim().length === 0
-}
+};
 
 export const exercisesMachine = Machine(
 	{
 		id: 'exercises',
 		context: {
 			exercises: [],
-			exercise: null,
 			newExercise: '',
+			editedExercise: null,
 			fetchError: ''
 		},
 		initial: 'idle',
@@ -117,7 +118,8 @@ export const exercisesMachine = Machine(
 				on: {
 					LOAD: 'fetching',
 					CREATE: 'creating',
-					DELETE: 'deleting'
+					DELETE: 'deleting',
+					EDIT: 'editing'
 				}
 			},
 			fetching: {
@@ -189,7 +191,22 @@ export const exercisesMachine = Machine(
 					onError: {
 						target: 'idle'
 					}
-				},
+				}
+			},
+			editing: {
+				entry: assign({
+					editedExercise: (_, event) => {
+						return spawn(editExerciseMachine(event.params.exercise));
+					}
+				}),
+				on: {
+					DONE_EDITING: {
+						target: 'idle',
+						actions: assign({
+							editedExercise: null
+						})
+					}
+				}
 			}
 		}
 	},
