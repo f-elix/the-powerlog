@@ -77,7 +77,10 @@
         <a href="/log" class="nav-link">full log</a>
       </li>
       <li>
-        <a href="/exercises" class="nav-link">your exercises</a>
+        <a href="/exercises" class="nav-link">exercises</a>
+      </li>
+      <li>
+        <a href="/templates" class="nav-link">templates</a>
       </li>
       <li on:click={() => authSend({ type: 'LOGOUT' })}>
         <a href="/" class="nav-link logout">logout</a>
