@@ -1,0 +1,48 @@
+# EXERCISE TYPE
+type Exercise {
+	_id: ID!
+	name: String
+	history: [ExerciseHistory]
+	group: ExerciseGroup
+	creator: User
+}
+
+type ExerciseHistory {
+	session: Session!
+	date: Date
+	executions: [Execution]
+}
+
+type ExerciseGroup {
+	_id: ID!
+	name: String
+	color: String
+	exercises: [Exercise]
+	creator: User
+}
+
+# INPUTS
+input ExerciseInput {
+	_id: ID
+	name: String
+	group: ExerciseGroupInput
+}
+
+input ExerciseGroupInput {
+	_id: ID
+	name: String
+	color: String
+	exercises: [ExerciseInput]
+}
+
+# ROOT
+type Query {
+	getExerciseById(exerciseId: ID!): Exercise
+	getExercisesByName(name: String!): [Exercise]
+	getAllExercises: [Exercise]
+}
+
+type Mutation {
+	saveExercise(exerciseData: ExerciseInput!): Exercise!
+	deleteExercise(exerciseId: ID!): Boolean
+}

@@ -9,8 +9,9 @@ const jwt = require('jsonwebtoken');
 const { ApolloServer, AuthenticationError } = require('apollo-server');
 
 // GraphQL imports
-const typeDefs = fs.readFileSync(path.join(__dirname, 'graphql', 'typeDefs.gql'), 'utf-8');
-const resolvers = require('./graphql/resolvers/index');
+// const typeDefs = fs.readFileSync(path.join(__dirname, 'graphql', 'typeDefs.gql'), 'utf-8');
+const typeDefs = require('./graphql/types');
+const resolvers = require('./graphql/resolvers');
 
 // MongoDB imports
 const mongoose = require('mongoose');

@@ -1,0 +1,24 @@
+# USER TYPE
+type User {
+	_id: ID
+	name: String!
+	email: String!
+	password: String!
+	createdAt: String!
+	log: [Session]
+}
+
+type AuthData {
+	token: String!
+}
+
+# ROOT
+type Query {
+	isAuth(token: String!): Boolean
+	getUserData: User
+}
+
+type Mutation {
+	signupUser(name: String!, email: String!, password: String!): AuthData!
+	loginUser(email: String!, password: String!): AuthData!
+}

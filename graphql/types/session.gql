@@ -1,0 +1,108 @@
+# SESSION TYPE
+type Session {
+	_id: ID!
+	createdAt: String
+	updatedAt: String
+	title: String!
+	sessionDate: Date!
+	exercises: [SessionExercise]
+	notes: String
+	bodyweigth: Bodyweight
+	creator: User
+}
+
+type Bodyweight {
+	amount: Int
+	unit: String
+}
+
+type SessionExercise {
+	movements: [Movement]
+}
+
+type Movement {
+	exercise: Exercise
+	executions: [Execution]
+}
+
+type Execution {
+	sets: Int
+	repsOrTime: RepsOrTime
+	weight: Weight
+	restTime: RestTime
+}
+
+type RepsOrTime {
+	amount: Int
+	unit: String
+}
+
+type Weight {
+	amount: Int
+	unit: String
+}
+
+type RestTime {
+	amount: Int
+	unit: String
+}
+
+# SESSION INPUTS
+input SessionInput {
+	_id: ID
+	name: String!
+	date: Date!
+	exercises: [SessionExerciseInput]
+	bodyweight: BodyweightInput
+	notes: String
+}
+
+input BodyweightInput {
+	amount: Int
+	unit: String
+}
+
+input SessionExerciseInput {
+	movements: [MovementInput]
+}
+
+input MovementInput {
+	exercise: ExerciseInput
+	executions: [ExecutionInput]
+}
+
+input ExecutionInput {
+	sets: Int
+	repsOrTime: RepsOrTimeInput
+	weight: WeightInput
+	restTime: RestTimeInput
+}
+
+input RepsOrTimeInput {
+	amount: Int
+	unit: String
+}
+
+input WeightInput {
+	amount: Int
+	unit: String
+}
+
+input RestTimeInput {
+	amount: Int
+	unit: String
+}
+
+# ROOT
+type Query {
+	getSessionById(sessionId: ID!): Session
+	getSessionsByDate(sessionDate: Date!): [Session]
+	getSessionsByTitle(title: String!): [Session]
+	getSessionsFromTo(fromDate: Date!, toDate: Date!): [Session]
+	getSessionRange(from: Int!, to: Int!): [Session]
+}
+
+type Mutation {
+	saveSession(sessionData: SessionInput!): Session!
+	deleteSession(sessionId: ID!): Boolean
+}
