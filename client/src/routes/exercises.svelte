@@ -119,7 +119,7 @@
     color="action"
     on:click={onCreateExercise}>
     <i class="material-icons">add</i>
-    Add new exercise
+    Add new
   </Button>
 
   <!-- Exercises list -->
