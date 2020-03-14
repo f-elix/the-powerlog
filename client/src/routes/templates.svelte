@@ -8,7 +8,7 @@
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
-  import CardExercise from "@/components/exercises/CardExercise.svelte";
+  import CardTemplate from "@/components/templates/CardTemplate.svelte";
   import Button from "@/components/UI/Button.svelte";
   import Input from "@/components/UI/Input.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
@@ -50,7 +50,7 @@
   <!-- Add button -->
   <Button size="big" variant="filled" color="action">
     <i class="material-icons">add</i>
-    Add new template
+    Add new
   </Button>
 
   <!-- Templates list -->
@@ -64,7 +64,7 @@
     <!-- {/if} -->
     <!-- {#each exercises as exercise (exercise._id)} -->
     <li>
-      <!-- @TODO card template -->
+      <CardTemplate />
     </li>
     <!-- {/each} -->
   </ul>
