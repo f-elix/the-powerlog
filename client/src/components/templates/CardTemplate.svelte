@@ -14,7 +14,7 @@
 </style>
 
 <article in:fly={{ x: 30 }} out:fly={{ x: 30, duration: 200 }}>
-  <h3>{template.name}</h3>
+  <!-- <h3>{template.name}</h3> -->
   <div>
     <!-- Edit btn -->
     <button class="edit">
