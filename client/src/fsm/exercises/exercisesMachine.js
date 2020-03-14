@@ -70,30 +70,6 @@ const services = {
 			console.log(err);
 			throw err;
 		}
-	},
-	searchExercises: async (context, _) => {
-		const queryName = 'getExercisesByName';
-		const query = {
-			query: `
-				query searchExercises($name: String!) {
-					getExercisesByName(name: $name) {
-						name
-						_id
-					}
-				}
-			`,
-			variables: {
-				name: context.searchFilter
-			}
-		};
-		try {
-			const token = getToken();
-			await getData(query, queryName, token);
-			return event.data;
-		} catch (err) {
-			console.log(err);
-			throw err;
-		}
 	}
 };
 
@@ -119,6 +95,22 @@ const actions = {
 	}),
 	updateFetchError: assign({
 		fetchError: (_, event) => event.data.message
+	}),
+	updateSearchFilter: assign({
+		searchFilter: (_, event) => event.params.value
+	}),
+	filterExercises: assign({
+		filteredExercises: (context, _) => {
+			return context.exercises.filter(exercise => {
+				return exercise.name
+					.trim()
+					.toLowerCase()
+					.includes(context.searchFilter.trim().toLowerCase());
+			});
+		}
+	}),
+	resetExercises: assign({
+		filteredExercises: null
 	})
 };
 
@@ -131,6 +123,7 @@ export const exercisesMachine = Machine(
 	{
 		id: 'exercises',
 		context: {
+			filteredExercises: null,
 			exercises: [],
 			newExercise: '',
 			editedExercise: null,
@@ -146,15 +139,10 @@ export const exercisesMachine = Machine(
 					CREATE: 'creating',
 					DELETE: 'deleting',
 					EDIT: 'editing',
-					SEARCH: [
-						{
-							cond: 'isSearchFilterEmpty',
-							target: 'idle'
-						},
-						{
-							target: 'searching'
-						}
-					]
+					SEARCH_INPUT: {
+						target: 'filtering',
+						actions: ['updateSearchFilter']
+					}
 				}
 			},
 			fetching: {
@@ -221,7 +209,7 @@ export const exercisesMachine = Machine(
 				invoke: {
 					src: 'deleteExercise',
 					onDone: {
-						target: 'idle',
+						target: 'idle'
 					},
 					onError: {
 						target: 'idle'
@@ -243,14 +231,19 @@ export const exercisesMachine = Machine(
 					}
 				}
 			},
-			searching: {
-				invoke: {
-					src: 'searchExercises',
-					onDone: {
-						target: 'idle',
-						actions: 'updateExercises'
-					},
-					onError: 'idle'
+			filtering: {
+				on: {
+					'': [
+						{
+							cond: 'isSearchFilterEmpty',
+							target: 'idle',
+							actions: ['resetExercises']
+						},
+						{
+							target: 'idle',
+							actions: ['filterExercises']
+						}
+					]
 				}
 			}
 		}

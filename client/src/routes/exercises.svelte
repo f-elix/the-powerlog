@@ -18,12 +18,14 @@
 
   let exercises = [];
 
-  $: exercises = $exercisesState.context.exercises;
+  $: exercises = $exercisesState.context.filteredExercises
+    ? $exercisesState.context.filteredExercises
+    : $exercisesState.context.exercises;
   $: editService = $exercisesState.context.editedExercise;
 
-  onMount(() => {
+  function onLoad() {
     exercisesSend({ type: "LOAD" });
-  });
+  }
 
   function onCreateExercise() {
     exercisesSend({ type: "CREATE" });
@@ -54,9 +56,13 @@
     exercisesSend({ type: "EDIT", params: { exercise: e.detail } });
   }
 
-  function onSearch(e) {
-    exercisesSend({ type: "SEARCH", params: { value: e.target.value } });
+  function onSearchInput(e) {
+    exercisesSend({ type: "SEARCH_INPUT", params: { value: e.target.value } });
   }
+
+  onMount(() => {
+    onLoad();
+  });
 </script>
 
 <style>
@@ -104,7 +110,7 @@
       type="search"
       label="Search Exercises"
       name="exercises"
-      on:input={onSearch} />
+      on:input={onSearchInput} />
   </form>
 
   <h1>your exercises</h1>
