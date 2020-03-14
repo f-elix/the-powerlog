@@ -13,6 +13,7 @@
   import Input from "@/components/UI/Input.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
   import ModalLayout from "@/components/UI/ModalLayout.svelte";
+  import SearchForm from "@/components/UI/SearchForm.svelte";
 
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
 
@@ -104,14 +105,10 @@
 
 <section>
   <!-- Search form -->
-  <form class="search-form" novalidate>
-    <i class="material-icons search-icon">search</i>
-    <Input
-      type="search"
-      label="Search Exercises"
-      name="exercises"
-      on:input={onSearchInput} />
-  </form>
+  <SearchForm
+    on:input={onSearchInput}
+    label="Search Exercises"
+    name="exercisesSearch" />
 
   <h1>your exercises</h1>
 
