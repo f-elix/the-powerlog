@@ -36,6 +36,9 @@ const TemplateSchema = new mongoose.Schema({
 			]
 		}
 	],
+	notes: {
+		type: String
+	},
 	creator: {
 		type: mongoose.Schema.Types.ObjectId,
 		required: true,

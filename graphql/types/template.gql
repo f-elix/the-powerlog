@@ -1,0 +1,27 @@
+# TEMPLATE TYPE
+type Template {
+	_id: ID!
+	name: String!
+	exercises: [sessionExercise]
+	notes: String
+	creator: User
+}
+
+# INPUTS
+input TemplateInput {
+	_id: ID
+	name: String!
+	exercises: [sessionExerciseInput]
+	notes: String
+}
+
+# ROOT
+type Query {
+	getTemplateById(templateId: ID!): Template
+	getAllTemplates: [Template]
+}
+
+type Mutation {
+	saveTemplate(templateData: templateInput!): Template!
+	deleteTemplate(templateId: ID!): Boolean
+}
