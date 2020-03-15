@@ -2,7 +2,7 @@
 type Template {
 	_id: ID!
 	name: String!
-	exercises: [sessionExercise]
+	exercises: [SessionExercise]
 	notes: String
 	creator: User
 }
@@ -11,7 +11,7 @@ type Template {
 input TemplateInput {
 	_id: ID
 	name: String!
-	exercises: [sessionExerciseInput]
+	exercises: [SessionExerciseInput]
 	notes: String
 }
 
@@ -22,6 +22,6 @@ type Query {
 }
 
 type Mutation {
-	saveTemplate(templateData: templateInput!): Template!
+	saveTemplate(templateData: TemplateInput!): Template!
 	deleteTemplate(templateId: ID!): Boolean
 }
