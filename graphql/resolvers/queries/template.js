@@ -1,4 +1,5 @@
 // Models
+const User = require('../../../models/User');
 const Template = require('../../../models/Template');
 
 const queries = {
@@ -22,6 +23,22 @@ const queries = {
 			...template._doc,
 			_id: template._id.toString()
 		};
+	},
+	getAllTemplates: async (_, {}, { currentUser }) => {
+		// Find user by ID and populate user's templates
+		const user = await User.findById(currentUser.userId).populate('templates');
+		if (!user) {
+			const error = new Error('Your session has ended. Please sign in again.');
+			error.statusCode = 401;
+			throw error;
+		}
+		// Return array of exercises
+		return user.templates.map(template => {
+			return {
+				...template._doc,
+				_id: template._id.toString()
+			};
+		});
 	}
 };
 
