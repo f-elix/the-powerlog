@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 const Session = require('../../models/Session');
 const Exercise = require('../../models/Exercise');
+const Template = require('../../models/Template');
 
 exports.signToken = async (userId, email) => {
 	return await jwt.sign(
@@ -67,5 +68,22 @@ exports.createSession = async (userId, sessionData) => {
 	return {
 		...newSession._doc,
 		_id: newSession._id.toString()
+	};
+};
+
+exports.createSession = async (userId, templateData) => {
+	// Find user
+	const user = await User.findById(userId);
+	// Create template
+	const template = new Template({
+		...templateData,
+		creator: userId
+	});
+	const newTemplate = await template.save();
+	user.templates.push(newTemplate);
+	await user.save();
+	return {
+		...newTemplate._doc,
+		_id: newTemplate._id.toString()
 	};
 };
