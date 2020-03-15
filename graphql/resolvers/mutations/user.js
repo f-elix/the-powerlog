@@ -6,7 +6,7 @@ const validator = require('validator');
 const User = require('../../../models/User');
 
 // Utils
-const signToken = require('../../../utils/signToken');
+const signToken = require('../utils');
 
 const mutations = {
 	// USER MUTATIONS

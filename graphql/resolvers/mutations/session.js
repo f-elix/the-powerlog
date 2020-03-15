@@ -2,7 +2,7 @@
 const Session = require('../../../models/Session');
 
 // Utils
-const createSession = require('../../../utils/createSession');
+const createSession = require('../utils');
 
 const mutations = {
 	// SESSION MUTATIONS

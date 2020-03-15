@@ -2,7 +2,7 @@
 const Exercise = require('../../../models/Exercise');
 
 // Utils
-const createExercise = require('../../../utils/createExercise');
+const createExercise = require('../utils');
 
 const mutations = {
 	// EXERCISE MUTATIONS
