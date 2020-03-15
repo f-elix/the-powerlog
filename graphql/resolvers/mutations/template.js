@@ -1,6 +1,9 @@
 // Models
 const Template = require('../../../models/Template');
 
+// Utils
+const { createTemplate } = require('../utils');
+
 const mutations = {
 	// TEMPLATE MUTATIONS
 	saveTemplate: async (_, { templateData }, { currentUser }) => {
@@ -10,11 +13,11 @@ const mutations = {
 			throw error;
 		}
 		// If no id, template doesn't exist so create one and return it
-		// if (!templateData._id) {
-		// 	return await createTemplate(currentUser.userId, templateData);
-		// }
+		if (!templateData._id) {
+			return await createTemplate(currentUser.userId, templateData);
+		}
 		// Find template
-		const template = await Template.findById(templateData._id).populate('creator');
+		const template = await Template.findById(templateData._id);
 		if (!template) {
 			const error = new Error('No template found.');
 			error.statusCode = 404;
@@ -30,7 +33,8 @@ const mutations = {
 		template.name = templateData.name;
 		template.exercises = templateData.exercises;
 		template.notes = templateData.notes;
-		const updatedTemplate = await template.save();
+		let updatedTemplate = await template.save();
+		updatedTemplate = await updatedTemplate.populate('exercises.movements.exercise').execPopulate();
 		// Return template
 		return {
 			...updatedTemplate._doc,

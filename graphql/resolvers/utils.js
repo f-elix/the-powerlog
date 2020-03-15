@@ -71,7 +71,7 @@ exports.createSession = async (userId, sessionData) => {
 	};
 };
 
-exports.createSession = async (userId, templateData) => {
+exports.createTemplate = async (userId, templateData) => {
 	// Find user
 	const user = await User.findById(userId);
 	// Create template
@@ -79,7 +79,8 @@ exports.createSession = async (userId, templateData) => {
 		...templateData,
 		creator: userId
 	});
-	const newTemplate = await template.save();
+	let newTemplate = await template.save();
+	newTemplate = await newTemplate.populate('exercises.movements.exercise').execPopulate();
 	user.templates.push(newTemplate);
 	await user.save();
 	return {
