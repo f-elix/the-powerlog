@@ -1,5 +1,6 @@
 // Models
 const Exercise = require('../../../models/Exercise');
+const User = require('../../../models/User');
 
 // Utils
 const { createExercise } = require('../utils');
