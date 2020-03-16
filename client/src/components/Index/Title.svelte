@@ -31,7 +31,7 @@
 
   <!-- Install btn -->
   <Button variant="filled" color="primary-30">
-    <i class="material-icons">save_alt</i>
+    <i class="material-icons">get_app</i>
     Install
   </Button>
 </div>
