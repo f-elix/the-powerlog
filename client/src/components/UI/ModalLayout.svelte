@@ -17,7 +17,6 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 15rem;
   }
 
   .overlay {
@@ -31,19 +30,22 @@
 
   .modal {
     z-index: 1001;
-    width: 80%;
-    padding: 1rem;
     background-color: var(--color-fg-light);
-    border-radius: var(--radius-default);
     box-shadow: var(--shadow-default);
   }
 
   .small {
+    width: 80%;
     max-width: 30rem;
+    margin-top: 15rem;
+    padding: 1rem;
+    border-radius: var(--radius-default);
   }
 
   .big {
+    width: 100%;
     max-width: 40rem;
+    margin-top: 6rem;
   }
 </style>
 
