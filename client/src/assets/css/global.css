@@ -73,6 +73,11 @@ h2 {
 	font-size: var(--text-big);
 }
 
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
 .auth-form {
 	width: 100%;
 	height: 32rem;

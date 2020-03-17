@@ -8,6 +8,7 @@
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
+  import TemplateForm from "@/components/templates/TemplateForm.svelte";
   import CardTemplate from "@/components/templates/CardTemplate.svelte";
   import Button from "@/components/UI/Button.svelte";
   import Input from "@/components/UI/Input.svelte";
@@ -25,27 +26,13 @@
     margin: 2rem auto;
     list-style-type: none;
   }
-
-  .create-form .btn-ctn {
-    display: flex;
-    justify-content: space-around;
-    margin: 2rem auto;
-  }
-
-  .message {
-    text-align: center;
-  }
-
-  .error {
-    color: var(--color-error);
-  }
 </style>
 
 <section>
+  <h1>your templates</h1>
+
   <!-- Search form -->
   <SearchForm label="Search Templates" name="searchTemplates" />
-
-  <h1>your templates</h1>
 
   <!-- Add button -->
   <Button size="big" variant="filled" color="action">
@@ -70,20 +57,7 @@
   </ul>
 
   <!-- Modal -->
-  <!-- {#if $exercisesState.matches('creating')} -->
-  <!-- <ModalLayout> -->
-  <!-- Error message -->
-  <!-- {#if $exercisesState.context.fetchError} -->
-  <!-- <p class="message error">Fetch error</p> -->
-  <!-- {/if} -->
-  <!-- Exercise form -->
-  <!-- <form class="create-form" novalidate>
-    <Input autofocus={true} name="exerciseName" label="Exercise Name" />
-    <div class="btn-ctn">
-      <Button color="error" variant="filled">Discard</Button>
-      <Button color="action" variant="filled" type="submit">Create</Button>
-    </div>
-  </form> -->
-  <!-- </ModalLayout> -->
-  <!-- {/if} -->
+  <ModalLayout size="big">
+    <TemplateForm />
+  </ModalLayout>
 </section>
