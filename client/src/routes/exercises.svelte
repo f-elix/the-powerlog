@@ -76,18 +76,6 @@
     list-style-type: none;
   }
 
-  .search-form {
-    position: relative;
-    margin: 2rem auto;
-  }
-
-  .search-form .search-icon {
-    position: absolute;
-    top: 20%;
-    right: 5%;
-    z-index: 10;
-  }
-
   .create-form .btn-ctn {
     display: flex;
     justify-content: space-around;
@@ -104,13 +92,13 @@
 </style>
 
 <section>
+  <h1>your exercises</h1>
+
   <!-- Search form -->
   <SearchForm
     on:input={onSearchInput}
     label="Search Exercises"
     name="exercisesSearch" />
-
-  <h1>your exercises</h1>
 
   <!-- Add button -->
   <Button
