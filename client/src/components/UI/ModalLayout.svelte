@@ -2,6 +2,8 @@
   // Svelte
   import { scale, fade } from "svelte/transition";
   import { quintOut } from "svelte/easing";
+
+  export let size = "small";
 </script>
 
 <style>
@@ -30,17 +32,24 @@
   .modal {
     z-index: 1001;
     width: 80%;
-    max-width: 30rem;
     padding: 1rem;
     background-color: var(--color-fg-light);
     border-radius: var(--radius-default);
     box-shadow: var(--shadow-default);
   }
+
+  .small {
+    max-width: 30rem;
+  }
+
+  .big {
+    max-width: 40rem;
+  }
 </style>
 
 <div class="modal-ctn">
   <div class="overlay" transition:fade={{ duration: 200 }} on:click />
-  <div class="modal" transition:scale={{ easing: quintOut, opacity: 0 }}>
+  <div class="modal {size}" transition:scale={{ easing: quintOut, opacity: 0 }}>
     <slot />
   </div>
 </div>
