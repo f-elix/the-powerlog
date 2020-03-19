@@ -97,12 +97,15 @@
   .add-icon {
     padding: 1rem;
     border-radius: 50%;
-    background-color: var(--color-fg);
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-action);
     font-size: 4rem;
-    transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1);
+    transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1),
+      border-color 0.2s linear;
   }
 
-  .add-icon.rotate {
+  .add-icon.open {
+    border-color: var(--color-info);
     transform: rotate(45deg);
   }
 
@@ -141,7 +144,7 @@
     transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1) 0.1s;
   }
 
-  .submenu-link.open {
+  .submenu.open .submenu-link {
     transform: translateY(0);
   }
 </style>
@@ -190,16 +193,16 @@
   </nav>
   <button class="add" on:click={toggleMenu}>
     <div class="add-icon-ctn">
-      <i class="material-icons add-icon" class:rotate={isSubMenuOpen}>add</i>
+      <i class="material-icons add-icon" class:open={isSubMenuOpen}>add</i>
     </div>
     <div class="submenu" class:open={isSubMenuOpen}>
-      <a href="/templates">
+      <a href="/sessions">
         <i class="material-icons">add</i>
-        New Template
+        Session
       </a>
-      <a href="/sessions" class="submenu-link" class:open={isSubMenuOpen}>
+      <a href="/templates" class="submenu-link" class:open={isSubMenuOpen}>
         <i class="material-icons">add</i>
-        New Session
+        Template
       </a>
     </div>
   </button>
