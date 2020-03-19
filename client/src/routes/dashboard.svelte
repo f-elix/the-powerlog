@@ -88,10 +88,6 @@
 </style>
 
 <section>
-  <!-- Create button -->
-  <Button size="fab" variant="filled" color="action">
-    <i class="material-icons">add</i>
-  </Button>
   <!-- Sessions ctn -->
   <div>
     <div class="heading">
