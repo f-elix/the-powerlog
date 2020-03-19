@@ -62,23 +62,36 @@
   }
 
   .add {
+    position: relative;
     box-sizing: content-box;
     width: 15%;
-    padding: 1rem;
-    border-radius: 50%;
     border: none;
     outline: none;
     background-color: var(--header-color);
     color: var(--color-primary);
-    transform: translate(5%, -30%);
+  }
+
+  .add::before {
+    content: "";
+    position: absolute;
+    z-index: -10;
+    top: -2rem;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: inherit;
   }
 
   .add-icon-ctn {
+    position: relative;
+    z-index: 100;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100%;
+    transform: translateY(-1rem);
   }
 
   .add-icon {
@@ -96,18 +109,31 @@
   .submenu {
     position: absolute;
     top: 0;
-    right: 1.5rem;
-    z-index: -100;
+    left: 0;
+    z-index: 10;
+    width: 40rem;
+    height: 40rem;
     display: flex;
     flex-direction: column;
-    width: fit-content;
-    opacity: 0;
+    padding: 6rem 7rem;
+    border-radius: 50%;
+    background-color: rgba(36, 52, 71, 0.4);
+    transform: translate(-40%, -40%) scale(0);
     transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1),
       opacity 0.15s linear;
   }
 
+  .submenu.open {
+    transform: translate(-40%, -40%) scale(1);
+  }
+
   .submenu i {
     font-size: 2rem;
+  }
+
+  .submenu a {
+    padding: 0.5rem 0;
+    font-size: var(--text-normal);
   }
 
   .submenu-link {
@@ -115,33 +141,8 @@
     transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1) 0.1s;
   }
 
-  .submenu.open {
-    transform: translateY(-175%);
-    opacity: 1;
-  }
-
   .submenu-link.open {
     transform: translateY(0);
-  }
-
-  .overlay {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    z-index: -1000;
-    width: 5rem;
-    height: 5rem;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transform: scale(0);
-    transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1),
-      opacity 0.15s linear;
-  }
-
-  .overlay.open {
-    opacity: 1;
-    transform: scale(6);
   }
 </style>
 
@@ -191,16 +192,15 @@
     <div class="add-icon-ctn">
       <i class="material-icons add-icon" class:rotate={isSubMenuOpen}>add</i>
     </div>
+    <div class="submenu" class:open={isSubMenuOpen}>
+      <a href="/templates">
+        <i class="material-icons">add</i>
+        New Template
+      </a>
+      <a href="/sessions" class="submenu-link" class:open={isSubMenuOpen}>
+        <i class="material-icons">add</i>
+        New Session
+      </a>
+    </div>
   </button>
-  <div class="submenu" class:open={isSubMenuOpen}>
-    <a href="/templates">
-      <i class="material-icons">add</i>
-      New Template
-    </a>
-    <a href="/sessions" class="submenu-link" class:open={isSubMenuOpen}>
-      <i class="material-icons">add</i>
-      New Session
-    </a>
-  </div>
-  <div class="overlay" class:open={isSubMenuOpen} />
 </header>
