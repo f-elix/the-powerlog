@@ -133,7 +133,7 @@
     flex-direction: column;
     padding: 6rem 7rem;
     border-radius: 50%;
-    background-color: rgba(36, 52, 71, 0.4);
+    background-color: rgba(36, 52, 71, 0.85);
     transform: translate(-40%, -40%) scale(0);
     transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1),
       opacity 0.15s linear;
@@ -145,19 +145,25 @@
 
   .submenu i {
     font-size: 2rem;
+    color: var(--color-action);
   }
 
   .submenu a {
-    padding: 0.5rem 0;
-    font-size: var(--text-normal);
+    padding: 1rem 0;
+    font-size: var(--text-big);
+    transform: translateY(100%);
   }
 
-  .submenu-link {
-    transform: translateY(100%);
+  .submenu a:first-of-type {
+    transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1) 0.05s;
+  }
+
+  .submenu a:nth-of-type(2) {
+    margin-left: -2rem;
     transition: transform 0.2s cubic-bezier(0.5, 0, 0.5, 1) 0.1s;
   }
 
-  .submenu.open .submenu-link {
+  .submenu.open a {
     transform: translateY(0);
   }
 </style>
@@ -218,7 +224,7 @@
         <i class="material-icons">add</i>
         Session
       </a>
-      <a href="/templates" class="submenu-link" class:open={isSubMenuOpen}>
+      <a href="/templates">
         <i class="material-icons">add</i>
         Template
       </a>
