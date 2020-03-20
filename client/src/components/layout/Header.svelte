@@ -78,6 +78,7 @@
     position: relative;
     box-sizing: content-box;
     width: 15%;
+    padding: 0 1rem;
     border: none;
     outline: none;
     background-color: var(--header-color);
