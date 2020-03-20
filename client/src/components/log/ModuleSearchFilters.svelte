@@ -172,8 +172,8 @@
     <!-- Name form -->
     {#if $filterDisplayState.matches('idle') && currentFilter === filters.name}
       <div
-        in:fly={{ x: 30, duration: 150 }}
-        out:fly={{ x: -30, duration: 150 }}
+        in:fly|local={{ x: 30, duration: 150 }}
+        out:fly|local={{ x: -30, duration: 150 }}
         on:outroend={onOutroEnd}>
         <Input
           label="session name"
@@ -183,8 +183,8 @@
       <!-- Date form -->
     {:else if $filterDisplayState.matches('idle') && currentFilter === filters.date}
       <div
-        in:fly={{ x: 30, duration: 150 }}
-        out:fly={{ x: -30, duration: 150 }}
+        in:fly|local={{ x: 30, duration: 150 }}
+        out:fly|local={{ x: -30, duration: 150 }}
         on:outroend={onOutroEnd}>
         <Input
           type="date"
@@ -196,8 +196,8 @@
     {:else if $filterDisplayState.matches('idle') && currentFilter === filters.period}
       <div
         class="period-inputs-ctn"
-        in:fly={{ x: 30, duration: 150 }}
-        out:fly={{ x: -30, duration: 150 }}
+        in:fly|local={{ x: 30, duration: 150 }}
+        out:fly|local={{ x: -30, duration: 150 }}
         on:outroend={onOutroEnd}>
         <Input
           type="date"

@@ -74,6 +74,7 @@
   ul {
     margin: 2rem auto;
     list-style-type: none;
+    overflow-x: hidden;
   }
 
   .create-form .btn-ctn {
