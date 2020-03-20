@@ -1,12 +1,15 @@
 <script>
   // Svelte
   import { getContext } from "svelte";
+  import { stores } from "@sapper/app";
 
   // Components
   import MenuButton from "@/components/UI/MenuButton.svelte";
   import Drawer from "@/components/UI/Drawer.svelte";
 
   const { authState, authSend } = getContext("auth");
+
+  const { page } = stores();
 
   let isSubMenuOpen = false;
 
@@ -43,10 +46,9 @@
   nav {
     width: 85%;
     height: 100%;
-    padding: 0.5rem;
   }
 
-  ul {
+  nav ul {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -55,10 +57,21 @@
     margin: 0;
   }
 
+  nav ul li {
+    height: 100%;
+    width: 20%;
+  }
+
   .nav-link {
     height: 100%;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
+    padding: 0 0.5rem;
+  }
+
+  .current-link {
+    background-color: var(--color-primary);
+    color: var(--header-color);
   }
 
   .add {
@@ -150,12 +163,6 @@
 </style>
 
 <header>
-  <!-- Logo -->
-  <!-- Username -->
-  <!-- <p class="username">{$authState.context.userData.name}'s log</p> -->
-  <!-- Hamburger -->
-  <!-- <MenuButton on:click={toggleMenu} state={isOpen} /> -->
-  <!-- Mobile nav -->
   <nav>
     <ul>
       <li on:click={() => authSend({ type: 'LOGOUT' })}>
@@ -165,26 +172,37 @@
         </a>
       </li>
       <li>
-        <a href="/dashboard" class="nav-link">
-          <!-- <img src="/img/icons/icon.svg" alt="" width="25" height="25" /> -->
+        <a
+          href="/dashboard"
+          class="nav-link"
+          class:current-link={$page.path.includes('/dashboard')}>
           <i class="material-icons">dashboard</i>
           dashboard
         </a>
       </li>
       <li>
-        <a href="/log" class="nav-link">
+        <a
+          href="/log"
+          class="nav-link"
+          class:current-link={$page.path.includes('/log')}>
           <i class="material-icons">view_list</i>
           log
         </a>
       </li>
       <li>
-        <a href="/exercises" class="nav-link">
+        <a
+          href="/exercises"
+          class="nav-link"
+          class:current-link={$page.path.includes('/exercises')}>
           <i class="material-icons">fitness_center</i>
           exercises
         </a>
       </li>
       <li>
-        <a href="/templates" class="nav-link">
+        <a
+          href="/templates"
+          class="nav-link"
+          class:current-link={$page.path.includes('/templates')}>
           <i class="material-icons">insert_drive_file</i>
           templates
         </a>
