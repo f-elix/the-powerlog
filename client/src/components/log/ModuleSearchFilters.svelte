@@ -83,7 +83,8 @@
 
 <style>
   section {
-    padding: 3rem 1rem;
+    padding: 0 1rem;
+    overflow-x: hidden;
   }
 
   .btn-ctn {
@@ -147,6 +148,7 @@
 </style>
 
 <section>
+  <h1>Your Log History</h1>
   <!-- Filter tab selection -->
   <h2>Filter log by</h2>
   <div class="btn-ctn">
