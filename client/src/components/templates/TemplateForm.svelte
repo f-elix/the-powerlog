@@ -32,7 +32,6 @@
   }
 
   .movement__name td {
-    padding: 0.5rem;
     font-weight: bold;
   }
 

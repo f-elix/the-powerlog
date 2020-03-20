@@ -2,6 +2,7 @@
   // Svelte
   import { onMount } from "svelte";
   import { flip } from "svelte/animate";
+  import { goto } from "@sapper/app";
 
   // FSM
   //   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
@@ -25,6 +26,7 @@
   ul {
     margin: 2rem auto;
     list-style-type: none;
+    overflow-x: hidden;
   }
 </style>
 
@@ -35,7 +37,11 @@
   <SearchForm label="Search Templates" name="searchTemplates" />
 
   <!-- Add button -->
-  <Button size="big" variant="filled" color="action">
+  <Button
+    size="big"
+    variant="filled"
+    color="action"
+    on:click={() => goto('/templates/new')}>
     <i class="material-icons">add</i>
     Add new
   </Button>
@@ -55,9 +61,4 @@
     </li>
     <!-- {/each} -->
   </ul>
-
-  <!-- Modal -->
-  <ModalLayout size="big">
-    <TemplateForm />
-  </ModalLayout>
 </section>

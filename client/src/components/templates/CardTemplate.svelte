@@ -47,7 +47,7 @@
   }
 </style>
 
-<article in:fly={{ x: 30 }} out:fly={{ x: 30, duration: 200 }}>
+<article in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
   <h3>Squat Day</h3>
   <div>
     <!-- View template btn -->
