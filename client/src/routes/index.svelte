@@ -22,6 +22,7 @@
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
+    padding-top: 2rem;
     text-align: center;
   }
 </style>
