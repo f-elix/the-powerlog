@@ -4,7 +4,7 @@
   import { fade } from "svelte/transition";
 
   // FSM
-  import { useMachine } from "@/fsm/useMachine.js";
+  import { useMachine } from "@/fsm/machineStores.js";
   import { authMachine } from "@/fsm/auth/authMachine.js";
 
   // Components

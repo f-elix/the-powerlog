@@ -6,7 +6,7 @@
   // FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
   import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
-  import { useMachine } from "@/fsm/useMachine.js";
+  import { useMachine } from "@/fsm/machineStores.js";
 
   // js
   import { currentWeekDates, lastWeekDates } from "@/assets/js/utils.js";

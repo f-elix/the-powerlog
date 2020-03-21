@@ -5,7 +5,7 @@
   //   FSM
   import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
   import { filterLogMachine } from "@/fsm/search/filterLogMachine.js";
-  import { useMachine } from "@/fsm/useMachine.js";
+  import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
