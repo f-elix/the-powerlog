@@ -64,9 +64,6 @@
     justify-content: space-between;
   }
 
-  .actions-ctn button {
-  }
-
   .actions-ctn button.edit {
     color: var(--color-info);
   }
