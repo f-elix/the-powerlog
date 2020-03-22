@@ -7,7 +7,8 @@
   // Components
   import Ripple from "./Ripple.svelte";
 
-  export let type = "text";
+  export let list = "";
+  export let type = !!list ? "" : "text";
   export let value = "";
   export let label = "";
   export let name = "";
@@ -135,6 +136,7 @@
       <input
         bind:this={input}
         {type}
+        {list}
         {name}
         class:label-padding={label}
         {placeholder}
