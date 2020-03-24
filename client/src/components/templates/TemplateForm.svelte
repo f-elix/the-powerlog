@@ -36,4 +36,3 @@
   <i class="material-icons">add_box</i>
   Add Exercise
 </Button>
-<!-- Add exercise modal -->

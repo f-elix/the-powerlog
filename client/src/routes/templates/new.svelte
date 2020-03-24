@@ -11,6 +11,7 @@
   import Button from "@/components/UI/Button.svelte";
   import TemplateForm from "@/components/templates/TemplateForm.svelte";
   import AddExerciseModal from "@/components/templates/AddExerciseModal.svelte";
+  import AddSetModal from "@/components/templates/AddSetModal.svelte";
 
   const { editTemplateState, editTemplateSend } = useMachine(
     editTemplateMachine
@@ -54,6 +55,10 @@
 <!-- Add exercise modal -->
 {#if $editTemplateState.matches('addingexercise')}
   <AddExerciseModal />
+{/if}
+<!-- Add set modal -->
+{#if $editTemplateState.matches('addingset')}
+  <AddSetModal />
 {/if}
 <!-- Template buttons -->
 <div class="template-btn-ctn">
