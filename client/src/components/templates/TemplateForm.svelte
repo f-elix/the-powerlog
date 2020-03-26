@@ -11,12 +11,25 @@
 
   const { editTemplateState, editTemplateSend } = getContext("editTemplate");
 
+  let templateExercises;
+
+  $: templateExercises = $editTemplateState.context.exercises;
+
   function onNameInput(e) {
     dispatch("nameinput", e.target.value);
   }
 
   function onAddExercise() {
     dispatch("addexercise");
+  }
+
+  function onAddSet(exercise) {
+    editTemplateSend({
+      type: "ADD_SET",
+      params: {
+        exercise
+      }
+    });
   }
 </script>
 
@@ -28,8 +41,9 @@
 <Input label="Template Name" name="templateName" on:input={onNameInput} />
 <!-- Exercises list -->
 <ul class="exercise-list">
-  <TemplateExercise />
-  <TemplateExercise />
+  {#each templateExercises as exercise (exercise._id)}
+    <TemplateExercise {exercise} on:addset={onAddSet(exercise)} />
+  {/each}
 </ul>
 <!-- Add exercise button -->
 <Button size="big" color="action" on:click={onAddExercise}>

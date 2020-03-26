@@ -4,6 +4,23 @@ import { editExerciseMachine } from './editExerciseMachine';
 const actions = {
 	updateTemplateName: assign({
 		templateName: (_, event) => event.params.value
+	}),
+	addExercise: assign({
+		exercises: (context, event) => {
+			const exercise = event.params.newExercise;
+			if (!exercise) {
+				return context.exercises;
+			}
+			const newExercise = {
+				movements: [
+					{
+						exercise: exercise,
+						executions: []
+					}
+				]
+			};
+			return [...context.exercises, newExercise];
+		}
 	})
 };
 
@@ -11,7 +28,8 @@ export const editTemplateMachine = Machine(
 	{
 		id: 'editTemplate',
 		context: {
-			templateName: ''
+			templateName: '',
+			exercises: []
 		},
 		initial: 'editing',
 		states: {
@@ -20,20 +38,20 @@ export const editTemplateMachine = Machine(
 					NAME_INPUT: {
 						actions: ['updateTemplateName']
 					},
-					ADD_EXERCISE: {
-						target: 'addingexercise'
-					}
+					ADD_EXERCISE: 'addingexercise',
+					ADD_SET: 'addingset'
 				}
 			},
 			addingexercise: {
-				invoke: {
-					id: 'addExercise',
-					src: editExerciseMachine,
-					onDone: {
+				on: {
+					SAVE: {
 						target: 'editing',
-						actions: []
-					}
-				},
+						actions: ['addExercise']
+					},
+					CANCEL: 'editing'
+				}
+			},
+			addingset: {
 				on: {
 					CANCEL: 'editing'
 				}

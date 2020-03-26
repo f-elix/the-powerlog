@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { getContext, onMount } from "svelte";
+  import { getContext } from "svelte";
 
   //FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
@@ -11,7 +11,13 @@
   import Select from "@/components/UI/Select.svelte";
   import EditFormLayout from "./EditFormLayout.svelte";
 
+  const { editTemplateState, editTemplateSend } = getContext("editTemplate");
+
   let repsTimeSelectedOption = "Reps";
+
+  function onCancel() {
+    editTemplateSend({ type: "CANCEL" });
+  }
 </script>
 
 <style>
@@ -45,7 +51,7 @@
   }
 </style>
 
-<EditFormLayout>
+<EditFormLayout on:cancel={onCancel}>
   <h2>Add Set</h2>
   <div class="input-group">
     <!-- Sets input -->

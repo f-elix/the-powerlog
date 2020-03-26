@@ -22,8 +22,6 @@
     editTemplateSend
   });
 
-  $: console.log($editTemplateState.children);
-
   function onCancel() {
     goto("/templates");
   }

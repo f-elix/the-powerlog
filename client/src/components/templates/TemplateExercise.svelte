@@ -1,7 +1,17 @@
 <script>
+  // Svelte
+  import { createEventDispatcher } from "svelte";
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
   import Button from "@/components/UI/Button.svelte";
+
+  const dispatch = createEventDispatcher();
+
+  export let exercise;
+
+  function onAddSet() {
+    dispatch("addset");
+  }
 </script>
 
 <style>
@@ -42,9 +52,15 @@
   }
 
   .add-set-btn {
+    width: 10rem;
     margin: 0.5rem 0;
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 0;
     color: var(--color-action);
+  }
+
+  .add-set-btn span {
+    display: flex;
+    align-items: center;
   }
 
   button {
@@ -80,24 +96,35 @@
 <li>
   <!-- Content -->
   <div class="content-ctn">
-    <p class="movement-name">Movement name</p>
-    <div class="set">
-      <p>
-        <span>3</span>
-        <span>X</span>
-        <span>10</span>
-      </p>
-      <p>
-        <span>225</span>
-        <span>lbs</span>
-      </p>
-    </div>
-    <button class="add-set-btn">
-      <i class="material-icons">add_circle_outline</i>
-      <Ripple />
-    </button>
+    {#each exercise.movements as movement}
+      <p class="movement-name">{movement.exercise.name}</p>
+      {#each movement.executions as execution, i}
+        <div class="set">
+          <p>
+            <span>{execution.sets}</span>
+            <span>X</span>
+            <span>{execution.repsOrTime.amount}</span>
+            {#if execution.repsOrTime.unit}
+              <span>{execution.repsOrTime.unit}</span>
+            {/if}
+          </p>
+          <p>
+            <span>{execution.weight.amount}</span>
+            <span>{execution.weight.unit}</span>
+          </p>
+        </div>
+      {/each}
+      <!-- Add set btn -->
+      <button class="add-set-btn" on:click={onAddSet}>
+        <span>
+          <i class="material-icons">add_circle_outline</i>
+          Add Set
+        </span>
+        <Ripple />
+      </button>
+    {/each}
   </div>
-  <!-- actions -->
+  <!-- Actions -->
   <div class="actions-ctn">
     <!-- Edit btn -->
     <button class="edit">

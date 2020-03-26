@@ -17,8 +17,29 @@
 
   $: exercises = $exercisesState.context.exercises;
 
+  let newExercise;
+
+  function onInput(e) {
+    const option = document.querySelector(`option[value="${e.target.value}"]`);
+    if (option) {
+      newExercise = JSON.parse(option.dataset.exercise);
+    }
+  }
+
   function onCancel() {
     editTemplateSend({ type: "CANCEL" });
+  }
+
+  function onSave() {
+    if (!newExercise) {
+      return;
+    }
+    editTemplateSend({
+      type: "SAVE",
+      params: {
+        newExercise
+      }
+    });
   }
 
   onMount(() => {
@@ -30,13 +51,13 @@
 
 </style>
 
-<EditFormLayout on:cancel={onCancel}>
+<EditFormLayout on:cancel={onCancel} on:submit={onSave}>
   <h2>Add Exercise</h2>
   <!-- Exercise input -->
-  <Input label="Exercise" list="exercises" />
+  <Input label="Exercise" list="exercises" on:input={onInput} />
   <datalist id="exercises">
     {#each exercises as exercise (exercise._id)}
-      <option value={exercise.name} />
+      <option value={exercise.name} data-exercise={JSON.stringify(exercise)} />
     {/each}
   </datalist>
 </EditFormLayout>

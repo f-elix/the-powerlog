@@ -11,10 +11,6 @@
   function onCancel() {
     dispatch("cancel");
   }
-
-  function onSubmit() {
-    dispatch("submit");
-  }
 </script>
 
 <style>
@@ -28,7 +24,7 @@
 </style>
 
 <ModalLayout on:click={onCancel}>
-  <form on:submit|preventDefault={onSubmit} novalidate>
+  <form on:submit|preventDefault novalidate>
     <slot />
     <!-- actions btn -->
     <div class="btn-ctn">
