@@ -7,6 +7,7 @@ const TemplateSchema = new mongoose.Schema({
 	},
 	exercises: [
 		{
+			_id: mongoose.Schema.Types.ObjectId,
 			movements: [
 				{
 					exercise: {
@@ -15,18 +16,18 @@ const TemplateSchema = new mongoose.Schema({
 					},
 					executions: [
 						{
+							_id: mongoose.Schema.Types.ObjectId,
 							sets: {
 								type: Number
 							},
-							repsOrTime: {
+							reps: {
+								type: Number
+							},
+							time: {
 								amount: Number,
 								unit: String
 							},
 							weight: {
-								amount: Number,
-								unit: String
-							},
-							restTime: {
 								amount: Number,
 								unit: String
 							}

@@ -27,22 +27,17 @@ type Movement {
 
 type Execution {
 	sets: Int
-	repsOrTime: RepsOrTime
+	reps: Int
+	time: Time
 	weight: Weight
-	restTime: RestTime
 }
 
-type RepsOrTime {
+type Time {
 	amount: Int
 	unit: String
 }
 
 type Weight {
-	amount: Int
-	unit: String
-}
-
-type RestTime {
 	amount: Int
 	unit: String
 }
