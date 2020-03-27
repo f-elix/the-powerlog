@@ -31,7 +31,7 @@ const SessionSchema = new mongoose.Schema({
 								amount: Number,
 								unit: String
 							},
-							weight: {
+							load: {
 								amount: Number,
 								unit: String
 							}
