@@ -1,26 +1,30 @@
 <script>
   // svelte
   import { goto } from "@sapper/app";
-  import { setContext } from "svelte";
+  import { onMount } from "svelte";
 
   // fsm
   import { editTemplateMachine } from "@/fsm/templates/editTemplateMachine.js";
+  import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
   import Button from "@/components/UI/Button.svelte";
   import TemplateForm from "@/components/templates/TemplateForm.svelte";
   import AddExerciseModal from "@/components/templates/AddExerciseModal.svelte";
-  import AddSetModal from "@/components/templates/AddSetModal.svelte";
+  import AddExecutionModal from "@/components/templates/AddExecutionModal.svelte";
 
   const { editTemplateState, editTemplateSend } = useMachine(
     editTemplateMachine
   );
+  const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
 
-  setContext("editTemplate", {
-    editTemplateState,
-    editTemplateSend
+  onMount(() => {
+    exercisesSend({ type: "LOAD" });
   });
+
+  $: exercises = $exercisesState.context.exercises;
+  $: templateExercises = $editTemplateState.context.exercises;
 
   function onCancel() {
     goto("/templates");
@@ -32,6 +36,28 @@
 
   function onAddExercise() {
     editTemplateSend({ type: "ADD_EXERCISE" });
+  }
+
+  function onAddExecution(e) {
+    editTemplateSend({
+      type: "ADD_EXECUTION",
+      params: {
+        exercise: e.detail
+      }
+    });
+  }
+
+  function onAddSave(e) {
+    editTemplateSend({
+      type: "SAVE",
+      params: {
+        value: e.detail
+      }
+    });
+  }
+
+  function onAddCancel() {
+    editTemplateSend({ type: "CANCEL" });
   }
 </script>
 
@@ -49,14 +75,18 @@
 <!-- Header -->
 <h1>Create a Template</h1>
 <!-- Template form -->
-<TemplateForm on:nameinput={onNameInput} on:addexercise={onAddExercise} />
+<TemplateForm
+  {templateExercises}
+  on:nameinput={onNameInput}
+  on:addexercise={onAddExercise}
+  on:addexecution={onAddExecution} />
 <!-- Add exercise modal -->
 {#if $editTemplateState.matches('addingexercise')}
-  <AddExerciseModal />
+  <AddExerciseModal {exercises} on:cancel={onAddCancel} on:save={onAddSave} />
 {/if}
 <!-- Add set modal -->
-{#if $editTemplateState.matches('addingset')}
-  <AddSetModal />
+{#if $editTemplateState.matches('addingexecution')}
+  <AddExecutionModal on:cancel={onAddCancel} on:save={onAddSave} />
 {/if}
 <!-- Template buttons -->
 <div class="template-btn-ctn">

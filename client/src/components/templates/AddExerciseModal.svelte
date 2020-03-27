@@ -1,21 +1,14 @@
 <script>
   // Svelte
-  import { getContext, onMount } from "svelte";
-
-  //FSM
-  import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
-  import { useMachine } from "@/fsm/machineStores.js";
+  import { createEventDispatcher } from "svelte";
 
   // Components
   import Input from "@/components/UI/Input.svelte";
   import EditFormLayout from "./EditFormLayout.svelte";
 
-  const { editTemplateState, editTemplateSend } = getContext("editTemplate");
-  const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
+  const dispatch = createEventDispatcher();
 
-  const addExerciseService = $editTemplateState.children.addExercise;
-
-  $: exercises = $exercisesState.context.exercises;
+  export let exercises;
 
   let newExercise;
 
@@ -27,24 +20,15 @@
   }
 
   function onCancel() {
-    editTemplateSend({ type: "CANCEL" });
+    dispatch("cancel");
   }
 
   function onSave() {
     if (!newExercise) {
       return;
     }
-    editTemplateSend({
-      type: "SAVE",
-      params: {
-        newExercise
-      }
-    });
+    dispatch("save", newExercise);
   }
-
-  onMount(() => {
-    exercisesSend({ type: "LOAD" });
-  });
 </script>
 
 <style>

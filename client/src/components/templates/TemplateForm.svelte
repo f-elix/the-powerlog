@@ -1,6 +1,6 @@
 <script>
   // svelte
-  import { createEventDispatcher, getContext } from "svelte";
+  import { createEventDispatcher } from "svelte";
 
   // Components
   import Input from "@/components/UI/Input.svelte";
@@ -9,11 +9,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const { editTemplateState, editTemplateSend } = getContext("editTemplate");
-
-  let templateExercises;
-
-  $: templateExercises = $editTemplateState.context.exercises;
+  export let templateExercises;
 
   function onNameInput(e) {
     dispatch("nameinput", e.target.value);
@@ -23,13 +19,8 @@
     dispatch("addexercise");
   }
 
-  function onAddSet(exercise) {
-    editTemplateSend({
-      type: "ADD_SET",
-      params: {
-        exercise
-      }
-    });
+  function onAddExecution(exercise) {
+    dispatch("addexecution", exercise);
   }
 </script>
 
@@ -42,7 +33,7 @@
 <!-- Exercises list -->
 <ul class="exercise-list">
   {#each templateExercises as exercise (exercise._id)}
-    <TemplateExercise {exercise} on:addset={onAddSet(exercise)} />
+    <TemplateExercise {exercise} on:addexecution={onAddExecution(exercise)} />
   {/each}
 </ul>
 <!-- Add exercise button -->

@@ -1,5 +1,6 @@
 import { Machine, assign } from 'xstate';
 import { editExerciseMachine } from './editExerciseMachine';
+import ObjectID from 'bson-objectid';
 
 const actions = {
 	updateTemplateName: assign({
@@ -7,11 +8,12 @@ const actions = {
 	}),
 	addExercise: assign({
 		exercises: (context, event) => {
-			const exercise = event.params.newExercise;
+			const exercise = event.params.value;
 			if (!exercise) {
 				return context.exercises;
 			}
 			const newExercise = {
+				_id: ObjectID(),
 				movements: [
 					{
 						exercise: exercise,
@@ -21,7 +23,8 @@ const actions = {
 			};
 			return [...context.exercises, newExercise];
 		}
-	})
+	}),
+	addExecution: assign({})
 };
 
 export const editTemplateMachine = Machine(
@@ -39,7 +42,7 @@ export const editTemplateMachine = Machine(
 						actions: ['updateTemplateName']
 					},
 					ADD_EXERCISE: 'addingexercise',
-					ADD_SET: 'addingset'
+					ADD_EXECUTION: 'addingexecution'
 				}
 			},
 			addingexercise: {
@@ -51,8 +54,12 @@ export const editTemplateMachine = Machine(
 					CANCEL: 'editing'
 				}
 			},
-			addingset: {
+			addingexecution: {
 				on: {
+					SAVE: {
+						target: 'editing',
+						actions: ['addExecution']
+					},
 					CANCEL: 'editing'
 				}
 			}

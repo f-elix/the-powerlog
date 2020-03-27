@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { createEventDispatcher } from "svelte";
+
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
   import Button from "@/components/UI/Button.svelte";
@@ -9,8 +10,8 @@
 
   export let exercise;
 
-  function onAddSet() {
-    dispatch("addset");
+  function onAddExecution() {
+    dispatch("addexecution");
   }
 </script>
 
@@ -115,7 +116,7 @@
         </div>
       {/each}
       <!-- Add set btn -->
-      <button class="add-set-btn" on:click={onAddSet}>
+      <button class="add-set-btn" on:click={onAddExecution}>
         <span>
           <i class="material-icons">add_circle_outline</i>
           Add Set
