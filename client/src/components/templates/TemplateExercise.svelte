@@ -10,8 +10,8 @@
 
   export let exercise;
 
-  function onAddExecution() {
-    dispatch("addexecution");
+  function onAddExecution(movement) {
+    dispatch("addexecution", movement);
   }
 </script>
 
@@ -104,19 +104,20 @@
           <p>
             <span>{execution.sets}</span>
             <span>X</span>
-            <span>{execution.repsOrTime.amount}</span>
-            {#if execution.repsOrTime.unit}
-              <span>{execution.repsOrTime.unit}</span>
+            {#if execution.reps}
+              <span>{execution.reps}</span>
+            {:else}
+              <span>{execution.time.amount} {execution.time.unit}</span>
             {/if}
           </p>
           <p>
-            <span>{execution.weight.amount}</span>
-            <span>{execution.weight.unit}</span>
+            <span>{execution.load.amount}</span>
+            <span>{execution.load.unit}</span>
           </p>
         </div>
       {/each}
       <!-- Add set btn -->
-      <button class="add-set-btn" on:click={onAddExecution}>
+      <button class="add-set-btn" on:click={onAddExecution(movement)}>
         <span>
           <i class="material-icons">add_circle_outline</i>
           Add Set

@@ -13,6 +13,8 @@
 
   const dispatch = createEventDispatcher();
 
+  export let exerciseName;
+
   const repsTimeOptions = ["Reps", "Time"];
   const timeUnitOptions = ["Sec", "Min"];
   const loadUnitOptions = ["Lbs", "Kg"];
@@ -22,8 +24,8 @@
   let selectedLoadUnit = "Lbs";
 
   let sets = 0;
-  let reps = null;
-  let time = null;
+  let reps = 0;
+  let time = 0;
   let load = 0;
 
   function onCancel() {
@@ -75,13 +77,14 @@
 </style>
 
 <EditFormLayout on:cancel={onCancel} on:submit={onDone}>
-  <h2>Add Set</h2>
+  <h2>{exerciseName}</h2>
   <div class="input-group">
     <!-- Sets input -->
     <Input
       type="number"
       label="Sets"
       name="sets"
+      autofocus={true}
       on:input={e => (sets = e.target.value)} />
     <!-- Reps/time inputs -->
     <div class="reps-inputs">

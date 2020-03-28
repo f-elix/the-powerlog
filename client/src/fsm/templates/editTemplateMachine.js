@@ -1,4 +1,4 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, spawn } from 'xstate';
 import { editExerciseMachine } from './editExerciseMachine';
 import ObjectID from 'bson-objectid';
 
@@ -9,14 +9,14 @@ const actions = {
 	addExercise: assign({
 		exercises: (context, event) => {
 			const exercise = event.params.value;
-			if (!exercise) {
-				return context.exercises;
+			if (!exercise._id) {
+				exercise._id = ObjectID();
 			}
 			const newExercise = {
 				_id: ObjectID(),
 				movements: [
 					{
-						exercise: exercise,
+						exercise,
 						executions: []
 					}
 				]
@@ -24,7 +24,14 @@ const actions = {
 			return [...context.exercises, newExercise];
 		}
 	}),
-	addExecution: assign({})
+	updateExercise: assign({
+		exercises: (context, event) => {
+			const updatedExerciseIndex = context.exercises.findIndex(e => e._id === event.exercise._id);
+			const updatedExercises = context.exercises;
+			updatedExercises[updatedExerciseIndex] = event.exercise;
+			return updatedExercises;
+		}
+	})
 };
 
 export const editTemplateMachine = Machine(
@@ -32,7 +39,8 @@ export const editTemplateMachine = Machine(
 		id: 'editTemplate',
 		context: {
 			templateName: '',
-			exercises: []
+			exercises: [],
+			editedExercise: null
 		},
 		initial: 'editing',
 		states: {
@@ -55,13 +63,20 @@ export const editTemplateMachine = Machine(
 				}
 			},
 			addingexecution: {
+				entry: assign({
+					editedExercise: (_, event) =>
+						spawn(editExerciseMachine(event.params.exercise, event.params.movement))
+				}),
 				on: {
-					SAVE: {
+					DONE: {
 						target: 'editing',
-						actions: ['addExecution']
+						actions: ['updateExercise']
 					},
 					CANCEL: 'editing'
-				}
+				},
+				exit: assign({
+					editedExercise: null
+				})
 			}
 		}
 	},

@@ -16,6 +16,10 @@
     const option = document.querySelector(`option[value="${e.target.value}"]`);
     if (option) {
       newExercise = JSON.parse(option.dataset.exercise);
+    } else {
+      newExercise = {
+        name: e.target.value
+      };
     }
   }
 

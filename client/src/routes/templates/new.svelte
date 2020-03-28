@@ -41,14 +41,21 @@
   function onAddExecution(e) {
     editTemplateSend({
       type: "ADD_EXECUTION",
+      params: e.detail
+    });
+  }
+
+  function onSaveExercise(e) {
+    editTemplateSend({
+      type: "SAVE",
       params: {
-        exercise: e.detail
+        value: e.detail
       }
     });
   }
 
-  function onAddSave(e) {
-    editTemplateSend({
+  function onSaveExecution(e) {
+    $editTemplateState.context.editedExercise.send({
       type: "SAVE",
       params: {
         value: e.detail
@@ -82,11 +89,17 @@
   on:addexecution={onAddExecution} />
 <!-- Add exercise modal -->
 {#if $editTemplateState.matches('addingexercise')}
-  <AddExerciseModal {exercises} on:cancel={onAddCancel} on:save={onAddSave} />
+  <AddExerciseModal
+    {exercises}
+    on:cancel={onAddCancel}
+    on:save={onSaveExercise} />
 {/if}
 <!-- Add set modal -->
 {#if $editTemplateState.matches('addingexecution')}
-  <AddExecutionModal on:cancel={onAddCancel} on:save={onAddSave} />
+  <AddExecutionModal
+    on:cancel={onAddCancel}
+    on:save={onSaveExecution}
+    exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
 {/if}
 <!-- Template buttons -->
 <div class="template-btn-ctn">
