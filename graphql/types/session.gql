@@ -21,11 +21,13 @@ type SessionExercise {
 }
 
 type Movement {
+	_id: ID
 	exercise: Exercise
 	executions: [Execution]
 }
 
 type Execution {
+	_id: ID
 	sets: Int
 	reps: Int
 	time: Time
@@ -58,32 +60,30 @@ input BodyweightInput {
 }
 
 input SessionExerciseInput {
+	_id: ID
 	movements: [MovementInput]
 }
 
 input MovementInput {
+	_id: ID
 	exercise: ExerciseInput
 	executions: [ExecutionInput]
 }
 
 input ExecutionInput {
+	_id: ID
 	sets: Int
-	repsOrTime: RepsOrTimeInput
-	weight: WeightInput
-	restTime: RestTimeInput
+	reps: Int
+	time: TimeInput
+	load: LoadInput
 }
 
-input RepsOrTimeInput {
+input TimeInput {
 	amount: Int
 	unit: String
 }
 
-input WeightInput {
-	amount: Int
-	unit: String
-}
-
-input RestTimeInput {
+input LoadInput {
 	amount: Int
 	unit: String
 }
