@@ -33,15 +33,15 @@
 
   function onDone() {
     const newExecution = {
-      sets,
-      load,
+      sets: +sets,
+      load: +load,
       selectedLoadUnit
     };
     if (selectedRepsTime === "Time") {
-      newExecution.time = repsTime;
+      newExecution.time = +repsTime;
       newExecution.selectedTimeUnit = selectedTimeUnit;
     } else {
-      newExecution.reps = repsTime;
+      newExecution.reps = +repsTime;
     }
     dispatch("save", newExecution);
   }

@@ -66,6 +66,10 @@
   function onAddCancel() {
     editTemplateSend({ type: "CANCEL" });
   }
+
+  function onSaveTemplate() {
+    editTemplateSend({ type: "SAVE_TEMPLATE" });
+  }
 </script>
 
 <style>
@@ -104,5 +108,7 @@
 <!-- Template buttons -->
 <div class="template-btn-ctn">
   <Button color="error" variant="filled" on:click={onCancel}>Cancel</Button>
-  <Button color="action" variant="filled">Create</Button>
+  <Button color="action" variant="filled" on:click={onSaveTemplate}>
+    Create
+  </Button>
 </div>

@@ -1,6 +1,37 @@
 import { Machine, assign, spawn } from 'xstate';
 import { editExerciseMachine } from './editExerciseMachine';
+import { getData, getToken } from '@/assets/js/utils.js';
+import { goto } from '@sapper/app';
 import ObjectID from 'bson-objectid';
+
+const services = {
+	saveTemplate: async (context, _) => {
+		const queryName = 'saveTemplate';
+		const query = {
+			query: `
+				mutation saveTemplate($data: TemplateInput!) {
+					saveTemplate(templateData: $data) {
+						name
+					}
+				}
+			`,
+			variables: {
+				data: {
+					name: context.templateName,
+					exercises: context.exercises
+				}
+			}
+		};
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	}
+};
 
 const actions = {
 	updateTemplateName: assign({
@@ -31,7 +62,10 @@ const actions = {
 			updatedExercises[updatedExerciseIndex] = event.exercise;
 			return updatedExercises;
 		}
-	})
+	}),
+	routeTemplates: () => {
+		goto('/templates');
+	}
 };
 
 export const editTemplateMachine = Machine(
@@ -50,7 +84,8 @@ export const editTemplateMachine = Machine(
 						actions: ['updateTemplateName']
 					},
 					ADD_EXERCISE: 'addingexercise',
-					ADD_EXECUTION: 'addingexecution'
+					ADD_EXECUTION: 'addingexecution',
+					SAVE_TEMPLATE: 'savingtemplate'
 				}
 			},
 			addingexercise: {
@@ -77,10 +112,26 @@ export const editTemplateMachine = Machine(
 				exit: assign({
 					editedExercise: null
 				})
+			},
+			savingtemplate: {
+				invoke: {
+					src: 'saveTemplate',
+					onDone: {
+						target: 'done'
+					},
+					onError: {
+						target: 'editing'
+					}
+				}
+			},
+			done: {
+				entry: 'routeTemplates',
+				type: 'final'
 			}
 		}
 	},
 	{
-		actions
+		actions,
+		services
 	}
 );

@@ -10,8 +10,6 @@
 
   export let exercise;
 
-  $: console.log(exercise);
-
   function onAddExecution(movement) {
     dispatch("addexecution", { exercise, movement });
   }
