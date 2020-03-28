@@ -5,7 +5,7 @@
 
   // FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
-  import { searchLogMachine } from "@/fsm/search/searchLogMachine.js";
+  import { searchLogMachine } from "@/fsm/log/searchLogMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
   // js

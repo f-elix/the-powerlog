@@ -5,7 +5,7 @@
 
   // FSM
   import { useMachine, useService } from "@/fsm/machineStores.js";
-  import { filters } from "@/fsm/search/filterDisplayMachine.js";
+  import { filters } from "@/fsm/log/filterDisplayMachine.js";
 
   // js
   import {
