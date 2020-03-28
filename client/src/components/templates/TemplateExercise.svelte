@@ -10,8 +10,10 @@
 
   export let exercise;
 
+  $: console.log(exercise);
+
   function onAddExecution(movement) {
-    dispatch("addexecution", movement);
+    dispatch("addexecution", { exercise, movement });
   }
 </script>
 
@@ -107,12 +109,13 @@
             {#if execution.reps}
               <span>{execution.reps}</span>
             {:else}
-              <span>{execution.time.amount} {execution.time.unit}</span>
+              <span>{execution.time.amount}</span>
+              <span>{execution.time.unit.toLowerCase()}</span>
             {/if}
           </p>
           <p>
             <span>{execution.load.amount}</span>
-            <span>{execution.load.unit}</span>
+            <span>{execution.load.unit.toLowerCase()}</span>
           </p>
         </div>
       {/each}

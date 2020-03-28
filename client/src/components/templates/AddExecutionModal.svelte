@@ -24,9 +24,8 @@
   let selectedLoadUnit = "Lbs";
 
   let sets = 0;
-  let reps = 0;
-  let time = 0;
   let load = 0;
+  let repsTime = 0;
 
   function onCancel() {
     dispatch("cancel");
@@ -35,12 +34,15 @@
   function onDone() {
     const newExecution = {
       sets,
-      reps,
-      time,
       load,
-      selectedLoadUnit,
-      selectedTimeUnit
+      selectedLoadUnit
     };
+    if (selectedRepsTime === "Time") {
+      newExecution.time = repsTime;
+      newExecution.selectedTimeUnit = selectedTimeUnit;
+    } else {
+      newExecution.reps = repsTime;
+    }
     dispatch("save", newExecution);
   }
 </script>
@@ -92,7 +94,7 @@
         type="number"
         label={selectedRepsTime}
         name="repsTime"
-        on:input={e => (selectedRepsTime === 'Reps' ? (reps = e.target.value) : (time = e.target.value))} />
+        on:input={e => (repsTime = e.target.value)} />
       <Select
         name="repsTime"
         options={repsTimeOptions}

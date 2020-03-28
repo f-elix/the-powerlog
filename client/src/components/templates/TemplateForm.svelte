@@ -18,13 +18,6 @@
   function onAddExercise() {
     dispatch("addexercise");
   }
-
-  function onAddExecution(e, exercise) {
-    dispatch("addexecution", {
-      exercise,
-      movement: e.detail
-    });
-  }
 </script>
 
 <style>
@@ -36,9 +29,7 @@
 <!-- Exercises list -->
 <ul class="exercise-list">
   {#each templateExercises as exercise (exercise._id)}
-    <TemplateExercise
-      {exercise}
-      on:addexecution={e => onAddExecution(e, exercise)} />
+    <TemplateExercise {exercise} on:addexecution />
   {/each}
 </ul>
 <!-- Add exercise button -->
