@@ -5,7 +5,7 @@
   import { goto } from "@sapper/app";
 
   // FSM
-  //   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
+  import { templatesMachine } from "@/fsm/templates/templatesMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
@@ -16,6 +16,14 @@
   import Spinner from "@/components/UI/Spinner.svelte";
   import ModalLayout from "@/components/UI/ModalLayout.svelte";
   import SearchForm from "@/components/UI/SearchForm.svelte";
+
+  const { templatesState, templatesSend } = useMachine(templatesMachine);
+
+  $: templates = $templatesState.context.templates;
+
+  onMount(() => {
+    templatesSend({ type: "LOAD" });
+  });
 </script>
 
 <style>
@@ -48,17 +56,10 @@
 
   <!-- Templates list -->
   <ul>
-    <!-- Spinner -->
-    <!-- {#if $exercisesState.matches('fetching')} -->
-    <!-- <Spinner /> -->
-    <!-- No results message -->
-    <!-- {:else if $exercisesState.context.fetchError} -->
-    <!-- <h2 class="message">No templates created yet</h2> -->
-    <!-- {/if} -->
-    <!-- {#each exercises as exercise (exercise._id)} -->
-    <li>
-      <CardTemplate />
-    </li>
-    <!-- {/each} -->
+    {#each templates as template (template._id)}
+      <li>
+        <CardTemplate {template} />
+      </li>
+    {/each}
   </ul>
 </section>

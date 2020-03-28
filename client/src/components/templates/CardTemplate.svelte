@@ -6,7 +6,7 @@
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
 
-  // export let template;
+  export let template;
 </script>
 
 <style>
@@ -48,7 +48,7 @@
 </style>
 
 <article in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
-  <h3>Squat Day</h3>
+  <h3>{template.name}</h3>
   <div>
     <!-- View template btn -->
     <button class="edit">
