@@ -96,6 +96,9 @@ const actions = {
 	updateFetchError: assign({
 		fetchError: (_, event) => event.data.message
 	}),
+	clearFetchError: assign({
+		fetchError: ''
+	}),
 	updateSearchFilter: assign({
 		searchFilter: (_, event) => event.params.value
 	}),
@@ -134,6 +137,13 @@ export const exercisesMachine = Machine(
 		states: {
 			idle: {
 				id: 'idle',
+				initial: 'normal',
+				states: {
+					normal: {},
+					error: {
+						exit: ['clearFetchError']
+					}
+				},
 				on: {
 					LOAD: 'fetching',
 					CREATE: 'creating',
@@ -153,7 +163,7 @@ export const exercisesMachine = Machine(
 						actions: ['updateExercises']
 					},
 					onError: {
-						target: 'idle',
+						target: 'idle.error',
 						actions: ['updateFetchError']
 					}
 				}
@@ -162,6 +172,13 @@ export const exercisesMachine = Machine(
 				initial: 'idle',
 				states: {
 					idle: {
+						initial: 'normal',
+						states: {
+							normal: {},
+							error: {
+								exit: ['clearFetchError']
+							}
+						},
 						on: {
 							INPUT: {
 								actions: ['updateNewExercise']
@@ -189,7 +206,7 @@ export const exercisesMachine = Machine(
 								actions: ['updateNewExercise']
 							},
 							onError: {
-								target: 'idle',
+								target: 'idle.error',
 								actions: ['updateFetchError']
 							}
 						}
@@ -212,7 +229,7 @@ export const exercisesMachine = Machine(
 						target: 'idle'
 					},
 					onError: {
-						target: 'idle'
+						target: 'idle.error'
 					}
 				}
 			},

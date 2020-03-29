@@ -79,6 +79,10 @@
 
   <!-- Templates list -->
   <ul>
+    <!-- Spinner -->
+    {#if $templatesState.matches('fetching')}
+      <Spinner />
+    {/if}
     {#each templates as template (template._id)}
       <li>
         <CardTemplate {template} on:delete={onDeleteTemplate} />

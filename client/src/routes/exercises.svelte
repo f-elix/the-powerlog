@@ -116,8 +116,9 @@
     <!-- Spinner -->
     {#if $exercisesState.matches('fetching')}
       <Spinner />
-      <!-- No results message -->
-    {:else if $exercisesState.context.fetchError}
+    {/if}
+    <!-- No results message -->
+    {#if $exercisesState.matches('idle.error')}
       <h2 class="message">{$exercisesState.context.fetchError}</h2>
     {/if}
     {#each exercises as exercise (exercise._id)}
@@ -135,7 +136,7 @@
   {#if $exercisesState.matches('creating')}
     <ModalLayout on:click={onDiscard}>
       <!-- Error message -->
-      {#if $exercisesState.context.fetchError}
+      {#if $exercisesState.matches('creating.idle.error')}
         <p class="message error">{$exercisesState.context.fetchError}</p>
       {/if}
       <!-- Exercise form -->
