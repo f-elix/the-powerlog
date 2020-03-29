@@ -19,11 +19,22 @@
 
   const { templatesState, templatesSend } = useMachine(templatesMachine);
 
-  $: templates = $templatesState.context.templates;
+  $: templates = $templatesState.context.filteredTemplates
+    ? $templatesState.context.filteredTemplates
+    : $templatesState.context.templates;
 
   onMount(() => {
     templatesSend({ type: "LOAD" });
   });
+
+  function onSearchInput(e) {
+    templatesSend({
+      type: "SEARCH_INPUT",
+      params: {
+        value: e.target.value
+      }
+    });
+  }
 
   function onDeleteTemplate(e) {
     templatesSend({
@@ -51,7 +62,10 @@
   <h1>your templates</h1>
 
   <!-- Search form -->
-  <SearchForm label="Search Templates" name="searchTemplates" />
+  <SearchForm
+    label="Search Templates"
+    name="searchTemplates"
+    on:input={onSearchInput} />
 
   <!-- Add button -->
   <Button

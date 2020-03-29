@@ -56,14 +56,36 @@ const actions = {
 				return t._id !== event.params.templateId;
 			});
 		}
+	}),
+	updateSearchFilter: assign({
+		searchFilter: (_, event) => event.params.value
+	}),
+	resetTemplates: assign({
+		filteredTemplates: null
+	}),
+	filterTemplates: assign({
+		filteredTemplates: (context, _) => {
+			return context.templates.filter(t => {
+				return t.name
+					.trim()
+					.toLowerCase()
+					.includes(context.searchFilter.trim().toLowerCase());
+			});
+		}
 	})
+};
+
+const guards = {
+	isSearchFilterEmpty: (context, _) => context.searchFilter.trim().length === 0
 };
 
 export const templatesMachine = Machine(
 	{
 		id: 'templates',
 		context: {
-			templates: []
+			templates: [],
+			filteredTemplates: null,
+			searchFilter: ''
 		},
 		initial: 'idle',
 		states: {
@@ -73,6 +95,10 @@ export const templatesMachine = Machine(
 					DELETE: {
 						target: 'deleting',
 						actions: ['removeTemplate']
+					},
+					SEARCH_INPUT: {
+						target: 'filtering',
+						actions: ['updateSearchFilter']
 					}
 				}
 			},
@@ -86,6 +112,21 @@ export const templatesMachine = Machine(
 					onError: 'idle'
 				}
 			},
+			filtering: {
+				on: {
+					'': [
+						{
+							cond: 'isSearchFilterEmpty',
+							target: 'idle',
+							actions: ['resetTemplates']
+						},
+						{
+							target: 'idle',
+							actions: ['filterTemplates']
+						}
+					]
+				}
+			},
 			deleting: {
 				invoke: {
 					src: 'deleteTemplate',
@@ -97,6 +138,7 @@ export const templatesMachine = Machine(
 	},
 	{
 		actions,
-		services
+		services,
+		guards
 	}
 );
