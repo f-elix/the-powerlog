@@ -4,7 +4,7 @@
 
   // Components
   import Input from "@/components/UI/Input.svelte";
-  import EditFormLayout from "./EditFormLayout.svelte";
+  import EditFormModalLayout from "./EditFormModalLayout.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -39,7 +39,7 @@
 
 </style>
 
-<EditFormLayout on:cancel={onCancel} on:submit={onSave}>
+<EditFormModalLayout on:cancel={onCancel} on:submit={onSave}>
   <h2>Add Exercise</h2>
   <!-- Exercise input -->
   <Input label="Exercise" list="exercises" on:input={onInput} />
@@ -48,4 +48,4 @@
       <option value={exercise.name} data-exercise={JSON.stringify(exercise)} />
     {/each}
   </datalist>
-</EditFormLayout>
+</EditFormModalLayout>

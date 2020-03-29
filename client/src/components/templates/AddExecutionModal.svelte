@@ -9,7 +9,7 @@
   // Components
   import Input from "@/components/UI/Input.svelte";
   import Select from "@/components/UI/Select.svelte";
-  import EditFormLayout from "./EditFormLayout.svelte";
+  import EditFormModalLayout from "./EditFormModalLayout.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -78,7 +78,7 @@
   }
 </style>
 
-<EditFormLayout on:cancel={onCancel} on:submit={onDone}>
+<EditFormModalLayout on:cancel={onCancel} on:submit={onDone}>
   <h2>{exerciseName}</h2>
   <div class="input-group">
     <!-- Sets input -->
@@ -115,4 +115,4 @@
         bind:selected={selectedLoadUnit} />
     </div>
   </div>
-</EditFormLayout>
+</EditFormModalLayout>
