@@ -73,7 +73,7 @@
 </script>
 
 <style>
-  .template-btn-ctn {
+  .actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -106,7 +106,7 @@
     exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
 {/if}
 <!-- Template buttons -->
-<div class="template-btn-ctn">
+<div class="actions">
   <Button color="error" variant="filled" on:click={onCancel}>Cancel</Button>
   <Button color="action" variant="filled" on:click={onSaveTemplate}>
     Create

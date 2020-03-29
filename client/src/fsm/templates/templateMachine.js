@@ -1,5 +1,6 @@
 import { Machine, assign } from 'xstate';
 import { getData, getToken } from '@/assets/js/utils.js';
+import { goto } from '@sapper/app';
 
 const services = {
 	getTemplate: async (_, event) => {
@@ -8,6 +9,7 @@ const services = {
 			query: `
 				query getTemplate($id: ID!) {
 					getTemplateById(templateId: $id) {
+                        _id
                         name
                         exercises {
                             movements {
@@ -46,6 +48,27 @@ const services = {
 			console.log(err);
 			throw err;
 		}
+	},
+	deleteTemplate: async (context, _) => {
+		const queryName = 'deleteTemplate';
+		const query = {
+			query: `
+				mutation deleteTemplate($id: ID!) {
+					deleteTemplate(templateId: $id)
+				}
+			`,
+			variables: {
+				id: context.template._id
+			}
+		};
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 
@@ -58,7 +81,13 @@ const actions = {
 	}),
 	clearFetchError: assign({
 		fetchError: ''
-	})
+	}),
+	routeTemplates: () => {
+		goto('/templates');
+	},
+	routeTemplate: (context, _) => {
+		goto(`/templates/${context.template._id}/edit`);
+	}
 };
 
 export const templateMachine = Machine(
@@ -86,7 +115,7 @@ export const templateMachine = Machine(
 				invoke: {
 					src: 'getTemplate',
 					onDone: {
-						target: 'success',
+						target: 'loaded',
 						actions: ['updateTemplate']
 					},
 					onError: {
@@ -95,7 +124,28 @@ export const templateMachine = Machine(
 					}
 				}
 			},
-			success: {}
+			loaded: {
+				on: {
+					DELETE: {
+						target: 'deleting',
+						actions: ['routeTemplates']
+					},
+					EDIT: {
+						target: '',
+						actions: 'routeTemplate'
+					}
+				}
+			},
+			deleting: {
+				invoke: {
+					src: 'deleteTemplate',
+					onDone: 'deleted',
+					onError: 'loaded'
+				}
+			},
+			deleted: {
+				type: 'final'
+			}
 		}
 	},
 	{
