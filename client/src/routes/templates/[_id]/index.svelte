@@ -1,13 +1,14 @@
 <script>
   // Svelte
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
   import { stores } from "@sapper/app";
 
   // FSM
-  import { useMachine } from "@/fsm/machineStores.js";
+  import { useMachine, useService } from "@/fsm/machineStores.js";
   import { templateMachine } from "@/fsm/templates/templateMachine.js";
 
   // Components
+  import EditTemplate from "@/components/templates/EditTemplate.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
   import Button from "@/components/UI/Button.svelte";
 
@@ -16,7 +17,15 @@
 
   const { templateState, templateSend } = useMachine(templateMachine);
 
-  let template;
+  $: if ($templateState.children.editTemplate) {
+    const { editTemplateState, editTemplateSend } = useService(
+      $templateState.children.editTemplate
+    );
+    setContext("editTemplate", {
+      editTemplateState,
+      editTemplateSend
+    });
+  }
 
   $: template = $templateState.context.template;
 
@@ -123,4 +132,7 @@
       Edit
     </Button>
   </div>
+{/if}
+{#if $templateState.matches('editing')}
+  <EditTemplate />
 {/if}

@@ -1,4 +1,5 @@
 import { Machine, assign } from 'xstate';
+import { editTemplateMachine } from './editTemplateMachine';
 import { getData, getToken } from '@/assets/js/utils.js';
 import { goto } from '@sapper/app';
 
@@ -84,9 +85,6 @@ const actions = {
 	}),
 	routeTemplates: () => {
 		goto('/templates');
-	},
-	routeTemplate: (context, _) => {
-		goto(`/templates/${context.template._id}/edit`);
 	}
 };
 
@@ -131,8 +129,7 @@ export const templateMachine = Machine(
 						actions: ['routeTemplates']
 					},
 					EDIT: {
-						target: '',
-						actions: 'routeTemplate'
+						target: 'editing'
 					}
 				}
 			},
@@ -145,6 +142,17 @@ export const templateMachine = Machine(
 			},
 			deleted: {
 				type: 'final'
+			},
+			editing: {
+				invoke: {
+					id: 'editTemplate',
+					src: editTemplateMachine,
+					data: {
+						template: (context, _) => context.template
+					},
+					onDone: {},
+					onError: {}
+				}
 			}
 		}
 	},

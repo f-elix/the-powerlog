@@ -16,10 +16,7 @@ const services = {
 				}
 			`,
 			variables: {
-				data: {
-					name: context.templateName,
-					exercises: context.exercises
-				}
+				data: context.template
 			}
 		};
 		try {
@@ -35,10 +32,14 @@ const services = {
 
 const actions = {
 	updateTemplateName: assign({
-		templateName: (_, event) => event.params.value
+		template: (context, event) => {
+			const updatedTemplate = context.template;
+			updatedTemplate.name = event.params.value;
+			return updatedTemplate;
+		}
 	}),
 	addExercise: assign({
-		exercises: (context, event) => {
+		template: (context, event) => {
 			const exercise = event.params.value;
 			if (!exercise._id) {
 				exercise._id = ObjectID();
@@ -52,15 +53,19 @@ const actions = {
 					}
 				]
 			};
-			return [...context.exercises, newExercise];
+			const updatedTemplate = context.template;
+			updatedTemplate.exercises = [...context.template.exercises, newExercise];
+			return updatedTemplate;
 		}
 	}),
 	updateExercise: assign({
-		exercises: (context, event) => {
-			const updatedExerciseIndex = context.exercises.findIndex(e => e._id === event.exercise._id);
-			const updatedExercises = context.exercises;
+		template: (context, event) => {
+			const updatedExerciseIndex = context.template.exercises.findIndex(e => e._id === event.exercise._id);
+			const updatedExercises = context.template.exercises;
 			updatedExercises[updatedExerciseIndex] = event.exercise;
-			return updatedExercises;
+			const updatedTemplate = context.template;
+			updatedTemplate.exercises = updatedExercises;
+			return updatedTemplate;
 		}
 	}),
 	routeTemplates: () => {
@@ -72,8 +77,10 @@ export const editTemplateMachine = Machine(
 	{
 		id: 'editTemplate',
 		context: {
-			templateName: '',
-			exercises: [],
+			template: {
+				name: '',
+				exercises: []
+			},
 			editedExercise: null
 		},
 		initial: 'editing',
