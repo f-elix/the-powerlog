@@ -56,6 +56,10 @@
     list-style-type: none;
     overflow-x: hidden;
   }
+
+  .message {
+    text-align: center;
+  }
 </style>
 
 <section>

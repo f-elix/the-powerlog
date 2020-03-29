@@ -10,6 +10,10 @@
 
   export let template;
 
+  function onView() {
+    dispatch("view", template._id);
+  }
+
   function onDelete() {
     dispatch("delete", template._id);
   }
@@ -57,11 +61,13 @@
   <h3>{template.name}</h3>
   <div>
     <!-- View template btn -->
-    <button class="edit">
-      <i class="material-icons">visibility</i>
-      <span>View Template</span>
-      <Ripple />
-    </button>
+    <a href={`templates/${template._id}`}>
+      <button class="edit">
+        <i class="material-icons">visibility</i>
+        <span>View Template</span>
+        <Ripple />
+      </button>
+    </a>
     <!-- Delete btn -->
     <button class="delete" on:click={onDelete}>
       <i class="material-icons">delete</i>

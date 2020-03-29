@@ -50,6 +50,7 @@ const actions = {
 	updateTemplates: assign({
 		templates: (_, event) => event.data
 	}),
+
 	removeTemplate: assign({
 		templates: (context, event) => {
 			return context.templates.filter(t => {
