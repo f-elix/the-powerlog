@@ -83,6 +83,10 @@
     {#if $templatesState.matches('fetching')}
       <Spinner />
     {/if}
+    <!-- No results message -->
+    {#if $templatesState.matches('idle.error')}
+      <h2 class="message">{$templatesState.context.fetchError}</h2>
+    {/if}
     {#each templates as template (template._id)}
       <li>
         <CardTemplate {template} on:delete={onDeleteTemplate} />

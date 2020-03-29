@@ -72,6 +72,12 @@ const actions = {
 					.includes(context.searchFilter.trim().toLowerCase());
 			});
 		}
+	}),
+	updateFetchError: assign({
+		fetchError: (_, event) => event.data.message
+	}),
+	clearFetchError: assign({
+		fetchError: ''
 	})
 };
 
@@ -85,11 +91,19 @@ export const templatesMachine = Machine(
 		context: {
 			templates: [],
 			filteredTemplates: null,
-			searchFilter: ''
+			searchFilter: '',
+			fetchError: ''
 		},
 		initial: 'idle',
 		states: {
 			idle: {
+				initial: 'normal',
+				states: {
+					normal: {},
+					error: {
+						exit: ['clearFetchError']
+					}
+				},
 				on: {
 					LOAD: 'fetching',
 					DELETE: {
@@ -109,7 +123,10 @@ export const templatesMachine = Machine(
 						target: 'idle',
 						actions: ['updateTemplates']
 					},
-					onError: 'idle'
+					onError: {
+						target: 'idle.error',
+						actions: ['updateFetchError']
+					}
 				}
 			},
 			filtering: {
@@ -131,7 +148,10 @@ export const templatesMachine = Machine(
 				invoke: {
 					src: 'deleteTemplate',
 					onDone: 'idle',
-					onError: 'idle'
+					onError: {
+						target: 'idle.error',
+						actions: ['updateFetchError']
+					}
 				}
 			}
 		}
