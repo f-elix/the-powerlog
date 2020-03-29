@@ -22,12 +22,40 @@ const services = {
 			console.log(err);
 			throw err;
 		}
+	},
+	deleteTemplate: async (_, event) => {
+		const queryName = 'deleteTemplate';
+		const query = {
+			query: `
+				mutation deleteTemplate($id: ID!) {
+					deleteTemplate(templateId: $id)
+				}
+			`,
+			variables: {
+				id: event.params.templateId
+			}
+		};
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 
 const actions = {
 	updateTemplates: assign({
 		templates: (_, event) => event.data
+	}),
+	removeTemplate: assign({
+		templates: (context, event) => {
+			return context.templates.filter(t => {
+				return t._id !== event.params.templateId;
+			});
+		}
 	})
 };
 
@@ -41,7 +69,11 @@ export const templatesMachine = Machine(
 		states: {
 			idle: {
 				on: {
-					LOAD: 'fetching'
+					LOAD: 'fetching',
+					DELETE: {
+						target: 'deleting',
+						actions: ['removeTemplate']
+					}
 				}
 			},
 			fetching: {
@@ -51,6 +83,13 @@ export const templatesMachine = Machine(
 						target: 'idle',
 						actions: ['updateTemplates']
 					},
+					onError: 'idle'
+				}
+			},
+			deleting: {
+				invoke: {
+					src: 'deleteTemplate',
+					onDone: 'idle',
 					onError: 'idle'
 				}
 			}

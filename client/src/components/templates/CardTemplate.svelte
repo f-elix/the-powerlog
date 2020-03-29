@@ -6,7 +6,13 @@
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
 
+  const dispatch = createEventDispatcher();
+
   export let template;
+
+  function onDelete() {
+    dispatch("delete", template._id);
+  }
 </script>
 
 <style>
@@ -57,7 +63,7 @@
       <Ripple />
     </button>
     <!-- Delete btn -->
-    <button class="delete">
+    <button class="delete" on:click={onDelete}>
       <i class="material-icons">delete</i>
       <span>Delete</span>
       <Ripple />

@@ -24,6 +24,15 @@
   onMount(() => {
     templatesSend({ type: "LOAD" });
   });
+
+  function onDeleteTemplate(e) {
+    templatesSend({
+      type: "DELETE",
+      params: {
+        templateId: e.detail
+      }
+    });
+  }
 </script>
 
 <style>
@@ -58,7 +67,7 @@
   <ul>
     {#each templates as template (template._id)}
       <li>
-        <CardTemplate {template} />
+        <CardTemplate {template} on:delete={onDeleteTemplate} />
       </li>
     {/each}
   </ul>
