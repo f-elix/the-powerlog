@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { createEventDispatcher } from "svelte";
+  import { fly } from "svelte/transition";
 
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
@@ -12,6 +13,10 @@
 
   function onAddExecution(movement) {
     dispatch("addexecution", { exercise, movement });
+  }
+
+  function onDeleteExercise() {
+    dispatch("deleteexercise", { exerciseId: exercise._id });
   }
 </script>
 
@@ -94,7 +99,7 @@
   }
 </style>
 
-<li>
+<li in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
   <!-- Content -->
   <div class="content-ctn">
     {#each exercise.movements as movement}
@@ -136,7 +141,7 @@
       <Ripple />
     </button>
     <!-- Delete btn -->
-    <button class="delete">
+    <button class="delete" on:click={onDeleteExercise}>
       <i class="material-icons">delete</i>
       <span class="screen-reader-text">Delete</span>
       <Ripple />

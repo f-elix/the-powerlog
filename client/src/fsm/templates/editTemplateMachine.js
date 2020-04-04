@@ -16,8 +16,8 @@ const services = {
 				}
 			`,
 			variables: {
-				data: context.template
-			}
+				data: context.template,
+			},
 		};
 		try {
 			const token = getToken();
@@ -27,7 +27,7 @@ const services = {
 			console.log(err);
 			throw err;
 		}
-	}
+	},
 };
 
 const actions = {
@@ -36,7 +36,7 @@ const actions = {
 			const updatedTemplate = context.template;
 			updatedTemplate.name = event.params.value;
 			return updatedTemplate;
-		}
+		},
 	}),
 	addExercise: assign({
 		template: (context, event) => {
@@ -49,28 +49,37 @@ const actions = {
 				movements: [
 					{
 						exercise,
-						executions: []
-					}
-				]
+						executions: [],
+					},
+				],
 			};
 			const updatedTemplate = context.template;
 			updatedTemplate.exercises = [...context.template.exercises, newExercise];
 			return updatedTemplate;
-		}
+		},
 	}),
 	updateExercise: assign({
 		template: (context, event) => {
-			const updatedExerciseIndex = context.template.exercises.findIndex(e => e._id === event.exercise._id);
+			const updatedExerciseIndex = context.template.exercises.findIndex((e) => e._id === event.exercise._id);
 			const updatedExercises = context.template.exercises;
 			updatedExercises[updatedExerciseIndex] = event.exercise;
 			const updatedTemplate = context.template;
 			updatedTemplate.exercises = updatedExercises;
 			return updatedTemplate;
-		}
+		},
+	}),
+	deleteExercise: assign({
+		template: (context, event) => {
+			const { exerciseId } = event.params;
+			const updatedExercises = context.template.exercises.filter((ex) => ex._id !== exerciseId);
+			const updatedTemplate = context.template;
+			updatedTemplate.exercises = updatedExercises;
+			return updatedTemplate;
+		},
 	}),
 	routeTemplates: () => {
 		goto('/templates');
-	}
+	},
 };
 
 export const editTemplateMachine = Machine(
@@ -79,66 +88,69 @@ export const editTemplateMachine = Machine(
 		context: {
 			template: {
 				name: '',
-				exercises: []
+				exercises: [],
 			},
-			editedExercise: null
+			editedExercise: null,
 		},
 		initial: 'editing',
 		states: {
 			editing: {
 				on: {
 					NAME_INPUT: {
-						actions: ['updateTemplateName']
+						actions: ['updateTemplateName'],
 					},
 					ADD_EXERCISE: 'addingexercise',
 					ADD_EXECUTION: 'addingexecution',
-					SAVE_TEMPLATE: 'savingtemplate'
-				}
+					DELETE_EXERCISE: {
+						actions: ['deleteExercise'],
+					},
+					SAVE_TEMPLATE: 'savingtemplate',
+				},
 			},
 			addingexercise: {
 				on: {
 					SAVE: {
 						target: 'editing',
-						actions: ['addExercise']
+						actions: ['addExercise'],
 					},
-					CANCEL: 'editing'
-				}
+					CANCEL: 'editing',
+				},
 			},
 			addingexecution: {
 				entry: assign({
 					editedExercise: (_, event) =>
-						spawn(editExerciseMachine(event.params.exercise, event.params.movement))
+						spawn(editExerciseMachine(event.params.exercise, event.params.movement)),
 				}),
 				on: {
 					DONE: {
 						target: 'editing',
-						actions: ['updateExercise']
+						actions: ['updateExercise'],
 					},
-					CANCEL: 'editing'
+					CANCEL: 'editing',
 				},
 				exit: assign({
-					editedExercise: null
-				})
+					editedExercise: null,
+				}),
 			},
 			savingtemplate: {
 				invoke: {
 					src: 'saveTemplate',
 					onDone: {
-						target: 'done'
+						target: 'done',
 					},
 					onError: {
-						target: 'editing'
-					}
-				}
+						target: 'editing',
+					},
+				},
 			},
 			done: {
 				entry: 'routeTemplates',
-				type: 'final'
-			}
-		}
+				type: 'final',
+			},
+		},
 	},
 	{
 		actions,
-		services
+		services,
 	}
 );

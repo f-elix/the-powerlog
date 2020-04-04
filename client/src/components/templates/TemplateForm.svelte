@@ -9,6 +9,7 @@
 
   const dispatch = createEventDispatcher();
 
+  export let templateName;
   export let templateExercises;
 
   function onNameInput(e) {
@@ -25,11 +26,15 @@
 </style>
 
 <!-- Name input -->
-<Input label="Template Name" name="templateName" on:input={onNameInput} />
+<Input
+  label="Template Name"
+  name="templateName"
+  on:input={onNameInput}
+  value={templateName} />
 <!-- Exercises list -->
 <ul class="exercise-list">
   {#each templateExercises as exercise (exercise._id)}
-    <TemplateExercise {exercise} on:addexecution />
+    <TemplateExercise {exercise} on:addexecution on:deleteexercise />
   {/each}
 </ul>
 <!-- Add exercise button -->

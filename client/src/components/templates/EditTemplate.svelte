@@ -20,8 +20,11 @@
     exercisesSend({ type: "LOAD" });
   });
 
-  $: exercises = $exercisesState.context.exercises;
+  export let isNew = true;
+
+  let templateName = $editTemplateState.context.template.name;
   $: templateExercises = $editTemplateState.context.template.exercises;
+  $: exercises = $exercisesState.context.exercises;
 
   function onNameInput(e) {
     editTemplateSend({ type: "NAME_INPUT", params: { value: e.detail } });
@@ -56,6 +59,15 @@
     });
   }
 
+  function onDeleteExercise(e) {
+    editTemplateSend({
+      type: "DELETE_EXERCISE",
+      params: {
+        exercise: e.detail
+      }
+    });
+  }
+
   function onAddCancel() {
     editTemplateSend({ type: "CANCEL" });
   }
@@ -81,13 +93,15 @@
 </style>
 
 <!-- Header -->
-<h1>Create a Template</h1>
+<h1>{isNew ? 'Creating' : 'Editing'} template...</h1>
 <!-- Template form -->
 <TemplateForm
   {templateExercises}
+  {templateName}
   on:nameinput={onNameInput}
   on:addexercise={onAddExercise}
-  on:addexecution={onAddExecution} />
+  on:addexecution={onAddExecution}
+  on:deleteexercise={onDeleteExercise} />
 <!-- Add exercise modal -->
 {#if $editTemplateState.matches('addingexercise')}
   <AddExerciseModal
@@ -112,6 +126,6 @@
   </a>
   <Button color="action" variant="filled" on:click={onSaveTemplate}>
     <i class="material-icons">done</i>
-    Create
+    {isNew ? 'Create' : 'Save'}
   </Button>
 </div>

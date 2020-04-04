@@ -27,8 +27,6 @@
     });
   }
 
-  $: template = $templateState.context.template;
-
   onMount(() => {
     templateSend({
       type: "LOAD",
@@ -37,6 +35,8 @@
       }
     });
   });
+
+  $: template = $templateState.context.template;
 
   function onDelete() {
     templateSend({ type: "DELETE" });
@@ -48,6 +48,14 @@
 </script>
 
 <style>
+  .spinner-ctn {
+    margin-top: 20rem;
+  }
+
+  h1 {
+    color: var(--color-info);
+  }
+
   li {
     background-color: var(--color-fg);
   }
@@ -85,7 +93,9 @@
 </style>
 
 {#if $templateState.matches('fetching')}
-  <Spinner />
+  <div class="spinner-ctn">
+    <Spinner />
+  </div>
 {/if}
 {#if $templateState.matches('loaded')}
   <!-- Title -->
@@ -133,6 +143,7 @@
     </Button>
   </div>
 {/if}
+<!-- Edit template -->
 {#if $templateState.matches('editing')}
-  <EditTemplate />
+  <EditTemplate isNew={false} />
 {/if}
