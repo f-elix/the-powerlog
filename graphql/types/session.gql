@@ -17,6 +17,7 @@ type Bodyweight {
 }
 
 type SessionExercise {
+	_id: ID
 	movements: [Movement]
 }
 
