@@ -13,6 +13,7 @@ const services = {
                         _id
                         name
                         exercises {
+							_id
                             movements {
                                 exercise {
                                     name
@@ -38,8 +39,8 @@ const services = {
 				}
 			`,
 			variables: {
-				id: event.params.templateId
-			}
+				id: event.params.templateId,
+			},
 		};
 		try {
 			const token = getToken();
@@ -59,8 +60,8 @@ const services = {
 				}
 			`,
 			variables: {
-				id: context.template._id
-			}
+				id: context.template._id,
+			},
 		};
 		try {
 			const token = getToken();
@@ -70,22 +71,22 @@ const services = {
 			console.log(err);
 			throw err;
 		}
-	}
+	},
 };
 
 const actions = {
 	updateTemplate: assign({
-		template: (_, event) => event.data
+		template: (_, event) => event.data,
 	}),
 	updateFetchError: assign({
-		fetchError: (_, event) => event.data.message
+		fetchError: (_, event) => event.data.message,
 	}),
 	clearFetchError: assign({
-		fetchError: ''
+		fetchError: '',
 	}),
 	routeTemplates: () => {
 		goto('/templates');
-	}
+	},
 };
 
 export const templateMachine = Machine(
@@ -93,7 +94,7 @@ export const templateMachine = Machine(
 		id: 'template',
 		context: {
 			template: {},
-			fetchError: ''
+			fetchError: '',
 		},
 		initial: 'idle',
 		states: {
@@ -102,62 +103,62 @@ export const templateMachine = Machine(
 				states: {
 					normal: {},
 					error: {
-						exit: ['clearFetchError']
-					}
+						exit: ['clearFetchError'],
+					},
 				},
 				on: {
-					LOAD: 'fetching'
-				}
+					LOAD: 'fetching',
+				},
 			},
 			fetching: {
 				invoke: {
 					src: 'getTemplate',
 					onDone: {
 						target: 'loaded',
-						actions: ['updateTemplate']
+						actions: ['updateTemplate'],
 					},
 					onError: {
 						target: 'idle.error',
-						actions: ['updateFetchError']
-					}
-				}
+						actions: ['updateFetchError'],
+					},
+				},
 			},
 			loaded: {
 				on: {
 					DELETE: {
 						target: 'deleting',
-						actions: ['routeTemplates']
+						actions: ['routeTemplates'],
 					},
 					EDIT: {
-						target: 'editing'
-					}
-				}
+						target: 'editing',
+					},
+				},
 			},
 			deleting: {
 				invoke: {
 					src: 'deleteTemplate',
 					onDone: 'deleted',
-					onError: 'loaded'
-				}
+					onError: 'loaded',
+				},
 			},
 			deleted: {
-				type: 'final'
+				type: 'final',
 			},
 			editing: {
 				invoke: {
 					id: 'editTemplate',
 					src: editTemplateMachine,
 					data: {
-						template: (context, _) => context.template
+						template: (context, _) => context.template,
 					},
 					onDone: {},
-					onError: {}
-				}
-			}
-		}
+					onError: {},
+				},
+			},
+		},
 	},
 	{
 		services,
-		actions
+		actions,
 	}
 );

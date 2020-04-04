@@ -1,6 +1,6 @@
 <script>
   // svelte
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, getContext } from "svelte";
   import { flip } from "svelte/animate";
 
   // Components
@@ -9,6 +9,8 @@
   import TemplateExercise from "./TemplateExercise.svelte";
 
   const dispatch = createEventDispatcher();
+
+  const { editTemplateState } = getContext("editTemplate");
 
   export let templateName;
   export let templateExercises;
@@ -36,6 +38,7 @@
 <Input
   label="Template Name"
   name="templateName"
+  errorMessage={$editTemplateState.context.nameError}
   on:input={onNameInput}
   value={templateName} />
 <!-- Exercises list -->

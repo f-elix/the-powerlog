@@ -77,9 +77,19 @@ const actions = {
 			return updatedTemplate;
 		},
 	}),
+	updateNameError: assign({
+		nameError: 'Name is required',
+	}),
+	clearNameError: assign({
+		nameError: '',
+	}),
 	routeTemplates: () => {
 		goto('/templates');
 	},
+};
+
+const guards = {
+	isNameEmpty: (context, _) => context.template.name.length === 0,
 };
 
 export const editTemplateMachine = Machine(
@@ -91,10 +101,19 @@ export const editTemplateMachine = Machine(
 				exercises: [],
 			},
 			editedExercise: null,
+			nameError: '',
 		},
 		initial: 'editing',
 		states: {
 			editing: {
+				initial: 'normal',
+				states: {
+					normal: {},
+					error: {
+						entry: ['updateNameError'],
+						exit: ['clearNameError'],
+					},
+				},
 				on: {
 					NAME_INPUT: {
 						actions: ['updateTemplateName'],
@@ -104,7 +123,15 @@ export const editTemplateMachine = Machine(
 					DELETE_EXERCISE: {
 						actions: ['deleteExercise'],
 					},
-					SAVE_TEMPLATE: 'savingtemplate',
+					SAVE_TEMPLATE: [
+						{
+							cond: 'isNameEmpty',
+							target: 'editing.error',
+						},
+						{
+							target: 'savingtemplate',
+						},
+					],
 				},
 			},
 			addingexercise: {
@@ -152,5 +179,6 @@ export const editTemplateMachine = Machine(
 	{
 		actions,
 		services,
+		guards,
 	}
 );
