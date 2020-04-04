@@ -63,7 +63,7 @@
     editTemplateSend({
       type: "DELETE_EXERCISE",
       params: {
-        exercise: e.detail
+        exerciseId: e.detail
       }
     });
   }

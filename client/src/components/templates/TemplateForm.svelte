@@ -1,6 +1,7 @@
 <script>
   // svelte
   import { createEventDispatcher } from "svelte";
+  import { flip } from "svelte/animate";
 
   // Components
   import Input from "@/components/UI/Input.svelte";
@@ -22,7 +23,13 @@
 </script>
 
 <style>
+  ul li {
+    background-color: var(--color-fg);
+  }
 
+  ul li:nth-of-type(even) {
+    background-color: var(--color-fg-dark);
+  }
 </style>
 
 <!-- Name input -->
@@ -34,7 +41,9 @@
 <!-- Exercises list -->
 <ul class="exercise-list">
   {#each templateExercises as exercise (exercise._id)}
-    <TemplateExercise {exercise} on:addexecution on:deleteexercise />
+    <li animate:flip={{ duration: 200 }}>
+      <TemplateExercise {exercise} on:addexecution on:deleteexercise />
+    </li>
   {/each}
 </ul>
 <!-- Add exercise button -->

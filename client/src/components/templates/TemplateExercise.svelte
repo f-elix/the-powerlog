@@ -16,21 +16,16 @@
   }
 
   function onDeleteExercise() {
-    dispatch("deleteexercise", { exerciseId: exercise._id });
+    dispatch("deleteexercise", exercise._id);
   }
 </script>
 
 <style>
-  li {
+  .wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem;
-    background-color: var(--color-fg);
-  }
-
-  li:nth-of-type(even) {
-    background-color: var(--color-fg-dark);
   }
 
   .content-ctn {
@@ -99,7 +94,10 @@
   }
 </style>
 
-<li in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
+<div
+  class="wrapper"
+  in:fly|local={{ x: 30 }}
+  out:fly|local={{ x: 30, duration: 200 }}>
   <!-- Content -->
   <div class="content-ctn">
     {#each exercise.movements as movement}
@@ -152,4 +150,4 @@
       <span class="screen-reader-text">Re-order</span>
     </button>
   </div>
-</li>
+</div>
