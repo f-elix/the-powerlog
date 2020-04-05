@@ -19,6 +19,8 @@
     dispatch("deleteexercise", exercise._id);
   }
 
+  function onAddMovement() {}
+
   function onAddExecution(movement) {
     dispatch("addexecution", { exercise, movement });
   }
@@ -71,27 +73,43 @@
     margin-right: 1rem;
   }
 
-  .add-set-btn {
-    width: 10rem;
-    margin: 0.5rem 0;
-    padding: 0.5rem 0.5rem 0.5rem 0;
-    color: var(--color-action);
-  }
-
-  .add-set-btn span {
-    display: flex;
-    align-items: center;
-  }
-
   button {
     width: 3rem;
-    height: 4rem;
+    height: 3rem;
     border-radius: 50%;
     background: none;
     border: none;
     outline: none;
     cursor: pointer;
     line-height: 1;
+  }
+
+  .add-set,
+  .add-movement {
+    display: block;
+    height: 4rem;
+    margin: 0.5rem 0;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+  }
+
+  .add-set span,
+  .add-movement span {
+    display: flex;
+    align-items: center;
+    color: var(--color-primary);
+  }
+
+  .add-set span i,
+  .add-movement span i {
+    color: var(--color-action);
+  }
+
+  .add-set {
+    width: 10rem;
+  }
+
+  .add-movement {
+    width: 15rem;
   }
 
   button.edit {
@@ -138,7 +156,7 @@
         <div class="set-ctn">
           <p class="set">
             <span>{execution.sets}</span>
-            <span>X</span>
+            <span>x</span>
             {#if execution.reps}
               <span>{execution.reps}</span>
             {:else}
@@ -166,8 +184,8 @@
           </button>
         </div>
       {/each}
-      <!-- Add set btn -->
-      <button class="add-set-btn" on:click={onAddExecution(movement)}>
+      <!-- Add execution btn -->
+      <button class="add-set" on:click={onAddExecution(movement)}>
         <span>
           <i class="material-icons">add_circle_outline</i>
           Add Set
@@ -175,6 +193,15 @@
         <Ripple />
       </button>
     {/each}
+    <!-- Add movement btn -->
+    <div>&mdash;</div>
+    <button class="add-movement" on:click={onAddMovement}>
+      <span>
+        <i class="material-icons">add_circle</i>
+        Add Movement
+      </span>
+      <Ripple />
+    </button>
   </div>
   <!-- Handle btn -->
   <button class="handle">

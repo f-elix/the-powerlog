@@ -66,6 +66,7 @@
 
   .movement {
     display: flex;
+    align-items: center;
     padding: 0.5rem;
   }
 
@@ -81,6 +82,14 @@
   .execution {
     display: flex;
     justify-content: space-between;
+  }
+
+  .execution {
+    margin: 0;
+  }
+
+  .execution .bold {
+    font-weight: bold;
   }
 
   .actions {
@@ -108,22 +117,22 @@
             <p class="exercise-name">{movement.exercise.name}</p>
             <div class="executions">
               {#each movement.executions as execution (execution._id)}
-                <div class="execution">
-                  <p>
-                    <span>{execution.sets}</span>
-                    <span>X</span>
-                    {#if execution.reps}
-                      <span>{execution.reps}</span>
-                    {:else}
-                      <span>{execution.time.amount}</span>
-                      <span>{execution.time.unit.toLowerCase()}</span>
-                    {/if}
-                  </p>
-                  <p>
-                    <span>{execution.load.amount}</span>
-                    <span>{execution.load.unit.toLowerCase()}</span>
-                  </p>
-                </div>
+                <p class="execution">
+                  <span class="bold">{execution.sets}</span>
+                  <span>x</span>
+                  {#if execution.reps}
+                    <span class="bold">{execution.reps}</span>
+                  {:else}
+                    <span class="bold">{execution.time.amount}</span>
+                    <span class="bold">
+                      {execution.time.unit.toLowerCase()}
+                    </span>
+                  {/if}
+                  <span>|</span>
+                  <span class="bold">
+                    {execution.load.amount} {execution.load.unit.toLowerCase()}
+                  </span>
+                </p>
               {/each}
             </div>
           </div>
