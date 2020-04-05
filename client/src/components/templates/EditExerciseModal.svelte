@@ -9,6 +9,8 @@
   const dispatch = createEventDispatcher();
 
   export let exercises;
+  export let isEditing = false;
+  export let editedMovement;
 
   let newExercise;
 
@@ -40,9 +42,13 @@
 </style>
 
 <EditFormModalLayout on:cancel={onCancel} on:submit={onSave}>
-  <h2>Add Exercise</h2>
+  <h2>{isEditing ? 'Edit' : 'Add'} Exercise</h2>
   <!-- Exercise input -->
-  <Input label="Exercise" list="exercises" on:input={onInput} />
+  <Input
+    label="Exercise"
+    list="exercises"
+    on:input={onInput}
+    value={editedMovement} />
   <datalist id="exercises">
     {#each exercises as exercise (exercise._id)}
       <option value={exercise.name} data-exercise={JSON.stringify(exercise)} />

@@ -1,7 +1,7 @@
 <script>
   // Svelte
   import { goto } from "@sapper/app";
-  import { onMount, getContext } from "svelte";
+  import { onMount, getContext, setContext } from "svelte";
 
   // FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
@@ -10,11 +10,13 @@
   // Components
   import Button from "@/components/UI/Button.svelte";
   import TemplateForm from "@/components/templates/TemplateForm.svelte";
-  import AddExerciseModal from "@/components/templates/AddExerciseModal.svelte";
+  import EditExerciseModal from "@/components/templates/EditExerciseModal.svelte";
   import AddExecutionModal from "@/components/templates/AddExecutionModal.svelte";
 
   const { editTemplateState, editTemplateSend } = getContext("editTemplate");
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
+
+  setContext("editExercise", {});
 
   onMount(() => {
     exercisesSend({ type: "LOAD" });
@@ -34,27 +36,21 @@
     editTemplateSend({ type: "ADD_EXERCISE" });
   }
 
-  function onAddExecution(e) {
+  function onEditExercise(e) {
     editTemplateSend({
-      type: "ADD_EXECUTION",
-      params: e.detail
+      type: "EDIT_EXERCISE",
+      params: {
+        exercise: e.detail.exercise,
+        movement: e.detail.movement
+      }
     });
   }
 
   function onSaveExercise(e) {
     editTemplateSend({
-      type: "SAVE",
+      type: "SAVE_EXERCISE",
       params: {
-        value: e.detail
-      }
-    });
-  }
-
-  function onSaveExecution(e) {
-    $editTemplateState.context.editedExercise.send({
-      type: "SAVE",
-      params: {
-        value: e.detail
+        exercise: e.detail
       }
     });
   }
@@ -64,6 +60,22 @@
       type: "DELETE_EXERCISE",
       params: {
         exerciseId: e.detail
+      }
+    });
+  }
+
+  function onAddExecution(e) {
+    editTemplateSend({
+      type: "ADD_EXECUTION",
+      params: e.detail
+    });
+  }
+
+  function onSaveExecution(e) {
+    $editTemplateState.context.editedExercise.send({
+      type: "SAVE",
+      params: {
+        value: e.detail
       }
     });
   }
@@ -100,12 +112,15 @@
   {templateName}
   on:nameinput={onNameInput}
   on:addexercise={onAddExercise}
-  on:addexecution={onAddExecution}
-  on:deleteexercise={onDeleteExercise} />
-<!-- Add exercise modal -->
-{#if $editTemplateState.matches('addingexercise')}
-  <AddExerciseModal
+  on:editexercise={onEditExercise}
+  on:deleteexercise={onDeleteExercise}
+  on:addexecution={onAddExecution} />
+<!-- Edit exercise modal -->
+{#if $editTemplateState.matches('exercise')}
+  <EditExerciseModal
     {exercises}
+    isEditing={$editTemplateState.matches('exercise.editing')}
+    editedMovement={$editTemplateState.context.editedExercise.state.context.movement.exercise.name}
     on:cancel={onAddCancel}
     on:save={onSaveExercise} />
 {/if}

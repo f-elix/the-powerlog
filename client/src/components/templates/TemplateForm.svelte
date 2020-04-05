@@ -6,7 +6,7 @@
   // Components
   import Input from "@/components/UI/Input.svelte";
   import Button from "@/components/UI/Button.svelte";
-  import TemplateExercise from "./TemplateExercise.svelte";
+  import CardTemplateExercise from "./CardTemplateExercise.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -45,7 +45,11 @@
 <ul class="exercise-list">
   {#each templateExercises as exercise (exercise._id)}
     <li animate:flip={{ duration: 200 }}>
-      <TemplateExercise {exercise} on:addexecution on:deleteexercise />
+      <CardTemplateExercise
+        {exercise}
+        on:editexercise
+        on:deleteexercise
+        on:addexecution />
     </li>
   {/each}
 </ul>

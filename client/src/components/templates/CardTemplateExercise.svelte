@@ -11,12 +11,16 @@
 
   export let exercise;
 
-  function onAddExecution(movement) {
-    dispatch("addexecution", { exercise, movement });
+  function onEditExercise(movement) {
+    dispatch("editexercise", { exercise, movement });
   }
 
   function onDeleteExercise() {
     dispatch("deleteexercise", exercise._id);
+  }
+
+  function onAddExecution(movement) {
+    dispatch("addexecution", { exercise, movement });
   }
 </script>
 
@@ -110,8 +114,8 @@
     {#each exercise.movements as movement}
       <p class="movement-name">
         <span>{movement.exercise.name}</span>
-        <!-- Edit btn -->
-        <button class="edit">
+        <!-- Edit exercise btn -->
+        <button class="edit" on:click={onEditExercise(movement)}>
           <i class="material-icons">edit</i>
           <span class="screen-reader-text">Edit</span>
           <Ripple />
