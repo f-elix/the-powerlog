@@ -76,7 +76,7 @@ const services = {
 
 const actions = {
 	updateTemplate: assign({
-		template: (_, event) => event.data,
+		template: (_, event) => event.data.template || event.data,
 	}),
 	updateFetchError: assign({
 		fetchError: (_, event) => event.data.message,
@@ -151,7 +151,10 @@ export const templateMachine = Machine(
 					data: {
 						template: (context, _) => context.template,
 					},
-					onDone: {},
+					onDone: {
+						target: 'loaded',
+						actions: ['updateTemplate'],
+					},
 					onError: {},
 				},
 			},

@@ -83,9 +83,6 @@ const actions = {
 	clearNameError: assign({
 		nameError: '',
 	}),
-	routeTemplates: () => {
-		goto('/templates');
-	},
 };
 
 const guards = {
@@ -200,8 +197,10 @@ export const editTemplateMachine = Machine(
 				},
 			},
 			done: {
-				entry: 'routeTemplates',
 				type: 'final',
+				data: {
+					template: (context, _) => context.template,
+				},
 			},
 		},
 	},
