@@ -16,8 +16,6 @@
   export let exerciseName;
   export let editedExecution;
 
-  $: console.log(editedExecution);
-
   const options = {
     reps: "Reps",
     time: "Time",
