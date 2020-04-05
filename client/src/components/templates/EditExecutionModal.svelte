@@ -14,18 +14,44 @@
   const dispatch = createEventDispatcher();
 
   export let exerciseName;
+  export let editedExecution;
 
-  const repsTimeOptions = ["Reps", "Time"];
-  const timeUnitOptions = ["Sec", "Min"];
-  const loadUnitOptions = ["Lbs", "Kg"];
+  $: console.log(editedExecution);
 
-  let selectedRepsTime = "Reps";
-  let selectedTimeUnit = "Sec";
-  let selectedLoadUnit = "Lbs";
+  const options = {
+    reps: "Reps",
+    time: "Time",
+    sec: "Sec",
+    min: "Min",
+    lbs: "Lbs",
+    kg: "Kg"
+  };
 
-  let sets = 0;
-  let load = 0;
-  let repsTime = 0;
+  const repsTimeOptions = [options.reps, options.time];
+  const timeUnitOptions = [options.sec, options.min];
+  const loadUnitOptions = [options.lbs, options.kg];
+
+  let selectedRepsTime = options.reps;
+  let selectedTimeUnit = options.sec;
+  let selectedLoadUnit = options.lbs;
+
+  let sets = "";
+  let load = "";
+  let repsTime = "";
+
+  $: if (editedExecution) {
+    selectedRepsTime = editedExecution.reps ? options.reps : options.time;
+    selectedTimeUnit = editedExecution.time.unit
+      ? editedExecution.time.unit
+      : selectedTimeUnit;
+    selectedLoadUnit = editedExecution.load.unit;
+
+    sets = editedExecution.sets;
+    load = editedExecution.load.amount;
+    repsTime = editedExecution.reps
+      ? editedExecution.reps
+      : editedExecution.time.amount;
+  }
 
   function onCancel() {
     dispatch("cancel");
@@ -42,6 +68,9 @@
       newExecution.selectedTimeUnit = selectedTimeUnit;
     } else {
       newExecution.reps = +repsTime;
+    }
+    if (editedExecution) {
+      newExecution._id = editedExecution._id;
     }
     dispatch("save", newExecution);
   }
@@ -87,6 +116,7 @@
       label="Sets"
       name="sets"
       autofocus={true}
+      value={sets}
       on:input={e => (sets = e.target.value)} />
     <!-- Reps/time inputs -->
     <div class="reps-inputs">
@@ -94,6 +124,7 @@
         type="number"
         label={selectedRepsTime}
         name="repsTime"
+        value={repsTime}
         on:input={e => (repsTime = e.target.value)} />
       <Select
         name="repsTime"
@@ -108,7 +139,11 @@
     </div>
     <!-- Load inputs -->
     <div class="load-inputs">
-      <Input label="Load" name="load" on:input={e => (load = e.target.value)} />
+      <Input
+        label="Load"
+        name="load"
+        value={load}
+        on:input={e => (load = e.target.value)} />
       <Select
         name="loadUnit"
         options={loadUnitOptions}

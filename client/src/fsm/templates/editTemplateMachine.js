@@ -60,7 +60,7 @@ const actions = {
 	}),
 	updateTemplateExercise: assign({
 		template: (context, event) => {
-			const updatedExerciseIndex = context.template.exercises.findIndex((e) => e._id === event.exercise._id);
+			const updatedExerciseIndex = context.template.exercises.findIndex(e => e._id === event.exercise._id);
 			const updatedExercises = context.template.exercises;
 			updatedExercises[updatedExerciseIndex] = event.exercise;
 			const updatedTemplate = context.template;
@@ -71,7 +71,7 @@ const actions = {
 	deleteExercise: assign({
 		template: (context, event) => {
 			const { exerciseId } = event.params;
-			const updatedExercises = context.template.exercises.filter((ex) => ex._id !== exerciseId);
+			const updatedExercises = context.template.exercises.filter(ex => ex._id !== exerciseId);
 			const updatedTemplate = context.template;
 			updatedTemplate.exercises = updatedExercises;
 			return updatedTemplate;
@@ -118,7 +118,8 @@ export const editTemplateMachine = Machine(
 					},
 					ADD_EXERCISE: 'exercise.adding',
 					EDIT_EXERCISE: 'exercise.editing',
-					ADD_EXECUTION: 'addingexecution',
+					ADD_EXECUTION: 'execution',
+					EDIT_EXECUTION: 'execution',
 					DELETE_EXERCISE: {
 						actions: ['deleteExercise'],
 					},
@@ -152,7 +153,7 @@ export const editTemplateMachine = Machine(
 						on: {
 							SAVE_EXERCISE: {
 								actions: send((_, event) => event, {
-									to: (context) => context.editedExercise,
+									to: context => context.editedExercise,
 								}),
 							},
 							DONE: {
@@ -169,12 +170,23 @@ export const editTemplateMachine = Machine(
 					CANCEL: 'editing',
 				},
 			},
-			addingexecution: {
+			execution: {
 				entry: assign({
 					editedExercise: (_, event) =>
-						spawn(editTemplateExerciseMachine(event.params.exercise, event.params.movement)),
+						spawn(
+							editTemplateExerciseMachine(
+								event.params.exercise,
+								event.params.movement,
+								event.params.execution
+							)
+						),
 				}),
 				on: {
+					SAVE_EXECUTION: {
+						actions: send((_, event) => event, {
+							to: context => context.editedExercise,
+						}),
+					},
 					DONE: {
 						target: 'editing',
 						actions: ['updateTemplateExercise'],

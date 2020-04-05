@@ -16,10 +16,11 @@ const services = {
 							_id
                             movements {
                                 exercise {
-                                    name
                                     _id
+                                    name
                                 }
                                 executions {
+									_id
                                     sets
                                     reps
                                     time {

@@ -49,7 +49,8 @@
         {exercise}
         on:editexercise
         on:deleteexercise
-        on:addexecution />
+        on:addexecution
+        on:editexecution />
     </li>
   {/each}
 </ul>

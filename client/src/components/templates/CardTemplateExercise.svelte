@@ -22,6 +22,10 @@
   function onAddExecution(movement) {
     dispatch("addexecution", { exercise, movement });
   }
+
+  function onEditExecution(movement, execution) {
+    dispatch("editexecution", { exercise, movement, execution });
+  }
 </script>
 
 <style>
@@ -137,8 +141,8 @@
               {execution.load.amount} {execution.load.unit.toLowerCase()}
             </span>
           </p>
-          <!-- Edit btn -->
-          <button class="edit">
+          <!-- Edit execution btn -->
+          <button class="edit" on:click={onEditExecution(movement, execution)}>
             <i class="material-icons">edit</i>
             <span class="screen-reader-text">Edit</span>
             <Ripple />

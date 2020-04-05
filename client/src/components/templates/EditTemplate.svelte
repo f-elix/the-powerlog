@@ -11,7 +11,7 @@
   import Button from "@/components/UI/Button.svelte";
   import TemplateForm from "@/components/templates/TemplateForm.svelte";
   import EditExerciseModal from "@/components/templates/EditExerciseModal.svelte";
-  import AddExecutionModal from "@/components/templates/AddExecutionModal.svelte";
+  import EditExecutionModal from "@/components/templates/EditExecutionModal.svelte";
 
   const { editTemplateState, editTemplateSend } = getContext("editTemplate");
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
@@ -71,11 +71,18 @@
     });
   }
 
+  function onEditExecution(e) {
+    editTemplateSend({
+      type: "EDIT_EXECUTION",
+      params: e.detail
+    });
+  }
+
   function onSaveExecution(e) {
-    $editTemplateState.context.editedExercise.send({
-      type: "SAVE",
+    editTemplateSend({
+      type: "SAVE_EXECUTION",
       params: {
-        value: e.detail
+        executionData: e.detail
       }
     });
   }
@@ -114,7 +121,8 @@
   on:addexercise={onAddExercise}
   on:editexercise={onEditExercise}
   on:deleteexercise={onDeleteExercise}
-  on:addexecution={onAddExecution} />
+  on:addexecution={onAddExecution}
+  on:editexecution={onEditExecution} />
 <!-- Edit exercise modal -->
 {#if $editTemplateState.matches('exercise')}
   <EditExerciseModal
@@ -124,11 +132,12 @@
     on:cancel={onAddCancel}
     on:save={onSaveExercise} />
 {/if}
-<!-- Add set modal -->
-{#if $editTemplateState.matches('addingexecution')}
-  <AddExecutionModal
+<!-- Edit execution modal -->
+{#if $editTemplateState.matches('execution')}
+  <EditExecutionModal
     on:cancel={onAddCancel}
     on:save={onSaveExecution}
+    editedExecution={$editTemplateState.context.editedExercise.state.context.execution}
     exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
 {/if}
 <!-- Template buttons -->
