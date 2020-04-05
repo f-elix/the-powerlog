@@ -26,6 +26,10 @@
   function onEditExecution(movement, execution) {
     dispatch("editexecution", { exercise, movement, execution });
   }
+
+  function onDeleteExecution(movement, execution) {
+    dispatch("deleteexecution", { exercise, movement, execution });
+  }
 </script>
 
 <style>
@@ -64,6 +68,7 @@
     display: flex;
     justify-content: space-between;
     width: 14rem;
+    margin-right: 1rem;
   }
 
   .add-set-btn {
@@ -79,7 +84,7 @@
   }
 
   button {
-    width: 4rem;
+    width: 3rem;
     height: 4rem;
     border-radius: 50%;
     background: none;
@@ -97,11 +102,15 @@
     font-size: var(--text-big);
   }
 
-  button.delete {
+  button.delete-execution,
+  button.delete-exercise {
+    color: var(--color-error);
+  }
+
+  button.delete-exercise {
     position: absolute;
     top: var(--padding);
     right: var(--padding);
-    color: var(--color-error);
   }
 
   button.handle {
@@ -147,6 +156,14 @@
             <span class="screen-reader-text">Edit</span>
             <Ripple />
           </button>
+          <!-- Delete execution btn -->
+          <button
+            class="delete-execution"
+            on:click={onDeleteExecution(movement, execution)}>
+            <i class="material-icons">clear</i>
+            <span class="screen-reader-text">Delete</span>
+            <Ripple />
+          </button>
         </div>
       {/each}
       <!-- Add set btn -->
@@ -165,7 +182,7 @@
     <span class="screen-reader-text">Re-order</span>
   </button>
   <!-- Delete btn -->
-  <button class="delete" on:click={onDeleteExercise}>
+  <button class="delete-exercise" on:click={onDeleteExercise}>
     <i class="material-icons">delete</i>
     <span class="screen-reader-text">Delete</span>
     <Ripple />

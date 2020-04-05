@@ -50,7 +50,8 @@
         on:editexercise
         on:deleteexercise
         on:addexecution
-        on:editexecution />
+        on:editexecution
+        on:deleteexecution />
     </li>
   {/each}
 </ul>

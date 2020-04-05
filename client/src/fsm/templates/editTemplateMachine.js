@@ -77,6 +77,17 @@ const actions = {
 			return updatedTemplate;
 		},
 	}),
+	deleteExecution: assign({
+		template: (context, event) => {
+			const { exercise, movement, execution } = event.params;
+			const exerciseIndex = context.template.exercises.findIndex(e => e._id === exercise._id);
+			const movementIndex = exercise.movements.findIndex(m => m._id === movement._id);
+			const updatedExecutions = movement.executions.filter(e => e._id !== execution._id);
+			const updatedTemplate = context.template;
+			updatedTemplate.exercises[exerciseIndex].movements[movementIndex].executions = updatedExecutions;
+			return updatedTemplate;
+		},
+	}),
 	updateNameError: assign({
 		nameError: 'Name is required',
 	}),
@@ -118,10 +129,13 @@ export const editTemplateMachine = Machine(
 					},
 					ADD_EXERCISE: 'exercise.adding',
 					EDIT_EXERCISE: 'exercise.editing',
-					ADD_EXECUTION: 'execution',
-					EDIT_EXECUTION: 'execution',
 					DELETE_EXERCISE: {
 						actions: ['deleteExercise'],
+					},
+					ADD_EXECUTION: 'execution',
+					EDIT_EXECUTION: 'execution',
+					DELETE_EXECUTION: {
+						actions: ['deleteExecution'],
 					},
 					SAVE_TEMPLATE: [
 						{

@@ -71,6 +71,13 @@
     });
   }
 
+  function onDeleteExecution(e) {
+    editTemplateSend({
+      type: "DELETE_EXECUTION",
+      params: e.detail
+    });
+  }
+
   function onEditExecution(e) {
     editTemplateSend({
       type: "EDIT_EXECUTION",
@@ -122,7 +129,8 @@
   on:editexercise={onEditExercise}
   on:deleteexercise={onDeleteExercise}
   on:addexecution={onAddExecution}
-  on:editexecution={onEditExecution} />
+  on:editexecution={onEditExecution}
+  on:deleteexecution={onDeleteExecution} />
 <!-- Edit exercise modal -->
 {#if $editTemplateState.matches('exercise')}
   <EditExerciseModal
