@@ -42,25 +42,74 @@ const actions = {
 			return updatedExercise;
 		},
 	}),
+	createExercise: assign({
+		exercise: (_, event) => {
+			const { exercise } = event.params;
+			if (!exercise._id) {
+				exercise._id = ObjectID();
+			}
+			const newExercise = {
+				_id: ObjectID(),
+				movements: [
+					{
+						exercise,
+						executions: [],
+					},
+				],
+			};
+			return newExercise;
+		},
+	}),
+	updateExerciseError: assign({
+		exerciseError: 'Exercise name is required.',
+	}),
+	clearExerciseError: assign({
+		exerciseError: '',
+	}),
+};
+
+const guards = {
+	isExerciseNameEmpty: (_, event) => event.params.exercise === null || event.params.exercise.name.trim().length === 0,
+	isEditingExercise: (context, _) => !!context.exercise,
 };
 
 export const editTemplateExerciseMachine = (exercise, movement, execution) => {
 	return Machine(
 		{
-			id: 'editExercise',
+			id: 'editTemplateExercise',
 			context: {
 				exercise,
 				movement,
 				execution,
+				exerciseError: '',
 			},
 			initial: 'editing',
 			states: {
 				editing: {
-					on: {
-						SAVE_EXERCISE: {
-							target: 'done',
-							actions: ['updateMovementExercise'],
+					initial: 'normal',
+					states: {
+						normal: {},
+						error: {
+							exit: ['clearExerciseError'],
 						},
+					},
+					on: {
+						SAVE_EXERCISE: [
+							{
+								cond: 'isExerciseNameEmpty',
+								target: 'editing.error',
+								actions: ['updateExerciseError'],
+							},
+							{
+								cond: 'isEditingExercise',
+								target: 'done',
+								actions: ['updateMovementExercise'],
+							},
+							{
+								target: 'done',
+								actions: ['createExercise'],
+							},
+						],
 						SAVE_EXECUTION: {
 							target: 'done',
 							actions: ['updateMovementExecution'],
@@ -68,13 +117,14 @@ export const editTemplateExerciseMachine = (exercise, movement, execution) => {
 					},
 				},
 				done: {
-					entry: sendParent({ type: 'DONE', exercise }),
+					entry: sendParent(context => ({ type: 'DONE', exercise: context.exercise })),
 					type: 'final',
 				},
 			},
 		},
 		{
 			actions,
+			guards,
 		}
 	);
 };

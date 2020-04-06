@@ -38,23 +38,10 @@ const actions = {
 			return updatedTemplate;
 		},
 	}),
-	addExercise: assign({
+	addTemplateExercise: assign({
 		template: (context, event) => {
-			const { exercise } = event.params;
-			if (!exercise._id) {
-				exercise._id = ObjectID();
-			}
-			const newExercise = {
-				_id: ObjectID(),
-				movements: [
-					{
-						exercise,
-						executions: [],
-					},
-				],
-			};
 			const updatedTemplate = context.template;
-			updatedTemplate.exercises = [...context.template.exercises, newExercise];
+			updatedTemplate.exercises = [...context.template.exercises, event.exercise];
 			return updatedTemplate;
 		},
 	}),
@@ -152,10 +139,13 @@ export const editTemplateMachine = Machine(
 				initial: 'adding',
 				states: {
 					adding: {
+						entry: assign({
+							editedExercise: (_, event) => spawn(editTemplateExerciseMachine()),
+						}),
 						on: {
-							SAVE_EXERCISE: {
+							DONE: {
 								target: '#editing',
-								actions: ['addExercise'],
+								actions: ['addTemplateExercise'],
 							},
 						},
 					},
@@ -165,24 +155,24 @@ export const editTemplateMachine = Machine(
 								spawn(editTemplateExerciseMachine(event.params.exercise, event.params.movement)),
 						}),
 						on: {
-							SAVE_EXERCISE: {
-								actions: send((_, event) => event, {
-									to: context => context.editedExercise,
-								}),
-							},
 							DONE: {
 								target: '#editing',
 								actions: ['updateTemplateExercise'],
 							},
 						},
-						exit: assign({
-							editedExercise: null,
-						}),
 					},
 				},
 				on: {
+					SAVE_EXERCISE: {
+						actions: send((_, event) => event, {
+							to: context => context.editedExercise,
+						}),
+					},
 					CANCEL: 'editing',
 				},
+				exit: assign({
+					editedExercise: null,
+				}),
 			},
 			execution: {
 				entry: assign({

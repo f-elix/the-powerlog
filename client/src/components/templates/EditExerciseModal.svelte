@@ -11,6 +11,7 @@
   export let exercises;
   export let isEditing = false;
   export let editedMovement;
+  export let exerciseError = "";
 
   let newExercise;
 
@@ -30,9 +31,6 @@
   }
 
   function onSave() {
-    if (!newExercise) {
-      return;
-    }
     dispatch("save", newExercise);
   }
 </script>
@@ -48,7 +46,9 @@
     label="Exercise"
     list="exercises"
     on:input={onInput}
-    value={editedMovement} />
+    autofocus={true}
+    errorMessage={exerciseError}
+    value={editedMovement ? editedMovement.exercise.name : ''} />
   <datalist id="exercises">
     {#each exercises as exercise (exercise._id)}
       <option value={exercise.name} data-exercise={JSON.stringify(exercise)} />
