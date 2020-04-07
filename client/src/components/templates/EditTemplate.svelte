@@ -28,8 +28,6 @@
   $: templateExercises = $editTemplateState.context.template.exercises;
   $: exercises = $exercisesState.context.exercises;
 
-  $: console.log($editTemplateState);
-
   function onNameInput(e) {
     editTemplateSend({ type: "NAME_INPUT", params: { value: e.detail } });
   }
@@ -148,6 +146,7 @@
   <EditExecutionModal
     on:cancel={onAddCancel}
     on:save={onSaveExecution}
+    executionError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.executionError : ''}
     editedExecution={$editTemplateState.context.editedExercise.state.context.execution}
     exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
 {/if}

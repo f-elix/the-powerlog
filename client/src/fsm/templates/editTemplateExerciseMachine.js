@@ -10,12 +10,12 @@ const actions = {
 				reps: executionData.reps,
 				time: {
 					amount: executionData.time,
-					unit: executionData.selectedTimeUnit,
+					unit: executionData.selectedTimeUnit
 				},
 				load: {
 					amount: executionData.load,
-					unit: executionData.selectedLoadUnit,
-				},
+					unit: executionData.selectedLoadUnit
+				}
 			};
 			const movementIndex = context.exercise.movements.findIndex(m => m._id === context.movement._id);
 			const updatedExercise = context.exercise;
@@ -27,11 +27,11 @@ const actions = {
 				execution._id = ObjectID();
 				updatedExercise.movements[movementIndex].executions = [
 					...updatedExercise.movements[movementIndex].executions,
-					execution,
+					execution
 				];
 			}
 			return updatedExercise;
-		},
+		}
 	}),
 	updateMovementExercise: assign({
 		exercise: (context, event) => {
@@ -40,7 +40,7 @@ const actions = {
 			const updatedExercise = context.exercise;
 			updatedExercise.movements[movementIndex].exercise = exercise;
 			return updatedExercise;
-		},
+		}
 	}),
 	createExercise: assign({
 		exercise: (_, event) => {
@@ -53,24 +53,29 @@ const actions = {
 				movements: [
 					{
 						exercise,
-						executions: [],
-					},
-				],
+						executions: []
+					}
+				]
 			};
 			return newExercise;
-		},
+		}
 	}),
 	updateExerciseError: assign({
-		exerciseError: 'Exercise name is required.',
+		exerciseError: 'Exercise name is required.'
 	}),
-	clearExerciseError: assign({
+	updateExecutionError: assign({
+		executionError: 'Number of sets is required.'
+	}),
+	clearErrors: assign({
 		exerciseError: '',
-	}),
+		executionError: ''
+	})
 };
 
 const guards = {
 	isExerciseNameEmpty: (_, event) => event.params.exercise === null || event.params.exercise.name.trim().length === 0,
 	isEditingExercise: (context, _) => !!context.exercise,
+	isSetsEmpty: (_, event) => event.params.executionData.sets <= 0
 };
 
 export const editTemplateExerciseMachine = (exercise, movement, execution) => {
@@ -82,6 +87,7 @@ export const editTemplateExerciseMachine = (exercise, movement, execution) => {
 				movement,
 				execution,
 				exerciseError: '',
+				executionError: ''
 			},
 			initial: 'editing',
 			states: {
@@ -90,41 +96,48 @@ export const editTemplateExerciseMachine = (exercise, movement, execution) => {
 					states: {
 						normal: {},
 						error: {
-							exit: ['clearExerciseError'],
-						},
+							exit: ['clearErrors']
+						}
 					},
 					on: {
 						SAVE_EXERCISE: [
 							{
 								cond: 'isExerciseNameEmpty',
 								target: 'editing.error',
-								actions: ['updateExerciseError'],
+								actions: ['updateExerciseError']
 							},
 							{
 								cond: 'isEditingExercise',
 								target: 'done',
-								actions: ['updateMovementExercise'],
+								actions: ['updateMovementExercise']
 							},
 							{
 								target: 'done',
-								actions: ['createExercise'],
-							},
+								actions: ['createExercise']
+							}
 						],
-						SAVE_EXECUTION: {
-							target: 'done',
-							actions: ['updateMovementExecution'],
-						},
-					},
+						SAVE_EXECUTION: [
+							{
+								cond: 'isSetsEmpty',
+								target: 'editing.error',
+								actions: ['updateExecutionError']
+							},
+							{
+								target: 'done',
+								actions: ['updateMovementExecution']
+							}
+						]
+					}
 				},
 				done: {
 					entry: sendParent(context => ({ type: 'DONE', exercise: context.exercise })),
-					type: 'final',
-				},
-			},
+					type: 'final'
+				}
+			}
 		},
 		{
 			actions,
-			guards,
+			guards
 		}
 	);
 };

@@ -15,6 +15,7 @@
 
   export let exerciseName;
   export let editedExecution;
+  export let executionError = "";
 
   const options = {
     reps: "Reps",
@@ -114,6 +115,7 @@
       label="Sets"
       name="sets"
       autofocus={true}
+      errorMessage={executionError}
       value={sets}
       on:input={e => (sets = e.target.value)} />
     <!-- Reps/time inputs -->
