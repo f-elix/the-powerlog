@@ -77,32 +77,31 @@
 
 <style>
   .input-group {
-    --first-column-width: 30%;
     display: grid;
-    grid-template-columns: var(--first-column-width) 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    grid-column-gap: 10%;
-    grid-row-gap: 2rem;
-    align-items: baseline;
-    margin: 2rem auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-column-gap: 1rem;
+    padding-bottom: 2rem;
   }
 
   .input-group .reps-inputs,
   .input-group .load-inputs {
-    grid-column: 1 / 4;
     display: grid;
     grid-gap: 1rem;
     align-items: baseline;
   }
 
+  .input-group .sets-input {
+    grid-column: 1 / 2;
+  }
+
   .input-group .reps-inputs {
-    grid-row: 2 / 3;
-    grid-template-columns: var(--first-column-width) 1fr 1fr;
+    grid-column: 2 / 3;
+    grid-template-rows: 50% 1fr 1fr;
   }
 
   .input-group .load-inputs {
-    grid-row: 3 / 4;
-    grid-template-columns: var(--first-column-width) 1fr;
+    grid-column: 3 / 4;
+    grid-template-rows: 50% 1fr;
   }
 </style>
 
@@ -110,14 +109,16 @@
   <h2>{exerciseName}</h2>
   <div class="input-group">
     <!-- Sets input -->
-    <Input
-      type="number"
-      label="Sets"
-      name="sets"
-      autofocus={true}
-      errorMessage={executionError}
-      value={sets}
-      on:input={e => (sets = e.target.value)} />
+    <div class="sets-input">
+      <Input
+        type="number"
+        label="Sets"
+        name="sets"
+        autofocus={true}
+        errorMessage={executionError}
+        value={sets}
+        on:input={e => (sets = e.target.value)} />
+    </div>
     <!-- Reps/time inputs -->
     <div class="reps-inputs">
       <Input
