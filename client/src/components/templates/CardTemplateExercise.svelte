@@ -11,8 +11,8 @@
 
   export let exercise;
 
-  function onEditExercise(movement) {
-    dispatch("editexercise", { exercise, movement });
+  function onEditExercise() {
+    dispatch("editexercise", exercise);
   }
 
   function onDeleteExercise() {
@@ -105,10 +105,6 @@
     width: 10rem;
   }
 
-  .add-movement {
-    width: 15rem;
-  }
-
   button.edit {
     color: var(--color-info);
   }
@@ -122,10 +118,12 @@
     color: var(--color-error);
   }
 
-  button.delete-exercise {
+  .exercise-btn-ctn {
     position: absolute;
     top: var(--padding);
     right: var(--padding);
+    display: flex;
+    align-items: center;
   }
 
   button.handle {
@@ -142,12 +140,7 @@
     {#each exercise.movements as movement}
       <p class="movement-name">
         <span>{movement.exercise.name}</span>
-        <!-- Edit exercise btn -->
-        <button class="edit" on:click={onEditExercise(movement)}>
-          <i class="material-icons">edit</i>
-          <span class="screen-reader-text">Edit</span>
-          <Ripple />
-        </button>
+
       </p>
       {#each movement.executions as execution, i}
         <div class="set-ctn">
@@ -196,10 +189,18 @@
     <i class="material-icons">reorder</i>
     <span class="screen-reader-text">Re-order</span>
   </button>
-  <!-- Delete btn -->
-  <button class="delete-exercise" on:click={onDeleteExercise}>
-    <i class="material-icons">delete</i>
-    <span class="screen-reader-text">Delete</span>
-    <Ripple />
-  </button>
+  <div class="exercise-btn-ctn">
+    <!-- Edit exercise btn -->
+    <button class="edit" on:click={onEditExercise}>
+      <i class="material-icons">edit</i>
+      <span class="screen-reader-text">Edit</span>
+      <Ripple />
+    </button>
+    <!-- Delete btn -->
+    <button class="delete-exercise" on:click={onDeleteExercise}>
+      <i class="material-icons">delete</i>
+      <span class="screen-reader-text">Delete</span>
+      <Ripple />
+    </button>
+  </div>
 </div>

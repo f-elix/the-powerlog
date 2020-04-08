@@ -39,18 +39,13 @@ const actions = {
 	addTemplateExercise: assign({
 		template: (context, event) => {
 			const updatedTemplate = context.template;
-			updatedTemplate.exercises = [
-				...context.template.exercises,
-				event.exercise
-			];
+			updatedTemplate.exercises = [...context.template.exercises, event.exercise];
 			return updatedTemplate;
 		}
 	}),
 	updateTemplateExercise: assign({
 		template: (context, event) => {
-			const updatedExerciseIndex = context.template.exercises.findIndex(
-				e => e._id === event.exercise._id
-			);
+			const updatedExerciseIndex = context.template.exercises.findIndex(e => e._id === event.exercise._id);
 			const updatedExercises = context.template.exercises;
 			updatedExercises[updatedExerciseIndex] = event.exercise;
 			const updatedTemplate = context.template;
@@ -61,9 +56,7 @@ const actions = {
 	deleteExercise: assign({
 		template: (context, event) => {
 			const { exerciseId } = event.params;
-			const updatedExercises = context.template.exercises.filter(
-				ex => ex._id !== exerciseId
-			);
+			const updatedExercises = context.template.exercises.filter(ex => ex._id !== exerciseId);
 			const updatedTemplate = context.template;
 			updatedTemplate.exercises = updatedExercises;
 			return updatedTemplate;
@@ -72,19 +65,11 @@ const actions = {
 	deleteExecution: assign({
 		template: (context, event) => {
 			const { exercise, movement, execution } = event.params;
-			const exerciseIndex = context.template.exercises.findIndex(
-				e => e._id === exercise._id
-			);
-			const movementIndex = exercise.movements.findIndex(
-				m => m._id === movement._id
-			);
-			const updatedExecutions = movement.executions.filter(
-				e => e._id !== execution._id
-			);
+			const exerciseIndex = context.template.exercises.findIndex(e => e._id === exercise._id);
+			const movementIndex = exercise.movements.findIndex(m => m._id === movement._id);
+			const updatedExecutions = movement.executions.filter(e => e._id !== execution._id);
 			const updatedTemplate = context.template;
-			updatedTemplate.exercises[exerciseIndex].movements[
-				movementIndex
-			].executions = updatedExecutions;
+			updatedTemplate.exercises[exerciseIndex].movements[movementIndex].executions = updatedExecutions;
 			return updatedTemplate;
 		}
 	}),
@@ -156,8 +141,7 @@ export const editTemplateMachine = Machine(
 				states: {
 					adding: {
 						entry: assign({
-							editedExercise: (_, event) =>
-								spawn(editTemplateExerciseMachine())
+							editedExercise: (_, event) => spawn(editTemplateExerciseMachine())
 						}),
 						on: {
 							DONE: {
@@ -168,13 +152,7 @@ export const editTemplateMachine = Machine(
 					},
 					editing: {
 						entry: assign({
-							editedExercise: (_, event) =>
-								spawn(
-									editTemplateExerciseMachine(
-										event.params.exercise,
-										event.params.movement
-									)
-								)
+							editedExercise: (_, event) => spawn(editTemplateExerciseMachine(event.params.exercise))
 						}),
 						on: {
 							DONE: {

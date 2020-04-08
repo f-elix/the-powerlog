@@ -28,6 +28,8 @@
   $: templateExercises = $editTemplateState.context.template.exercises;
   $: exercises = $exercisesState.context.exercises;
 
+  $: console.log($editTemplateState.context.editedExercise);
+
   function onNameInput(e) {
     editTemplateSend({ type: "NAME_INPUT", params: { value: e.detail } });
   }
@@ -40,8 +42,7 @@
     editTemplateSend({
       type: "EDIT_EXERCISE",
       params: {
-        exercise: e.detail.exercise,
-        movement: e.detail.movement
+        exercise: e.detail
       }
     });
   }
