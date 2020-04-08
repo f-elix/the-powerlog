@@ -65,7 +65,7 @@ const actions = {
 	}),
 	generateExerciseIds: assign({
 		templateExercise: (context, _) => {
-			const updatedExercise = context.exercise;
+			const updatedExercise = context.templateExercise;
 			updatedExercise.movements.forEach(m => {
 				if (!m.exercise._id) {
 					m.exercise._id = ObjectID();

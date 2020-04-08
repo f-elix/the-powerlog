@@ -45,6 +45,11 @@
 </script>
 
 <style>
+  .error-message {
+    text-align: center;
+    color: var(--color-error);
+  }
+
   .input-ctn {
     margin-bottom: 2rem;
   }
@@ -93,7 +98,7 @@
 <EditFormModalLayout on:cancel={onCancel} on:submit={onSave}>
   <h2>{isEditing ? 'Edit' : 'Add'} Exercise</h2>
   {#if exerciseError}
-    <p>{{ exerciseError }}</p>
+    <p class="error-message">{exerciseError}</p>
   {/if}
   <!-- Movement input(s) -->
   {#each editedExercise.movements as movement, i (movement._id)}
@@ -108,6 +113,7 @@
         <!-- Delete movement btn -->
         <button
           class="delete-movement"
+          type="button"
           on:click={onDeleteMovement(movement._id)}>
           <i class="material-icons">clear</i>
           <span class="screen-reader-text">Delete</span>
@@ -122,7 +128,7 @@
     {/each}
   </datalist>
   <!-- Add movement btn -->
-  <button class="add-movement" on:click={onAddMovement}>
+  <button class="add-movement" type="button" on:click={onAddMovement}>
     <span>
       <i class="material-icons">add_circle</i>
       Add Movement

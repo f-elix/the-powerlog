@@ -121,8 +121,6 @@
   function onSaveTemplate() {
     editTemplateSend({ type: "SAVE_TEMPLATE" });
   }
-
-  $: console.log($editTemplateState);
 </script>
 
 <style>
