@@ -19,8 +19,6 @@
     dispatch("deleteexercise", exercise._id);
   }
 
-  function onAddMovement() {}
-
   function onAddExecution(movement) {
     dispatch("addexecution", { exercise, movement });
   }
@@ -84,16 +82,15 @@
     line-height: 1;
   }
 
-  .add-set,
-  .add-movement {
+  .add-set {
     display: block;
     height: 4rem;
     margin: 0.5rem 0;
     padding: 0.5rem 0.5rem 0.5rem 0;
+    border-radius: 0;
   }
 
-  .add-set span,
-  .add-movement span {
+  .add-set span {
     display: flex;
     align-items: center;
     color: var(--color-primary);
@@ -193,15 +190,6 @@
         <Ripple />
       </button>
     {/each}
-    <!-- Add movement btn -->
-    <div>&mdash;</div>
-    <button class="add-movement" on:click={onAddMovement}>
-      <span>
-        <i class="material-icons">add_circle</i>
-        Add Movement
-      </span>
-      <Ripple />
-    </button>
   </div>
   <!-- Handle btn -->
   <button class="handle">

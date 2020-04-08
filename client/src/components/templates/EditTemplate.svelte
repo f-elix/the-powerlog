@@ -32,11 +32,11 @@
     editTemplateSend({ type: "NAME_INPUT", params: { value: e.detail } });
   }
 
-  function onAddExercise() {
+  function onAddTemplateExercise() {
     editTemplateSend({ type: "ADD_EXERCISE" });
   }
 
-  function onEditExercise(e) {
+  function onEditTemplateExercise(e) {
     editTemplateSend({
       type: "EDIT_EXERCISE",
       params: {
@@ -46,7 +46,7 @@
     });
   }
 
-  function onSaveExercise(e) {
+  function onSaveTemplateExercise(e) {
     editTemplateSend({
       type: "SAVE_EXERCISE",
       params: {
@@ -55,12 +55,32 @@
     });
   }
 
-  function onDeleteExercise(e) {
+  function onDeleteTemplateExercise(e) {
     editTemplateSend({
       type: "DELETE_EXERCISE",
       params: {
         exerciseId: e.detail
       }
+    });
+  }
+
+  function onAddMovement() {
+    editTemplateSend({ type: "ADD_MOVEMENT" });
+  }
+
+  function onDeleteMovement(e) {
+    editTemplateSend({
+      type: "DELETE_MOVEMENT",
+      params: {
+        movementId: e.detail
+      }
+    });
+  }
+
+  function onExerciseInput(e) {
+    editTemplateSend({
+      type: "EXERCISE_INPUT",
+      params: e.detail
     });
   }
 
@@ -101,6 +121,8 @@
   function onSaveTemplate() {
     editTemplateSend({ type: "SAVE_TEMPLATE" });
   }
+
+  $: console.log($editTemplateState);
 </script>
 
 <style>
@@ -125,9 +147,9 @@
   {templateExercises}
   {templateName}
   on:nameinput={onNameInput}
-  on:addexercise={onAddExercise}
-  on:editexercise={onEditExercise}
-  on:deleteexercise={onDeleteExercise}
+  on:addexercise={onAddTemplateExercise}
+  on:editexercise={onEditTemplateExercise}
+  on:deleteexercise={onDeleteTemplateExercise}
   on:addexecution={onAddExecution}
   on:editexecution={onEditExecution}
   on:deleteexecution={onDeleteExecution} />
@@ -136,10 +158,13 @@
   <EditExerciseModal
     {exercises}
     isEditing={$editTemplateState.matches('exercise.editing')}
-    editedMovement={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.movement : null}
+    editedExercise={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.templateExercise : null}
     exerciseError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.exerciseError : ''}
+    on:exerciseinput={onExerciseInput}
+    on:addmovement={onAddMovement}
+    on:deletemovement={onDeleteMovement}
     on:cancel={onAddCancel}
-    on:save={onSaveExercise} />
+    on:save={onSaveTemplateExercise} />
 {/if}
 <!-- Edit execution modal -->
 {#if $editTemplateState.matches('execution')}

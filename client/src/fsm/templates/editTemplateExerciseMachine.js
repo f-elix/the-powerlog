@@ -3,7 +3,7 @@ import ObjectID from 'bson-objectid';
 
 const actions = {
 	updateMovementExecution: assign({
-		exercise: (context, event) => {
+		templateExercise: (context, event) => {
 			const { executionData } = event.params;
 			const execution = {
 				sets: executionData.sets,
@@ -33,35 +33,49 @@ const actions = {
 			return updatedExercise;
 		}
 	}),
-	updateMovementExercise: assign({
-		exercise: (context, event) => {
-			const { exercise } = event.params;
-			const movementIndex = context.exercise.movements.findIndex(m => m === context.movement);
-			const updatedExercise = context.exercise;
-			updatedExercise.movements[movementIndex].exercise = exercise;
+	updateExerciseMovement: assign({
+		templateExercise: (context, event) => {
+			const { movementId, exercise } = event.params;
+			const movementIndex = context.templateExercise.movements.findIndex(m => m._id === movementId);
+			const updatedTemplateExercise = context.templateExercise;
+			updatedTemplateExercise.movements[movementIndex].exercise = exercise;
+			return updatedTemplateExercise;
+		}
+	}),
+	addMovement: assign({
+		templateExercise: (context, _) => {
+			const updatedExercise = context.templateExercise;
+			const addedMovement = {
+				_id: ObjectID(),
+				exercise: {
+					name: ''
+				},
+				executions: []
+			};
+			updatedExercise.movements.push(addedMovement);
 			return updatedExercise;
 		}
 	}),
-	createExercise: assign({
-		exercise: (_, event) => {
-			const { exercise } = event.params;
-			if (!exercise._id) {
-				exercise._id = ObjectID();
-			}
-			const newExercise = {
-				_id: ObjectID(),
-				movements: [
-					{
-						exercise,
-						executions: []
-					}
-				]
-			};
-			return newExercise;
+	deleteMovement: assign({
+		templateExercise: (context, event) => {
+			const updatedExercise = context.templateExercise;
+			updatedExercise.movements = updatedExercise.movements.filter(m => m._id !== event.params.movementId);
+			return updatedExercise;
+		}
+	}),
+	generateExerciseIds: assign({
+		templateExercise: (context, _) => {
+			const updatedExercise = context.exercise;
+			updatedExercise.movements.forEach(m => {
+				if (!m.exercise._id) {
+					m.exercise._id = ObjectID();
+				}
+			});
+			return updatedExercise;
 		}
 	}),
 	updateExerciseError: assign({
-		exerciseError: 'Exercise name is required.'
+		exerciseError: 'Movement name is required.'
 	}),
 	updateExecutionError: assign({
 		executionError: 'Number of sets is required.'
@@ -73,17 +87,30 @@ const actions = {
 };
 
 const guards = {
-	isExerciseNameEmpty: (_, event) => event.params.exercise === null || event.params.exercise.name.trim().length === 0,
-	isEditingExercise: (context, _) => !!context.exercise,
+	hasEmptyMovement: (context, _) => context.templateExercise.movements.some(m => m.exercise.name.trim().length === 0),
 	isSetsEmpty: (_, event) => event.params.executionData.sets <= 0
 };
 
-export const editTemplateExerciseMachine = (exercise, movement, execution) => {
+export const editTemplateExerciseMachine = (templateExercise, movement, execution) => {
+	if (!templateExercise) {
+		templateExercise = {
+			_id: ObjectID(),
+			movements: [
+				{
+					_id: ObjectID(),
+					exercise: {
+						name: ''
+					},
+					executions: []
+				}
+			]
+		};
+	}
 	return Machine(
 		{
 			id: 'editTemplateExercise',
 			context: {
-				exercise,
+				templateExercise,
 				movement,
 				execution,
 				exerciseError: '',
@@ -100,20 +127,24 @@ export const editTemplateExerciseMachine = (exercise, movement, execution) => {
 						}
 					},
 					on: {
+						EXERCISE_INPUT: {
+							actions: ['updateExerciseMovement']
+						},
+						ADD_MOVEMENT: {
+							actions: ['addMovement']
+						},
+						DELETE_MOVEMENT: {
+							actions: ['deleteMovement']
+						},
 						SAVE_EXERCISE: [
 							{
-								cond: 'isExerciseNameEmpty',
+								cond: 'hasEmptyMovement',
 								target: 'editing.error',
 								actions: ['updateExerciseError']
 							},
 							{
-								cond: 'isEditingExercise',
 								target: 'done',
-								actions: ['updateMovementExercise']
-							},
-							{
-								target: 'done',
-								actions: ['createExercise']
+								actions: ['generateExerciseIds']
 							}
 						],
 						SAVE_EXECUTION: [
@@ -130,7 +161,10 @@ export const editTemplateExerciseMachine = (exercise, movement, execution) => {
 					}
 				},
 				done: {
-					entry: sendParent(context => ({ type: 'DONE', exercise: context.exercise })),
+					entry: sendParent(context => ({
+						type: 'DONE',
+						exercise: context.templateExercise
+					})),
 					type: 'final'
 				}
 			}
