@@ -17,8 +17,8 @@ const actions = {
 					unit: executionData.selectedLoadUnit
 				}
 			};
-			const movementIndex = context.exercise.movements.findIndex(m => m._id === context.movement._id);
-			const updatedExercise = context.exercise;
+			const movementIndex = context.templateExercise.movements.findIndex(m => m._id === context.movement._id);
+			const updatedExercise = context.templateExercise;
 			if (executionData._id) {
 				execution._id = executionData._id;
 				const executionIndex = context.movement.executions.findIndex(e => e._id === context.execution._id);
