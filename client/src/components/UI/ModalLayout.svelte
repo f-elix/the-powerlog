@@ -29,6 +29,8 @@
   }
 
   .modal {
+    max-height: 40rem;
+    overflow: scroll;
     z-index: 1001;
     background-color: var(--color-fg-light);
     box-shadow: var(--shadow-default);
