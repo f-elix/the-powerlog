@@ -18,7 +18,9 @@
 </script>
 
 <style>
-
+  main {
+    padding-bottom: calc(var(--header-height) + 2rem);
+  }
 </style>
 
 <main>
