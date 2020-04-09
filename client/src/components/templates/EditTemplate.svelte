@@ -16,7 +16,9 @@
   const { editTemplateState, editTemplateSend } = getContext("editTemplate");
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
 
-  setContext("editExercise", {});
+  setContext("editExercise", {
+    editTemplateState
+  });
 
   onMount(() => {
     exercisesSend({ type: "LOAD" });
@@ -120,6 +122,44 @@
   function onSaveTemplate() {
     editTemplateSend({ type: "SAVE_TEMPLATE" });
   }
+
+  function onDrag(e) {
+    editTemplateSend({
+      type: "DRAG",
+      params: {
+        pointerx: e.detail.pointerx,
+        pointery: e.detail.pointery,
+        exercise: e.detail.exercise
+      }
+    });
+  }
+
+  function onMouseOver(e) {
+    editTemplateSend({
+      type: "HOVER",
+      params: {
+        exercise: e.detail
+      }
+    });
+  }
+
+  function onDrop() {
+    editTemplateSend({ type: "DROP" });
+  }
+
+  function onMove(e) {
+    editTemplateSend({
+      type: "MOVE",
+      params: {
+        x: e.clientX,
+        y: e.clientY
+      }
+    });
+  }
+
+  function onLeave() {
+    editTemplateSend({ type: "LEAVE" });
+  }
 </script>
 
 <style>
@@ -137,51 +177,56 @@
   }
 </style>
 
-<!-- Header -->
-<h1>{isNew ? 'Creating' : 'Editing'} template...</h1>
-<!-- Template form -->
-<TemplateForm
-  {templateExercises}
-  {templateName}
-  on:nameinput={onNameInput}
-  on:addexercise={onAddTemplateExercise}
-  on:editexercise={onEditTemplateExercise}
-  on:deleteexercise={onDeleteTemplateExercise}
-  on:addexecution={onAddExecution}
-  on:editexecution={onEditExecution}
-  on:deleteexecution={onDeleteExecution} />
-<!-- Edit exercise modal -->
-{#if $editTemplateState.matches('exercise')}
-  <EditExerciseModal
-    {exercises}
-    isEditing={$editTemplateState.matches('exercise.editing')}
-    editedExercise={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.templateExercise : null}
-    exerciseError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.exerciseError : ''}
-    on:exerciseinput={onExerciseInput}
-    on:addmovement={onAddMovement}
-    on:deletemovement={onDeleteMovement}
-    on:cancel={onAddCancel}
-    on:save={onSaveTemplateExercise} />
-{/if}
-<!-- Edit execution modal -->
-{#if $editTemplateState.matches('execution')}
-  <EditExecutionModal
-    on:cancel={onAddCancel}
-    on:save={onSaveExecution}
-    executionError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.executionError : ''}
-    editedExecution={$editTemplateState.context.editedExercise.state.context.execution}
-    exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
-{/if}
-<!-- Template buttons -->
-<div class="actions">
-  <a href="/templates">
-    <Button color="error" variant="filled">
-      <i class="material-icons">cancel</i>
-      Cancel
+<div on:mouseup={onDrop} on:mousemove={onMove}>
+  <!-- Header -->
+  <h1>{isNew ? 'Creating' : 'Editing'} template...</h1>
+  <!-- Template form -->
+  <TemplateForm
+    {templateExercises}
+    {templateName}
+    on:nameinput={onNameInput}
+    on:addexercise={onAddTemplateExercise}
+    on:editexercise={onEditTemplateExercise}
+    on:deleteexercise={onDeleteTemplateExercise}
+    on:addexecution={onAddExecution}
+    on:editexecution={onEditExecution}
+    on:deleteexecution={onDeleteExecution}
+    on:drag={onDrag}
+    on:hover={onMouseOver}
+    on:leave={onLeave} />
+  <!-- Edit exercise modal -->
+  {#if $editTemplateState.matches('exercise')}
+    <EditExerciseModal
+      {exercises}
+      isEditing={$editTemplateState.matches('exercise.editing')}
+      editedExercise={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.templateExercise : null}
+      exerciseError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.exerciseError : ''}
+      on:exerciseinput={onExerciseInput}
+      on:addmovement={onAddMovement}
+      on:deletemovement={onDeleteMovement}
+      on:cancel={onAddCancel}
+      on:save={onSaveTemplateExercise} />
+  {/if}
+  <!-- Edit execution modal -->
+  {#if $editTemplateState.matches('execution')}
+    <EditExecutionModal
+      on:cancel={onAddCancel}
+      on:save={onSaveExecution}
+      executionError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.executionError : ''}
+      editedExecution={$editTemplateState.context.editedExercise.state.context.execution}
+      exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
+  {/if}
+  <!-- Template buttons -->
+  <div class="actions">
+    <a href="/templates">
+      <Button color="error" variant="filled">
+        <i class="material-icons">cancel</i>
+        Cancel
+      </Button>
+    </a>
+    <Button color="action" variant="filled" on:click={onSaveTemplate}>
+      <i class="material-icons">done</i>
+      {isNew ? 'Create' : 'Save'}
     </Button>
-  </a>
-  <Button color="action" variant="filled" on:click={onSaveTemplate}>
-    <i class="material-icons">done</i>
-    {isNew ? 'Create' : 'Save'}
-  </Button>
+  </div>
 </div>

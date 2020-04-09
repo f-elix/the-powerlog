@@ -2,6 +2,12 @@ import { Machine, assign, spawn, send } from 'xstate';
 import { editTemplateExerciseMachine } from './editTemplateExerciseMachine';
 import { getData, getToken } from '@/assets/js/utils.js';
 
+const reorder = (array, from, to) => {
+	const reorderedArray = array;
+	reorderedArray.splice(to, 0, reorderedArray.splice(from, 1)[0]);
+	return reorderedArray;
+};
+
 const services = {
 	saveTemplate: async (context, _) => {
 		const queryName = 'saveTemplate';
@@ -81,6 +87,45 @@ const actions = {
 	}),
 	forwardToEditedExercise: send((_, event) => event, {
 		to: context => context.editedExercise
+	}),
+	updateDraggedExercise: assign({
+		draggedExercise: (_, event) => event.params.exercise
+	}),
+	clearDraggedExercise: assign({
+		draggedExercise: null
+	}),
+	updateHoveredExercise: assign({
+		hoveredExercise: (_, event) => event.params.exercise
+	}),
+	clearHoveredExercise: assign({
+		hoveredExercise: null
+	}),
+	updatePointer: assign({
+		pointerx: (_, event) => event.params.pointerx,
+		pointery: (_, event) => event.params.pointery
+	}),
+	updateCoords: assign({
+		x: (context, event) => event.params.x - context.pointerx,
+		y: (context, event) => event.params.y - context.pointery
+	}),
+	clearDragging: assign({
+		pointerx: 0,
+		pointery: 0,
+		x: 0,
+		y: 0
+	}),
+	updateExerciseOrder: assign({
+		template: (context, _) => {
+			const updatedTemplate = context.template;
+			const draggedExerciseIndex = context.template.exercises.findIndex(
+				e => e._id === context.draggedExercise._id
+			);
+			const hoveredExerciseIndex = context.template.exercises.findIndex(
+				e => e._id === context.hoveredExercise._id
+			);
+			updatedTemplate.exercises = reorder(context.template.exercises, draggedExerciseIndex, hoveredExerciseIndex);
+			return updatedTemplate;
+		}
 	})
 };
 
@@ -97,7 +142,13 @@ export const editTemplateMachine = Machine(
 				exercises: []
 			},
 			editedExercise: null,
-			nameError: ''
+			nameError: '',
+			draggedExercise: null,
+			hoveredExercise: null,
+			pointerx: 0,
+			pointery: 0,
+			x: 0,
+			y: 0
 		},
 		initial: 'editing',
 		states: {
@@ -124,6 +175,9 @@ export const editTemplateMachine = Machine(
 					EDIT_EXECUTION: 'execution',
 					DELETE_EXECUTION: {
 						actions: ['deleteExecution']
+					},
+					DRAG: {
+						target: 'dragging'
 					},
 					SAVE_TEMPLATE: [
 						{
@@ -207,6 +261,41 @@ export const editTemplateMachine = Machine(
 				exit: assign({
 					editedExercise: null
 				})
+			},
+			dragging: {
+				entry: ['updatePointer', 'updateDraggedExercise'],
+				initial: 'outside',
+				states: {
+					outside: {
+						on: {
+							// LEAVE: {
+							// 	target: '#editing'
+							// },
+							HOVER: {
+								actions: ['updateHoveredExercise', 'updateExerciseOrder'],
+								target: 'inside'
+							}
+						}
+					},
+					inside: {
+						on: {
+							LEAVE: {
+								target: 'outside',
+								actions: ['clearHoveredExercise']
+							}
+						}
+					}
+				},
+				on: {
+					MOVE: {
+						internal: true,
+						actions: ['updateCoords']
+					},
+					DROP: {
+						target: 'editing'
+					}
+				},
+				exit: ['clearDragging', 'clearDraggedExercise', 'clearHoveredExercise']
 			},
 			savingtemplate: {
 				invoke: {

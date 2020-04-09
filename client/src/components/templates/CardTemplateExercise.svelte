@@ -1,7 +1,6 @@
 <script>
   // Svelte
   import { createEventDispatcher } from "svelte";
-  import { fly } from "svelte/transition";
 
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
@@ -10,6 +9,7 @@
   const dispatch = createEventDispatcher();
 
   export let exercise;
+  export let isDragging = false;
 
   function onEditExercise() {
     dispatch("editexercise", exercise);
@@ -29,6 +29,14 @@
 
   function onDeleteExecution(movement, execution) {
     dispatch("deleteexecution", { exercise, movement, execution });
+  }
+
+  function onDrag(e) {
+    dispatch("drag", {
+      exercise,
+      pointerx: e.clientX,
+      pointery: e.clientY
+    });
   }
 </script>
 
@@ -128,13 +136,15 @@
 
   button.handle {
     color: var(--color-primary);
+    cursor: grab;
+  }
+
+  button.handle.dragging {
+    cursor: grabbing;
   }
 </style>
 
-<div
-  class="wrapper"
-  in:fly|local={{ x: 30 }}
-  out:fly|local={{ x: 30, duration: 200 }}>
+<div class="wrapper">
   <!-- Content -->
   <div class="content-ctn">
     {#each exercise.movements as movement}
@@ -185,7 +195,7 @@
     {/each}
   </div>
   <!-- Handle btn -->
-  <button class="handle">
+  <button class="handle" on:mousedown={onDrag} class:dragging={isDragging}>
     <i class="material-icons">reorder</i>
     <span class="screen-reader-text">Re-order</span>
   </button>
