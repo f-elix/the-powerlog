@@ -120,7 +120,7 @@ export const templateMachine = Machine(
 				invoke: {
 					src: 'getTemplate',
 					onDone: {
-						target: 'loaded',
+						target: 'displaying',
 						actions: ['updateTemplate']
 					},
 					onError: {
@@ -129,26 +129,16 @@ export const templateMachine = Machine(
 					}
 				}
 			},
-			loaded: {
+			displaying: {
 				on: {
 					DELETE: {
 						target: 'deleting',
 						actions: ['routeTemplates']
 					},
 					EDIT: {
-						target: 'editing'
+						target: 'transitioning'
 					}
 				}
-			},
-			deleting: {
-				invoke: {
-					src: 'deleteTemplate',
-					onDone: 'deleted',
-					onError: 'loaded'
-				}
-			},
-			deleted: {
-				type: 'final'
 			},
 			editing: {
 				invoke: {
@@ -158,10 +148,26 @@ export const templateMachine = Machine(
 						template: (context, _) => context.template
 					},
 					onDone: {
-						target: 'loaded',
+						target: 'transitioning',
 						actions: ['updateTemplate']
 					}
 				}
+			},
+			transitioning: {
+				on: {
+					DISPLAY_OUT: 'editing',
+					EDIT_OUT: 'displaying'
+				}
+			},
+			deleting: {
+				invoke: {
+					src: 'deleteTemplate',
+					onDone: 'deleted',
+					onError: 'displaying'
+				}
+			},
+			deleted: {
+				type: 'final'
 			}
 		}
 	},

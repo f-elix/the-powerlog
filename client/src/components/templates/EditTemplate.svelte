@@ -2,6 +2,7 @@
   // Svelte
   import { goto } from "@sapper/app";
   import { onMount, getContext, setContext } from "svelte";
+  import { fly } from "svelte/transition";
 
   // FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
@@ -188,7 +189,10 @@
 
 <svelte:body on:pointerup={onDrop} on:pointermove={onMove} />
 
-<div>
+<div
+  in:fly|local={{ x: 30 }}
+  out:fly|local={{ x: 30, duration: 200 }}
+  on:outroend>
   <!-- Header -->
   <h1>{isNew ? 'Creating' : 'Editing'} template...</h1>
   <!-- Template form -->
