@@ -29,6 +29,11 @@
   let templateName = $editTemplateState.context.template.name;
   $: templateExercises = $editTemplateState.context.template.exercises;
   $: exercises = $exercisesState.context.exercises;
+  $: if ($editTemplateState.matches("dragging")) {
+    document.body.dataset.state = "dragging";
+  } else {
+    delete document.body.dataset.state;
+  }
 
   function onNameInput(e) {
     editTemplateSend({ type: "NAME_INPUT", params: { value: e.detail } });
@@ -127,9 +132,13 @@
     editTemplateSend({
       type: "DRAG",
       params: {
-        pointerx: e.detail.pointerx,
-        pointery: e.detail.pointery,
-        exercise: e.detail.exercise
+        exercise: e.detail.exercise,
+        x: e.detail.x,
+        y: e.detail.y,
+        handleWidth: e.detail.handleWidth,
+        ctnWidth: e.detail.ctnWidth,
+        ctnHeight: e.detail.ctnHeight,
+        ctnPaddingRight: e.detail.ctnPaddingRight
       }
     });
   }
@@ -177,7 +186,9 @@
   }
 </style>
 
-<div on:mouseup={onDrop} on:mousemove={onMove}>
+<svelte:body on:pointerup={onDrop} on:pointermove={onMove} />
+
+<div>
   <!-- Header -->
   <h1>{isNew ? 'Creating' : 'Editing'} template...</h1>
   <!-- Template form -->

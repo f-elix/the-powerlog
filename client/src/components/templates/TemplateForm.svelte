@@ -41,7 +41,7 @@
     const { exercise } = params;
     if (
       $editTemplateState.matches("dragging") &&
-      exercise._id === draggedExercise._id
+      draggedExercise._id === exercise._id
     ) {
       return {
         easing: _ => 0
@@ -54,12 +54,27 @@
 
 <style>
   ul li {
+    width: 100%;
+    max-width: calc(var(--main-width) - (var(--main-h-padding) * 2));
     background-color: var(--color-fg);
-    transition: transform 0.25s cubic-bezier(0.7, 0, 0.3, 1);
   }
 
   ul li:nth-of-type(even) {
     background-color: var(--color-fg-dark);
+  }
+
+  .dragged {
+    position: absolute;
+    z-index: 1000;
+    outline: 2px solid var(--color-primary);
+    background-color: var(--color-fg-light);
+    opacity: 0.5;
+    pointer-events: none;
+    transition: none;
+  }
+
+  .hovered {
+    outline: 2px solid var(--color-info);
   }
 </style>
 
@@ -74,15 +89,17 @@
 <ul class="exercise-list">
   {#each templateExercises as exercise (exercise._id)}
     <li
-      style={$editTemplateState.matches('dragging') && draggedExercise._id === exercise._id ? `transform: translate(${x}px, ${y}px); z-index: 100; transition: none` : ''}
+      style={$editTemplateState.matches('dragging') && draggedExercise._id === exercise._id ? `top: ${y}px; left: ${x}px;` : ''}
+      class:dragged={$editTemplateState.matches('dragging') && draggedExercise._id === exercise._id}
+      class:hovered={$editTemplateState.matches('dragging') && hoveredExercise && hoveredExercise._id === exercise._id}
       animate:move={{ exercise }}
       in:fly|local={{ x: 30 }}
       out:fly|local={{ x: 30, duration: 200 }}
-      on:mouseenter={e => onMouseEnter(e, exercise)}
-      on:mouseleave={e => onMouseLeave(e, exercise)}>
+      on:pointerenter={e => onMouseEnter(e, exercise)}
+      on:pointerleave={e => onMouseLeave(e, exercise)}>
       <CardTemplateExercise
-        isDragging={$editTemplateState.matches('dragging') && draggedExercise._id}
         {exercise}
+        isDragging={$editTemplateState.matches('dragging') && draggedExercise._id === exercise._id}
         on:editexercise
         on:deleteexercise
         on:addexecution

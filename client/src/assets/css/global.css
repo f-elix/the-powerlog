@@ -32,6 +32,8 @@
 
 	/* Misc */
 	--header-height: 5rem;
+	--main-width: 400px;
+	--main-h-padding: 1rem;
 }
 
 html {
@@ -56,8 +58,8 @@ body {
 
 main {
 	width: 100%;
-	max-width: 400px;
-	padding: 0 1rem;
+	max-width: var(--main-width);
+	padding: 0 var(--main-h-padding);
 }
 
 table {
@@ -92,4 +94,8 @@ h2 {
 	overflow: hidden;
 	clip: rect(1px, 1px, 1px, 1px);
 	clip-path: inset(50%);
+}
+
+[data-state='dragging'] {
+	cursor: grabbing;
 }

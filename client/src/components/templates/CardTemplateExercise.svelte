@@ -1,12 +1,14 @@
 <script>
   // Svelte
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, getContext } from "svelte";
 
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
   import Button from "@/components/UI/Button.svelte";
 
   const dispatch = createEventDispatcher();
+
+  const { editTemplateState } = getContext("editTemplate");
 
   export let exercise;
   export let isDragging = false;
@@ -32,10 +34,19 @@
   }
 
   function onDrag(e) {
+    const handle = e.target.closest(".handle");
+    const wrapper = handle.closest(".wrapper");
+    const li = handle.closest("li");
     dispatch("drag", {
       exercise,
-      pointerx: e.clientX,
-      pointery: e.clientY
+      x: e.clientX,
+      y: e.clientY,
+      handleWidth: handle.offsetWidth,
+      ctnWidth: li.offsetWidth,
+      ctnHeight: li.offsetHeight,
+      ctnPaddingRight: parseInt(
+        window.getComputedStyle(wrapper).getPropertyValue("padding-right")
+      )
     });
   }
 </script>
@@ -90,6 +101,10 @@
     line-height: 1;
   }
 
+  :global([data-state="dragging"] button) {
+    cursor: inherit;
+  }
+
   .add-set {
     display: block;
     height: 4rem;
@@ -136,11 +151,11 @@
 
   button.handle {
     color: var(--color-primary);
-    cursor: grab;
+    cursor: inherit;
   }
 
-  button.handle.dragging {
-    cursor: grabbing;
+  button.handle.cursor-grab {
+    cursor: grab;
   }
 </style>
 
@@ -195,7 +210,11 @@
     {/each}
   </div>
   <!-- Handle btn -->
-  <button class="handle" on:mousedown={onDrag} class:dragging={isDragging}>
+  <button
+    class="handle"
+    on:pointerdown={onDrag}
+    class:dragging={isDragging}
+    class:cursor-grab={!$editTemplateState.matches('dragging')}>
     <i class="material-icons">reorder</i>
     <span class="screen-reader-text">Re-order</span>
   </button>
