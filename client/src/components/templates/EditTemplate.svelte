@@ -124,10 +124,6 @@
     editTemplateSend({ type: "CANCEL" });
   }
 
-  function onSaveTemplate() {
-    editTemplateSend({ type: "SAVE_TEMPLATE" });
-  }
-
   function onDrag(e) {
     editTemplateSend({
       type: "DRAG",
@@ -169,6 +165,14 @@
   function onLeave() {
     editTemplateSend({ type: "LEAVE" });
   }
+
+  function onSaveTemplate() {
+    editTemplateSend({ type: "SAVE_TEMPLATE" });
+  }
+
+  function onCancelEdit() {
+    editTemplateSend({ type: "CANCEL_EDIT" });
+  }
 </script>
 
 <style>
@@ -179,10 +183,6 @@
     width: 80%;
     margin: 0 auto;
     padding: 3rem 1rem;
-  }
-
-  .actions a {
-    text-decoration: none;
   }
 </style>
 
@@ -229,12 +229,10 @@
   {/if}
   <!-- Template buttons -->
   <div class="actions">
-    <a href="/templates">
-      <Button color="error" variant="filled">
-        <i class="material-icons">cancel</i>
-        Cancel
-      </Button>
-    </a>
+    <Button color="error" variant="filled" on:click={onCancelEdit}>
+      <i class="material-icons">cancel</i>
+      Cancel
+    </Button>
     <Button color="action" variant="filled" on:click={onSaveTemplate}>
       <i class="material-icons">done</i>
       {isNew ? 'Create' : 'Save'}

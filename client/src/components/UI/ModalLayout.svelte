@@ -30,10 +30,15 @@
 
   .modal {
     max-height: 40rem;
-    overflow: scroll;
     z-index: 1001;
+    overflow: scroll;
+    scroll-behavior: smooth;
     background-color: var(--color-fg-light);
     box-shadow: var(--shadow-default);
+  }
+
+  .modal::-webkit-scrollbar {
+    display: none;
   }
 
   .small {

@@ -189,7 +189,10 @@ export const editTemplateMachine = Machine(
 						{
 							target: 'savingtemplate'
 						}
-					]
+					],
+					CANCEL_EDIT: {
+						target: 'canceled'
+					}
 				}
 			},
 			exercise: {
@@ -312,6 +315,9 @@ export const editTemplateMachine = Machine(
 				data: {
 					template: (context, _) => context.template
 				}
+			},
+			canceled: {
+				type: 'final'
 			}
 		}
 	},
