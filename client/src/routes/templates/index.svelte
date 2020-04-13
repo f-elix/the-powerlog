@@ -9,8 +9,8 @@
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
-  import TemplateForm from "@/components/templates/TemplateForm.svelte";
-  import CardTemplate from "@/components/templates/CardTemplate.svelte";
+  import EditWorkoutForm from "@/components/workouts/EditWorkoutForm.svelte";
+  import CardWorkout from "@/components/workouts/CardWorkout.svelte";
   import Button from "@/components/UI/Button.svelte";
   import Input from "@/components/UI/Input.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
@@ -93,7 +93,10 @@
     {/if}
     {#each templates as template (template._id)}
       <li>
-        <CardTemplate {template} on:delete={onDeleteTemplate} />
+        <CardWorkout
+          workout={template}
+          workoutType="template"
+          on:delete={onDeleteTemplate} />
       </li>
     {/each}
   </ul>

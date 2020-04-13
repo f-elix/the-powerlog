@@ -8,14 +8,15 @@
 
   const dispatch = createEventDispatcher();
 
-  export let template;
+  export let workoutType = "session";
+  export let workout;
 
   function onView() {
-    dispatch("view", template._id);
+    dispatch("view", workout._id);
   }
 
   function onDelete() {
-    dispatch("delete", template._id);
+    dispatch("delete", workout._id);
   }
 </script>
 
@@ -48,7 +49,7 @@
     display: none;
   }
 
-  button.edit {
+  button.view {
     color: var(--color-info);
   }
 
@@ -58,11 +59,15 @@
 </style>
 
 <article in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
-  <h3>{template.name}</h3>
+  <h3>{workout.name}</h3>
+  <!-- {#if workoutType === 'session'}
+  <p>{workout.date}</p>
+  {/if} -->
   <div>
-    <!-- View template btn -->
-    <a href={`templates/${template._id}`}>
-      <button class="edit">
+    <!-- View workout btn -->
+    <a
+      href={`${workoutType === 'session' ? 'log' : 'templates'}/${workout._id}`}>
+      <button class="view">
         <i class="material-icons">visibility</i>
         <span>View Template</span>
         <Ripple />

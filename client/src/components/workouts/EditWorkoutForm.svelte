@@ -7,18 +7,18 @@
   // Components
   import Input from "@/components/UI/Input.svelte";
   import Button from "@/components/UI/Button.svelte";
-  import CardTemplateExercise from "./CardTemplateExercise.svelte";
+  import EditWorkoutCardExercise from "./EditWorkoutCardExercise.svelte";
 
   const dispatch = createEventDispatcher();
 
-  const { editTemplateState } = getContext("editTemplate");
+  const { editWorkoutState } = getContext("editWorkout");
 
-  export let templateName;
-  export let templateExercises;
+  export let workoutName;
+  export let workoutExercises;
 
-  $: draggedExercise = $editTemplateState.context.draggedExercise;
-  $: x = $editTemplateState.context.x;
-  $: y = $editTemplateState.context.y;
+  $: draggedExercise = $editWorkoutState.context.draggedExercise;
+  $: x = $editWorkoutState.context.x;
+  $: y = $editWorkoutState.context.y;
 
   function onNameInput(e) {
     dispatch("nameinput", e.target.value);
@@ -39,7 +39,7 @@
   function move(node, animation, params) {
     const { exercise } = params;
     if (
-      $editTemplateState.matches("dragging") &&
+      $editWorkoutState.matches("dragging") &&
       draggedExercise._id === exercise._id
     ) {
       return {
@@ -75,24 +75,24 @@
 
 <!-- Name input -->
 <Input
-  label="Template Name"
-  name="templateName"
-  errorMessage={$editTemplateState.context.nameError}
+  label="Name"
+  name="workoutName"
+  errorMessage={$editWorkoutState.context.nameError}
   on:input={onNameInput}
-  value={templateName} />
+  value={workoutName} />
 <!-- Exercises list -->
 <ul class="exercise-list">
-  {#each templateExercises as exercise (exercise._id)}
+  {#each workoutExercises as exercise (exercise._id)}
     <li
-      style={$editTemplateState.matches('dragging') && draggedExercise._id === exercise._id ? `transform: translate3d(${x}px, ${y}px, 0px) scale(1.025);` : ''}
-      class:dragged={$editTemplateState.matches('dragging') && draggedExercise._id === exercise._id}
+      style={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id ? `transform: translate3d(${x}px, ${y}px, 0px) scale(1.025);` : ''}
+      class:dragged={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id}
       data-exercise-id={exercise._id}
       animate:move={{ exercise }}
       in:fly|local={{ x: 30 }}
       out:fly|local={{ x: 30, duration: 200 }}
       on:pointerenter={e => onPointerEnter(e, exercise)}
       on:pointerleave>
-      <CardTemplateExercise
+      <EditWorkoutCardExercise
         {exercise}
         on:editexercise
         on:deleteexercise

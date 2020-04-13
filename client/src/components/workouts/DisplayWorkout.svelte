@@ -8,7 +8,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let template;
+  export let workout;
 
   function onDelete() {
     dispatch("delete");
@@ -73,9 +73,9 @@
   in:fly|local={{ x: 30 }}
   out:fly|local={{ x: 30, duration: 200 }}
   on:outroend>
-  <h1>{template.name}</h1>
+  <h1>{workout.name}</h1>
   <ul class="exercise-list">
-    {#each template.exercises as exercise (exercise._id)}
+    {#each workout.exercises as exercise (exercise._id)}
       <li>
         {#each exercise.movements as movement (movement._id)}
           <div class="movement">

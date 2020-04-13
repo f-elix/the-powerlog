@@ -3,20 +3,18 @@
   import { setContext } from "svelte";
 
   // fsm
-  import { editTemplateMachine } from "@/fsm/templates/editTemplateMachine.js";
+  import { editWorkoutMachine } from "@/fsm/workouts/editWorkoutMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
-  import EditTemplate from "@/components/templates/EditTemplate.svelte";
+  import EditWorkout from "@/components/workouts/EditWorkout.svelte";
 
-  const { editTemplateState, editTemplateSend } = useMachine(
-    editTemplateMachine
-  );
+  const { editWorkoutState, editWorkoutSend } = useMachine(editWorkoutMachine);
 
-  setContext("editTemplate", {
-    editTemplateState,
-    editTemplateSend
+  setContext("editWorkout", {
+    editWorkoutState,
+    editWorkoutSend
   });
 </script>
 
-<EditTemplate />
+<EditWorkout workoutType="template" />

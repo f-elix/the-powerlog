@@ -5,53 +5,53 @@
 
   // FSM
   import { useMachine, useService } from "@/fsm/machineStores.js";
-  import { templateMachine } from "@/fsm/templates/templateMachine.js";
+  import { workoutMachine } from "@/fsm/workouts/workoutMachine.js";
 
   // Components
-  import DisplayTemplate from "@/components/templates/DisplayTemplate.svelte";
-  import EditTemplate from "@/components/templates/EditTemplate.svelte";
+  import DisplayWorkout from "@/components/workouts/DisplayWorkout.svelte";
+  import EditWorkout from "@/components/workouts/EditWorkout.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
 
   const { page } = stores();
   const { _id } = $page.params;
 
-  const { templateState, templateSend } = useMachine(templateMachine);
+  const { workoutState, workoutSend } = useMachine(workoutMachine);
 
-  $: if ($templateState.children.editTemplate) {
-    const { editTemplateState, editTemplateSend } = useService(
-      $templateState.children.editTemplate
+  $: if ($workoutState.children.editWorkout) {
+    const { editWorkoutState, editWorkoutSend } = useService(
+      $workoutState.children.editWorkout
     );
-    setContext("editTemplate", {
-      editTemplateState,
-      editTemplateSend
+    setContext("editWorkout", {
+      editWorkoutState,
+      editWorkoutSend
     });
   }
 
   onMount(() => {
-    templateSend({
-      type: "LOAD",
+    workoutSend({
+      type: "LOAD_TEMPLATE",
       params: {
         templateId: _id
       }
     });
   });
 
-  $: template = $templateState.context.template;
+  $: template = $workoutState.context.workoutData;
 
   function onDelete() {
-    templateSend({ type: "DELETE" });
+    workoutSend({ type: "DELETE_TEMPLATE" });
   }
 
   function onEdit() {
-    templateSend({ type: "EDIT" });
+    workoutSend({ type: "EDIT" });
   }
 
   function onDisplayOut() {
-    templateSend({ type: "DISPLAY_OUT" });
+    workoutSend({ type: "DISPLAY_OUT" });
   }
 
   function onEditOut() {
-    templateSend({ type: "EDIT_OUT" });
+    workoutSend({ type: "EDIT_OUT" });
   }
 </script>
 
@@ -62,20 +62,20 @@
 </style>
 
 <!-- Loading spinner -->
-{#if $templateState.matches('fetching')}
+{#if $workoutState.matches('fetching')}
   <div class="spinner-ctn">
     <Spinner />
   </div>
 {/if}
 <!-- Display template -->
-{#if $templateState.matches('displaying')}
-  <DisplayTemplate
-    {template}
+{#if $workoutState.matches('displaying')}
+  <DisplayWorkout
+    workout={template}
     on:delete={onDelete}
     on:edit={onEdit}
     on:outroend={onDisplayOut} />
 {/if}
 <!-- Edit template -->
-{#if $templateState.matches('editing')}
-  <EditTemplate isNew={false} on:outroend={onEditOut} />
+{#if $workoutState.matches('editing')}
+  <EditWorkout isNew={false} on:outroend={onEditOut} />
 {/if}

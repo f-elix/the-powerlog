@@ -3,7 +3,7 @@ import ObjectID from 'bson-objectid';
 
 const actions = {
 	updateMovementExecution: assign({
-		templateExercise: (context, event) => {
+		workoutExercise: (context, event) => {
 			const { executionData } = event.params;
 			const execution = {
 				sets: executionData.sets,
@@ -17,8 +17,8 @@ const actions = {
 					unit: executionData.selectedLoadUnit
 				}
 			};
-			const movementIndex = context.templateExercise.movements.findIndex(m => m._id === context.movement._id);
-			const updatedExercise = context.templateExercise;
+			const movementIndex = context.workoutExercise.movements.findIndex(m => m._id === context.movement._id);
+			const updatedExercise = context.workoutExercise;
 			if (executionData._id) {
 				execution._id = executionData._id;
 				const executionIndex = context.movement.executions.findIndex(e => e._id === context.execution._id);
@@ -34,17 +34,17 @@ const actions = {
 		}
 	}),
 	updateExerciseMovement: assign({
-		templateExercise: (context, event) => {
+		workoutExercise: (context, event) => {
 			const { movementId, exercise } = event.params;
-			const movementIndex = context.templateExercise.movements.findIndex(m => m._id === movementId);
-			const updatedTemplateExercise = context.templateExercise;
-			updatedTemplateExercise.movements[movementIndex].exercise = exercise;
-			return updatedTemplateExercise;
+			const movementIndex = context.workoutExercise.movements.findIndex(m => m._id === movementId);
+			const updatedWorkoutExercise = context.workoutExercise;
+			updatedWorkoutExercise.movements[movementIndex].exercise = exercise;
+			return updatedWorkoutExercise;
 		}
 	}),
 	addMovement: assign({
-		templateExercise: (context, _) => {
-			const updatedExercise = context.templateExercise;
+		workoutExercise: (context, _) => {
+			const updatedExercise = context.workoutExercise;
 			const addedMovement = {
 				_id: ObjectID(),
 				exercise: {
@@ -57,15 +57,15 @@ const actions = {
 		}
 	}),
 	deleteMovement: assign({
-		templateExercise: (context, event) => {
-			const updatedExercise = context.templateExercise;
+		workoutExercise: (context, event) => {
+			const updatedExercise = context.workoutExercise;
 			updatedExercise.movements = updatedExercise.movements.filter(m => m._id !== event.params.movementId);
 			return updatedExercise;
 		}
 	}),
 	generateExerciseIds: assign({
-		templateExercise: (context, _) => {
-			const updatedExercise = context.templateExercise;
+		workoutExercise: (context, _) => {
+			const updatedExercise = context.workoutExercise;
 			updatedExercise.movements.forEach(m => {
 				if (!m.exercise._id) {
 					m.exercise._id = ObjectID();
@@ -87,13 +87,13 @@ const actions = {
 };
 
 const guards = {
-	hasEmptyMovement: (context, _) => context.templateExercise.movements.some(m => m.exercise.name.trim().length === 0),
+	hasEmptyMovement: (context, _) => context.workoutExercise.movements.some(m => m.exercise.name.trim().length === 0),
 	isSetsEmpty: (_, event) => event.params.executionData.sets <= 0
 };
 
-export const editTemplateExerciseMachine = (templateExercise, movement, execution) => {
-	if (!templateExercise) {
-		templateExercise = {
+export const editWorkoutExerciseMachine = (workoutExercise, movement, execution) => {
+	if (!workoutExercise) {
+		workoutExercise = {
 			_id: ObjectID(),
 			movements: [
 				{
@@ -108,9 +108,9 @@ export const editTemplateExerciseMachine = (templateExercise, movement, executio
 	}
 	return Machine(
 		{
-			id: 'editTemplateExercise',
+			id: 'editWorkoutExercise',
 			context: {
-				templateExercise,
+				workoutExercise,
 				movement,
 				execution,
 				exerciseError: '',
@@ -163,7 +163,7 @@ export const editTemplateExerciseMachine = (templateExercise, movement, executio
 				done: {
 					entry: sendParent(context => ({
 						type: 'DONE',
-						exercise: context.templateExercise
+						exercise: context.workoutExercise
 					})),
 					type: 'final'
 				}

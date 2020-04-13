@@ -10,15 +10,15 @@
 
   // Components
   import Button from "@/components/UI/Button.svelte";
-  import TemplateForm from "@/components/templates/TemplateForm.svelte";
-  import EditExerciseModal from "@/components/templates/EditExerciseModal.svelte";
-  import EditExecutionModal from "@/components/templates/EditExecutionModal.svelte";
+  import EditWorkoutForm from "@/components/workouts/EditWorkoutForm.svelte";
+  import EditExerciseModal from "@/components/workouts/EditExerciseModal.svelte";
+  import EditExecutionModal from "@/components/workouts/EditExecutionModal.svelte";
 
-  const { editTemplateState, editTemplateSend } = getContext("editTemplate");
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
 
   setContext("editExercise", {
-    editTemplateState
+    editWorkoutState
   });
 
   onMount(() => {
@@ -26,26 +26,27 @@
   });
 
   export let isNew = true;
+  export let workoutType = "session";
 
-  let templateName = $editTemplateState.context.template.name;
-  $: templateExercises = $editTemplateState.context.template.exercises;
+  let workoutName = $editWorkoutState.context.workout.name;
+  $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
-  $: if ($editTemplateState.matches("dragging")) {
+  $: if ($editWorkoutState.matches("dragging")) {
     document.body.dataset.state = "dragging";
   } else {
     delete document.body.dataset.state;
   }
 
   function onNameInput(e) {
-    editTemplateSend({ type: "NAME_INPUT", params: { value: e.detail } });
+    editWorkoutSend({ type: "NAME_INPUT", params: { value: e.detail } });
   }
 
-  function onAddTemplateExercise() {
-    editTemplateSend({ type: "ADD_EXERCISE" });
+  function onAddWorkoutExercise() {
+    editWorkoutSend({ type: "ADD_EXERCISE" });
   }
 
-  function onEditTemplateExercise(e) {
-    editTemplateSend({
+  function onEditWorkoutExercise(e) {
+    editWorkoutSend({
       type: "EDIT_EXERCISE",
       params: {
         exercise: e.detail
@@ -53,8 +54,8 @@
     });
   }
 
-  function onSaveTemplateExercise(e) {
-    editTemplateSend({
+  function onSaveWorkoutExercise(e) {
+    editWorkoutSend({
       type: "SAVE_EXERCISE",
       params: {
         exercise: e.detail
@@ -62,8 +63,8 @@
     });
   }
 
-  function onDeleteTemplateExercise(e) {
-    editTemplateSend({
+  function onDeleteWorkoutExercise(e) {
+    editWorkoutSend({
       type: "DELETE_EXERCISE",
       params: {
         exerciseId: e.detail
@@ -72,11 +73,11 @@
   }
 
   function onAddMovement() {
-    editTemplateSend({ type: "ADD_MOVEMENT" });
+    editWorkoutSend({ type: "ADD_MOVEMENT" });
   }
 
   function onDeleteMovement(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "DELETE_MOVEMENT",
       params: {
         movementId: e.detail
@@ -85,35 +86,35 @@
   }
 
   function onExerciseInput(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "EXERCISE_INPUT",
       params: e.detail
     });
   }
 
   function onAddExecution(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "ADD_EXECUTION",
       params: e.detail
     });
   }
 
   function onDeleteExecution(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "DELETE_EXECUTION",
       params: e.detail
     });
   }
 
   function onEditExecution(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "EDIT_EXECUTION",
       params: e.detail
     });
   }
 
   function onSaveExecution(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "SAVE_EXECUTION",
       params: {
         executionData: e.detail
@@ -122,11 +123,11 @@
   }
 
   function onAddCancel() {
-    editTemplateSend({ type: "CANCEL" });
+    editWorkoutSend({ type: "CANCEL" });
   }
 
   function onDrag(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "DRAG",
       params: {
         exercise: e.detail.exercise,
@@ -137,7 +138,7 @@
   }
 
   function onPointerEnter(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "ENTER",
       params: {
         exerciseId: e.detail.exerciseId,
@@ -147,11 +148,11 @@
   }
 
   function onDrop() {
-    editTemplateSend({ type: "DROP" });
+    editWorkoutSend({ type: "DROP" });
   }
 
   function onMove(e) {
-    editTemplateSend({
+    editWorkoutSend({
       type: "MOVE",
       params: {
         x: e.clientX,
@@ -167,7 +168,7 @@
       .elementFromPoint(pagex, pagey)
       .closest("[data-exercise-id]");
     if (targetEl) {
-      editTemplateSend({
+      editWorkoutSend({
         type: "ENTER",
         params: {
           exerciseId: targetEl.dataset.exerciseId,
@@ -175,8 +176,8 @@
         }
       });
     } else {
-      editTemplateSend({ type: "LEAVE" });
-      editTemplateSend({
+      editWorkoutSend({ type: "LEAVE" });
+      editWorkoutSend({
         type: "MOVE",
         params: {
           x: e.touches[0].clientX,
@@ -187,15 +188,15 @@
   }
 
   function onPointerLeave() {
-    editTemplateSend({ type: "LEAVE" });
+    editWorkoutSend({ type: "LEAVE" });
   }
 
-  function onSaveTemplate() {
-    editTemplateSend({ type: "SAVE_TEMPLATE" });
+  function onSaveWorkout() {
+    editWorkoutSend({ type: "SAVE_TEMPLATE" });
   }
 
   function onCancelEdit() {
-    editTemplateSend({ type: "CANCEL_EDIT" });
+    editWorkoutSend({ type: "CANCEL_EDIT" });
   }
 </script>
 
@@ -221,15 +222,15 @@
   out:fly|local={{ x: 30, duration: 200 }}
   on:outroend>
   <!-- Header -->
-  <h1>{isNew ? 'Creating' : 'Editing'} template...</h1>
-  <!-- Template form -->
-  <TemplateForm
-    {templateExercises}
-    {templateName}
+  <h1>{isNew ? 'Creating' : 'Editing'} {workoutType}...</h1>
+  <!-- Workout form -->
+  <EditWorkoutForm
+    {workoutExercises}
+    {workoutName}
     on:nameinput={onNameInput}
-    on:addexercise={onAddTemplateExercise}
-    on:editexercise={onEditTemplateExercise}
-    on:deleteexercise={onDeleteTemplateExercise}
+    on:addexercise={onAddWorkoutExercise}
+    on:editexercise={onEditWorkoutExercise}
+    on:deleteexercise={onDeleteWorkoutExercise}
     on:addexecution={onAddExecution}
     on:editexecution={onEditExecution}
     on:deleteexecution={onDeleteExecution}
@@ -237,34 +238,34 @@
     on:pointerenter={onPointerEnter}
     on:pointerleave={onPointerLeave} />
   <!-- Edit exercise modal -->
-  {#if $editTemplateState.matches('exercise')}
+  {#if $editWorkoutState.matches('exercise')}
     <EditExerciseModal
       {exercises}
-      isEditing={$editTemplateState.matches('exercise.editing')}
-      editedExercise={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.templateExercise : null}
-      exerciseError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.exerciseError : ''}
+      isEditing={$editWorkoutState.matches('exercise.editing')}
+      editedExercise={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.workoutExercise : null}
+      exerciseError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.exerciseError : ''}
       on:exerciseinput={onExerciseInput}
       on:addmovement={onAddMovement}
       on:deletemovement={onDeleteMovement}
       on:cancel={onAddCancel}
-      on:save={onSaveTemplateExercise} />
+      on:save={onSaveWorkoutExercise} />
   {/if}
   <!-- Edit execution modal -->
-  {#if $editTemplateState.matches('execution')}
+  {#if $editWorkoutState.matches('execution')}
     <EditExecutionModal
       on:cancel={onAddCancel}
       on:save={onSaveExecution}
-      executionError={$editTemplateState.context.editedExercise ? $editTemplateState.context.editedExercise.state.context.executionError : ''}
-      editedExecution={$editTemplateState.context.editedExercise.state.context.execution}
-      exerciseName={$editTemplateState.context.editedExercise.state.context.movement.exercise.name} />
+      executionError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.executionError : ''}
+      editedExecution={$editWorkoutState.context.editedExercise.state.context.execution}
+      exerciseName={$editWorkoutState.context.editedExercise.state.context.movement.exercise.name} />
   {/if}
-  <!-- Template buttons -->
+  <!-- Workout buttons -->
   <div class="actions">
     <Button color="error" variant="filled" on:click={onCancelEdit}>
       <i class="material-icons">cancel</i>
       Cancel
     </Button>
-    <Button color="action" variant="filled" on:click={onSaveTemplate}>
+    <Button color="action" variant="filled" on:click={onSaveWorkout}>
       <i class="material-icons">done</i>
       {isNew ? 'Create' : 'Save'}
     </Button>

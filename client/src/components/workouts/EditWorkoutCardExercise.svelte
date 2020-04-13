@@ -8,7 +8,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const { editTemplateState } = getContext("editTemplate");
+  const { editWorkoutState } = getContext("editWorkout");
 
   export let exercise;
 
@@ -203,7 +203,7 @@
   <button
     class="handle"
     on:pointerdown={onDrag}
-    class:cursor-grab={!$editTemplateState.matches('dragging')}>
+    class:cursor-grab={!$editWorkoutState.matches('dragging')}>
     <i class="material-icons">reorder</i>
     <span class="screen-reader-text">Re-order</span>
   </button>
