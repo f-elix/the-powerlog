@@ -5,7 +5,7 @@
 
   // FSM
   import { authMachine } from "@/fsm/auth/authMachine.js";
-  import { searchLogMachine } from "@/fsm/log/searchLogMachine.js";
+  import { logMachine } from "@/fsm/log/logMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
   // js
@@ -17,7 +17,7 @@
   import ModuleDashboardResults from "@/components/log/ModuleDashboardResults.svelte";
 
   const { authState, authSend } = getContext("auth");
-  const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
+  const { logState, logSend } = useMachine(logMachine);
 
   const { currentMonday, currentSunday } = currentWeekDates();
   const { lastMonday, lastSunday } = lastWeekDates();
@@ -37,7 +37,7 @@
   let week = currentWeek;
 
   function getCurrentWeek({ query, queryName }) {
-    searchLogSend({
+    logSend({
       type: "SEARCH",
       params: {
         query,
@@ -48,7 +48,7 @@
   }
 
   function getLastWeek({ query, queryName }) {
-    searchLogSend({
+    logSend({
       type: "SEARCH",
       params: {
         query,
@@ -70,8 +70,8 @@
     getCurrentWeek(sessionPeriodQuery(currentMonday, currentSunday));
   });
 
-  $: sessions = $searchLogState.context.sessions;
-  $: error = $searchLogState.context.error.length > 0;
+  $: sessions = $logState.context.sessions;
+  $: error = $logState.context.error.length > 0;
 </script>
 
 <style>
@@ -98,8 +98,8 @@
     </div>
     <!-- Search results -->
     <ModuleDashboardResults
-      isLoading={$searchLogState.matches('fetching')}
-      isSuccess={$searchLogState.matches('idle')}
+      isLoading={$logState.matches('fetching')}
+      isSuccess={$logState.matches('idle')}
       isError={error}
       errorMessage={week.noResultMessage}
       {sessions} />

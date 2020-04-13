@@ -131,20 +131,17 @@
       params: {
         exercise: e.detail.exercise,
         x: e.detail.x,
-        y: e.detail.y,
-        handleWidth: e.detail.handleWidth,
-        ctnWidth: e.detail.ctnWidth,
-        ctnHeight: e.detail.ctnHeight,
-        ctnPaddingRight: e.detail.ctnPaddingRight
+        y: e.detail.y
       }
     });
   }
 
-  function onMouseOver(e) {
+  function onPointerEnter(e) {
     editTemplateSend({
-      type: "HOVER",
+      type: "ENTER",
       params: {
-        exercise: e.detail
+        exerciseId: e.detail.exerciseId,
+        elHeight: e.detail.elHeight
       }
     });
   }
@@ -163,7 +160,33 @@
     });
   }
 
-  function onLeave() {
+  function onTouchMove(e) {
+    const pagex = e.touches[0].pageX;
+    const pagey = e.touches[0].pageY;
+    const targetEl = document
+      .elementFromPoint(pagex, pagey)
+      .closest("[data-exercise-id]");
+    if (targetEl) {
+      editTemplateSend({
+        type: "ENTER",
+        params: {
+          exerciseId: targetEl.dataset.exerciseId,
+          elHeight: targetEl.offsetHeight
+        }
+      });
+    } else {
+      editTemplateSend({ type: "LEAVE" });
+      editTemplateSend({
+        type: "MOVE",
+        params: {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY
+        }
+      });
+    }
+  }
+
+  function onPointerLeave() {
     editTemplateSend({ type: "LEAVE" });
   }
 
@@ -187,7 +210,11 @@
   }
 </style>
 
-<svelte:body on:pointerup={onDrop} on:pointermove={onMove} />
+<svelte:body
+  on:pointerup={onDrop}
+  on:touchend={onDrop}
+  on:pointermove={onMove}
+  on:touchmove={onTouchMove} />
 
 <div
   in:fly|local={{ x: 30 }}
@@ -207,8 +234,8 @@
     on:editexecution={onEditExecution}
     on:deleteexecution={onDeleteExecution}
     on:drag={onDrag}
-    on:hover={onMouseOver}
-    on:leave={onLeave} />
+    on:pointerenter={onPointerEnter}
+    on:pointerleave={onPointerLeave} />
   <!-- Edit exercise modal -->
   {#if $editTemplateState.matches('exercise')}
     <EditExerciseModal

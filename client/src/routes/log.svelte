@@ -3,7 +3,7 @@
   import { onMount, setContext } from "svelte";
 
   //   FSM
-  import { searchLogMachine } from "@/fsm/log/searchLogMachine.js";
+  import { logMachine } from "@/fsm/log/logMachine.js";
   import { filterLogMachine } from "@/fsm/log/filterLogMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
@@ -13,7 +13,7 @@
   import Button from "@/components/UI/Button.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
 
-  const { searchLogState, searchLogSend } = useMachine(searchLogMachine);
+  const { logState, logSend } = useMachine(logMachine);
   const { filterLogState, filterLogSend } = useMachine(filterLogMachine);
 
   setContext("filter", {
@@ -28,15 +28,15 @@
   let error = false;
 
   $: filteredSessions = $filterLogState.context.sessions;
-  $: loadedSessions = $searchLogState.context.sessions;
+  $: loadedSessions = $logState.context.sessions;
   $: sessions = filteredSessions.length > 0 ? filteredSessions : loadedSessions;
-  $: loadMoreError = !!$searchLogState.context.error;
+  $: loadMoreError = !!$logState.context.error;
   $: loadMoreErrorMessage =
     sessions.length > 0 ? "No more sessions found" : errorMessage;
   $: filterFetchError = !!$filterLogState.context.fetchError;
 
   function onLoadMore() {
-    searchLogSend({ type: "LOAD_MORE" });
+    logSend({ type: "LOAD_MORE" });
   }
 
   onMount(() => {
@@ -85,10 +85,10 @@
   <!-- LOAD MORE -->
   {#if sessions === loadedSessions && !filterFetchError}
     <div class="load-more-btn">
-      {#if $searchLogState.matches('fetching')}
+      {#if $logState.matches('fetching')}
         <!-- Spinner -->
         <Spinner />
-      {:else if $searchLogState.matches('idle') && !error}
+      {:else if $logState.matches('idle') && !error}
         <!-- Load more btn -->
         <Button color="action" size="big" on:click={onLoadMore}>
           Load more

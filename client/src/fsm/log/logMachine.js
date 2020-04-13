@@ -60,9 +60,9 @@ const actions = {
 	})
 };
 
-export const searchLogMachine = Machine(
+export const logMachine = Machine(
 	{
-		id: 'searchLog',
+		id: 'log',
 		context: {
 			sessions: [],
 			error: '',
@@ -80,7 +80,6 @@ export const searchLogMachine = Machine(
 						actions: ['clearError']
 					},
 					LOAD_MORE: {
-						// cond: 'alreadyHasSessions',
 						target: 'fetching.loadingmore',
 						actions: ['clearError']
 					}

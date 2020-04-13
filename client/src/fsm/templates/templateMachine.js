@@ -33,7 +33,6 @@ const services = {
                                     }
                                 }
                             }
-
                         }
                         notes
 					}

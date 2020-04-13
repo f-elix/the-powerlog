@@ -94,35 +94,36 @@ const actions = {
 	clearDraggedExercise: assign({
 		draggedExercise: null
 	}),
-	updateHoveredExercise: assign({
-		hoveredExercise: (_, event) => event.params.exercise
-	}),
-	clearHoveredExercise: assign({
-		hoveredExercise: null
+	updatePointer: assign({
+		pointerx: (_, event) => event.params.x,
+		pointery: (_, event) => event.params.y
 	}),
 	updateCoords: assign({
-		x: (context, event) => event.params.x - context.ctnWidth + (context.ctnPaddingRight + context.handleWidth / 2),
-		y: (context, event) => event.params.y - context.ctnHeight / 2
+		x: (context, event) => event.params.x - context.pointerx,
+		y: (context, event) => event.params.y - context.pointery
 	}),
-	setElsData: assign({
-		handleWidth: (_, event) => event.params.handleWidth,
-		ctnWidth: (_, event) => event.params.ctnWidth,
-		ctnHeight: (_, event) => event.params.ctnHeight,
-		ctnPaddingRight: (_, event) => event.params.ctnPaddingRight
+	updatePointerPosition: assign({
+		pointery: (context, event) => {
+			if (context.y < 0) {
+				return context.pointery - event.params.elHeight;
+			} else {
+				return context.pointery + event.params.elHeight;
+			}
+		}
 	}),
 	clearDragging: assign({
 		x: 0,
-		y: 0
+		y: 0,
+		pointerx: 0,
+		pointery: 0
 	}),
 	updateExerciseOrder: assign({
-		template: (context, _) => {
+		template: (context, event) => {
 			const updatedTemplate = context.template;
 			const draggedExerciseIndex = context.template.exercises.findIndex(
 				e => e._id === context.draggedExercise._id
 			);
-			const hoveredExerciseIndex = context.template.exercises.findIndex(
-				e => e._id === context.hoveredExercise._id
-			);
+			const hoveredExerciseIndex = context.template.exercises.findIndex(e => e._id === event.params.exerciseId);
 			updatedTemplate.exercises = reorder(context.template.exercises, draggedExerciseIndex, hoveredExerciseIndex);
 			return updatedTemplate;
 		}
@@ -147,10 +148,8 @@ export const editTemplateMachine = Machine(
 			hoveredExercise: null,
 			x: 0,
 			y: 0,
-			handleWidth: null,
-			ctnWidth: null,
-			ctnHeight: null,
-			ctnPaddingRight: null
+			pointerx: 0,
+			pointery: 0
 		},
 		initial: 'editing',
 		states: {
@@ -268,13 +267,13 @@ export const editTemplateMachine = Machine(
 				})
 			},
 			dragging: {
-				entry: ['setElsData', 'updateCoords', 'updateDraggedExercise'],
+				entry: ['updatePointer', 'updateDraggedExercise'],
 				initial: 'outside',
 				states: {
 					outside: {
 						on: {
-							HOVER: {
-								actions: ['updateHoveredExercise', 'updateExerciseOrder'],
+							ENTER: {
+								actions: ['updateExerciseOrder', 'updatePointerPosition'],
 								target: 'inside'
 							}
 						}
@@ -282,8 +281,7 @@ export const editTemplateMachine = Machine(
 					inside: {
 						on: {
 							LEAVE: {
-								target: 'outside',
-								actions: ['clearHoveredExercise']
+								target: 'outside'
 							}
 						}
 					}
@@ -297,7 +295,7 @@ export const editTemplateMachine = Machine(
 						target: 'editing'
 					}
 				},
-				exit: ['clearDragging', 'clearDraggedExercise', 'clearHoveredExercise']
+				exit: ['clearDragging', 'clearDraggedExercise']
 			},
 			savingtemplate: {
 				invoke: {

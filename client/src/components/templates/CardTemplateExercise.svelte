@@ -11,7 +11,6 @@
   const { editTemplateState } = getContext("editTemplate");
 
   export let exercise;
-  export let isDragging = false;
 
   function onEditExercise() {
     dispatch("editexercise", exercise);
@@ -34,19 +33,10 @@
   }
 
   function onDrag(e) {
-    const handle = e.target.closest(".handle");
-    const wrapper = handle.closest(".wrapper");
-    const li = handle.closest("li");
     dispatch("drag", {
       exercise,
       x: e.clientX,
-      y: e.clientY,
-      handleWidth: handle.offsetWidth,
-      ctnWidth: li.offsetWidth,
-      ctnHeight: li.offsetHeight,
-      ctnPaddingRight: parseInt(
-        window.getComputedStyle(wrapper).getPropertyValue("padding-right")
-      )
+      y: e.clientY
     });
   }
 </script>
@@ -213,7 +203,6 @@
   <button
     class="handle"
     on:pointerdown={onDrag}
-    class:dragging={isDragging}
     class:cursor-grab={!$editTemplateState.matches('dragging')}>
     <i class="material-icons">reorder</i>
     <span class="screen-reader-text">Re-order</span>

@@ -96,6 +96,7 @@ h2 {
 	clip-path: inset(50%);
 }
 
-[data-state='dragging'] {
+body[data-state='dragging'] {
 	cursor: grabbing;
+	overflow: hidden;
 }
