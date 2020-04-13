@@ -3,7 +3,7 @@ type Session {
 	_id: ID!
 	createdAt: String
 	updatedAt: String
-	title: String!
+	name: String!
 	sessionDate: Date!
 	exercises: [SessionExercise]
 	notes: String
