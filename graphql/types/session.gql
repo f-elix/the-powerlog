@@ -93,7 +93,7 @@ input LoadInput {
 type Query {
 	getSessionById(sessionId: ID!): Session
 	getSessionsByDate(sessionDate: Date!): [Session]
-	getSessionsByTitle(title: String!): [Session]
+	getSessionsByName(name: String!): [Session]
 	getSessionsFromTo(fromDate: Date!, toDate: Date!): [Session]
 	getSessionRange(from: Int!, to: Int!): [Session]
 }
