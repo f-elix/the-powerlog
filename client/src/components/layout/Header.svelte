@@ -221,7 +221,7 @@
       <i class="material-icons add-icon" class:open={isSubMenuOpen}>add</i>
     </div>
     <div class="submenu" class:open={isSubMenuOpen}>
-      <a href="/sessions/new">
+      <a href="/log/new">
         <i class="material-icons">add</i>
         Session
       </a>
