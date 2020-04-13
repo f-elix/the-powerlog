@@ -240,7 +240,9 @@ export const workoutMachine = Machine(
 					id: 'editWorkout',
 					src: editWorkoutMachine,
 					data: {
-						workout: (context, _) => context.workoutData
+						workout: (context, _) => {
+							return { ...context.workoutData };
+						}
 					},
 					onDone: {
 						target: 'transitioning',
