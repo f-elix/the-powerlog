@@ -57,6 +57,7 @@
   }
 </style>
 
+<h1>Your Log History</h1>
 <ModuleSearchFilters />
 <section class="sessions-ctn">
   <!-- SESSIONS -->

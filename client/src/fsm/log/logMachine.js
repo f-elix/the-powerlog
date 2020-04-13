@@ -1,51 +1,19 @@
 import { Machine, assign } from 'xstate';
 import { sessionRangeQuery } from '@/assets/js/session-queries.js';
-
-const sessions = async (query, queryName) => {
-	const token = localStorage.getItem(process.env.APP_TOKEN);
-	try {
-		const res = await fetch(process.env.APP_API, {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json',
-				authorization: token
-			},
-			body: JSON.stringify(query)
-		});
-		const data = await res.json();
-		if (data.errors) {
-			const error = new Error();
-			error.message = data.errors[0].message;
-			error.statusCode = data.errors[0].extensions.exception.statusCode;
-			throw error;
-		}
-		const sessions = data.data[queryName];
-		if (!sessions.length) {
-			const error = new Error();
-			error.message = 'No results found';
-			error.statusCode = 404;
-			throw error;
-		}
-		return sessions;
-	} catch (err) {
-		console.log(err);
-		throw err;
-	}
-};
+import { getData, getToken } from '@/assets/js/utils.js';
 
 const services = {
-	getSessions: async (_, event) => {
-		const { query, queryName } = event.params;
-		return sessions(query, queryName);
-	},
 	getSessionsRange: async (context, _) => {
 		const { query, queryName } = sessionRangeQuery(context.rangeFrom, context.rangeTo);
-		return sessions(query, queryName);
+		try {
+			const token = getToken();
+			const data = getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
-};
-
-const guards = {
-	alreadyHasSessions: (context, _) => context.sessions.length > 0
 };
 
 const actions = {
@@ -75,48 +43,24 @@ export const logMachine = Machine(
 			idle: {
 				id: 'idle',
 				on: {
-					SEARCH: {
-						target: 'fetching',
-						actions: ['clearError']
-					},
 					LOAD_MORE: {
-						target: 'fetching.loadingmore',
+						target: 'fetching',
 						actions: ['clearError']
 					}
 				}
 			},
 			fetching: {
-				initial: 'loading',
-				states: {
-					loading: {
-						invoke: {
-							src: 'getSessions',
-							onDone: [
-								{
-									target: '#idle',
-									actions: ['updateSessions']
-								}
-							],
-							onError: {
-								target: '#idle',
-								actions: ['updateError', 'clearSessions']
-							}
+				invoke: {
+					src: 'getSessionsRange',
+					onDone: [
+						{
+							target: 'idle',
+							actions: ['addSessions', 'updateRange']
 						}
-					},
-					loadingmore: {
-						invoke: {
-							src: 'getSessionsRange',
-							onDone: [
-								{
-									target: '#idle',
-									actions: ['addSessions', 'updateRange']
-								}
-							],
-							onError: {
-								target: '#idle',
-								actions: ['updateError']
-							}
-						}
+					],
+					onError: {
+						target: 'idle',
+						actions: ['updateError']
 					}
 				}
 			}
@@ -124,7 +68,6 @@ export const logMachine = Machine(
 	},
 	{
 		services,
-		actions,
-		guards
+		actions
 	}
 );

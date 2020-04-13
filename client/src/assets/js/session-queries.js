@@ -1,81 +1,81 @@
 export function sessionPeriodQuery(from, to) {
-    return {
-        query: {
-            query: `
+	return {
+		query: {
+			query: `
             query getSessionsFromTo($fromDate: Date!, $toDate: Date!) {
                 getSessionsFromTo(fromDate: $fromDate, toDate: $toDate) {
                     _id
-                    title
+                    name
                     sessionDate
                 }
             }
         `,
-            variables: {
-                fromDate: from,
-                toDate: to
-            }
-        },
-        queryName: 'getSessionsFromTo'
-    }
+			variables: {
+				fromDate: from,
+				toDate: to
+			}
+		},
+		queryName: 'getSessionsFromTo'
+	};
 }
 
 export function sessionRangeQuery(from, to) {
-    return {
-        query: {
-            query: `
+	return {
+		query: {
+			query: `
 				query getSessionRange($from: Int!, $to: Int!) {
 					getSessionRange(from: $from, to: $to){
 					sessionDate
-					title
+					name
 					_id
 					}
 				}
 			`,
-            variables: {
-                from,
-                to
-            }
-        },
-        queryName: 'getSessionRange'
-    };
+			variables: {
+				from,
+				to
+			}
+		},
+		queryName: 'getSessionRange'
+	};
 }
 
-export function sessionNameQuery(title) {
-    return {
-        query: {
-            query: `
+export function sessionNameQuery(name) {
+	return {
+		query: {
+			query: `
                 query searchByTitle($title: String!) {
-                    getSessionsByTitle(title: $title) {
+                    getSessionsByTitle(name: $title) {
                         _id
-                        title
+                        name
                         sessionDate
                     }
                 }
             `,
-            variables: {
-                title
-            }
-        },
-        queryName: 'getSessionsByTitle'
-    }
+			variables: {
+				name
+			}
+		},
+		queryName: 'getSessionsByTitle'
+	};
 }
 
 export function sessionDateQuery(date) {
-    return {
-        query: {
-            query: `
+	return {
+		query: {
+			query: `
                 query searchByDate($date: Date!) {
                     getSessionsByDate(sessionDate: $date) {
                     _id
-                    title
+                    name
                     sessionDate
                     }
                 }
             `,
-            variables: {
-                date
-            }
-        },
-        queryName: 'getSessionsByDate'
-    }
+			variables: {
+				date
+			}
+		},
+		queryName: 'getSessionsByDate'
+	};
 }

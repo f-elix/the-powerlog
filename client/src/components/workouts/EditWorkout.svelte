@@ -29,6 +29,7 @@
   export let workoutType = "session";
 
   let workoutName = $editWorkoutState.context.workout.name;
+  let workoutDate = $editWorkoutState.context.workout.date;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
   $: if ($editWorkoutState.matches("dragging")) {
@@ -39,6 +40,10 @@
 
   function onNameInput(e) {
     editWorkoutSend({ type: "NAME_INPUT", params: { value: e.detail } });
+  }
+
+  function onDateInput(e) {
+    editWorkoutSend({ type: "DATE_INPUT", params: { value: e.detail } });
   }
 
   function onAddWorkoutExercise() {
@@ -192,7 +197,11 @@
   }
 
   function onSaveWorkout() {
-    editWorkoutSend({ type: "SAVE_TEMPLATE" });
+    if (workoutType === "session") {
+      editWorkoutSend({ type: "SAVE_SESSION" });
+    } else if (workoutType === "template") {
+      editWorkoutSend({ type: "SAVE_TEMPLATE" });
+    }
   }
 
   function onCancelEdit() {
@@ -225,9 +234,12 @@
   <h1>{isNew ? 'Creating' : 'Editing'} {workoutType}...</h1>
   <!-- Workout form -->
   <EditWorkoutForm
+    {workoutType}
     {workoutExercises}
     {workoutName}
+    {workoutDate}
     on:nameinput={onNameInput}
+    on:dateinput={onDateInput}
     on:addexercise={onAddWorkoutExercise}
     on:editexercise={onEditWorkoutExercise}
     on:deleteexercise={onDeleteWorkoutExercise}

@@ -1,53 +1,43 @@
 import { Machine, assign, spawn } from 'xstate';
-import { sessionNameQuery, sessionDateQuery, sessionPeriodQuery } from '@/assets/js/session-queries.js';
 import { filterDisplayMachine } from './filterDisplayMachine.js';
+import { sessionNameQuery, sessionDateQuery, sessionPeriodQuery } from '@/assets/js/session-queries.js';
+import { getData, getToken } from '@/assets/js/utils.js';
 
 const invalidDatesError = 'The second date must be later than the first';
-
-const sessions = async (query, queryName) => {
-	const token = localStorage.getItem(process.env.APP_TOKEN);
-	try {
-		const res = await fetch(process.env.APP_API, {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json',
-				authorization: token
-			},
-			body: JSON.stringify(query)
-		});
-		const data = await res.json();
-		if (data.errors) {
-			const error = new Error();
-			error.message = data.errors[0].message;
-			error.statusCode = data.errors[0].extensions.exception.statusCode;
-			throw error;
-		}
-		const sessions = data.data[queryName];
-		if (!sessions.length) {
-			const error = new Error();
-			error.message = 'No results found';
-			error.statusCode = 404;
-			throw error;
-		}
-		return sessions;
-	} catch (err) {
-		console.log(err);
-		throw err;
-	}
-};
 
 const services = {
 	getSessionsByTitle: async (context, _) => {
 		const { query, queryName } = sessionNameQuery(context.nameFilter);
-		return sessions(query, queryName);
+		try {
+			const token = getToken();
+			const data = getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	},
 	getSessionsByDate: async (context, _) => {
 		const { query, queryName } = sessionDateQuery(context.dateFilter);
-		return sessions(query, queryName);
+		try {
+			const token = getToken();
+			const data = getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	},
 	getSessionsFromTo: async (context, _) => {
 		const { query, queryName } = sessionPeriodQuery(context.periodFilter.from, context.periodFilter.to);
-		return sessions(query, queryName);
+		try {
+			const token = getToken();
+			const data = getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 

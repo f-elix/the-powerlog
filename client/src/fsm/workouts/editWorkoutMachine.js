@@ -8,6 +8,14 @@ const reorder = (array, from, to) => {
 	return reorderedArray;
 };
 
+const today = () => {
+	const date = new Date();
+	const month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
+	const day = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`;
+	const formattedDate = `${date.getFullYear()}-${month}-${day}`;
+	return formattedDate;
+};
+
 const services = {
 	saveTemplate: async (context, _) => {
 		const queryName = 'saveTemplate';
@@ -62,6 +70,13 @@ const actions = {
 		workout: (context, event) => {
 			const updatedWorkout = context.workout;
 			updatedWorkout.name = event.params.value;
+			return updatedWorkout;
+		}
+	}),
+	updateWorkoutDate: assign({
+		workout: (context, event) => {
+			const updatedWorkout = context.workout;
+			updatedWorkout.date = event.params.value;
 			return updatedWorkout;
 		}
 	}),
@@ -162,6 +177,7 @@ export const editWorkoutMachine = Machine(
 		id: 'editWorkout',
 		context: {
 			workout: {
+				date: today(),
 				name: '',
 				exercises: []
 			},
@@ -189,6 +205,9 @@ export const editWorkoutMachine = Machine(
 				on: {
 					NAME_INPUT: {
 						actions: ['updateWorkoutName']
+					},
+					DATE_INPUT: {
+						actions: ['updateWorkoutDate']
 					},
 					ADD_EXERCISE: 'exercise.adding',
 					EDIT_EXERCISE: 'exercise.editing',

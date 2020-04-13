@@ -13,7 +13,9 @@
 
   const { editWorkoutState } = getContext("editWorkout");
 
+  export let workoutType;
   export let workoutName;
+  export let workoutDate = null;
   export let workoutExercises;
 
   $: draggedExercise = $editWorkoutState.context.draggedExercise;
@@ -22,6 +24,10 @@
 
   function onNameInput(e) {
     dispatch("nameinput", e.target.value);
+  }
+
+  function onDateInput(e) {
+    dispatch("dateinput", e.target.value);
   }
 
   function onAddExercise() {
@@ -73,6 +79,16 @@
   }
 </style>
 
+<!-- Date input -->
+{#if workoutType === 'session'}
+  <Input
+    type="date"
+    label="Date"
+    name="workoutDate"
+    on:input={onDateInput}
+    value={workoutDate} />
+  <br />
+{/if}
 <!-- Name input -->
 <Input
   label="Name"

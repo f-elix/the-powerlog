@@ -148,7 +148,6 @@
 </style>
 
 <section>
-  <h1>Your Log History</h1>
   <!-- Filter tab selection -->
   <h2>Filter log by</h2>
   <div class="btn-ctn">
