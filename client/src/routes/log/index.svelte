@@ -5,20 +5,31 @@
   //   FSM
   import { logMachine } from "@/fsm/log/logMachine.js";
   import { filterLogMachine } from "@/fsm/log/filterLogMachine.js";
-  import { useMachine } from "@/fsm/machineStores.js";
+  import { useMachine, useService } from "@/fsm/machineStores.js";
 
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
-  import ModuleSearchFilters from "@/components/log/ModuleSearchFilters.svelte";
+  import SearchFilters from "@/components/log/SearchFilters.svelte";
   import Button from "@/components/UI/Button.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
 
   const { logState, logSend } = useMachine(logMachine);
   const { filterLogState, filterLogSend } = useMachine(filterLogMachine);
+  const { filterDisplayState, filterDisplaySend } = useService(
+    $filterLogState.context.filterDisplay
+  );
 
   setContext("filter", {
-    filterLogState,
-    filterLogSend
+    filterLogState
+  });
+
+  setContext("filterDisplay", {
+    filterDisplayState,
+    filterDisplaySend
+  });
+
+  onMount(() => {
+    onLoadMore();
   });
 
   let filteredSessions = [];
@@ -39,9 +50,45 @@
     logSend({ type: "LOAD_MORE" });
   }
 
-  onMount(() => {
-    onLoadMore();
-  });
+  function onNameInput(e) {
+    filterLogSend({
+      type: "NAME_INPUT",
+      params: {
+        value: e.detail
+      }
+    });
+  }
+
+  function onDateInput(e) {
+    filterLogSend({
+      type: "DATE_INPUT",
+      params: {
+        value: e.detail
+      }
+    });
+  }
+
+  function onFromInput(e) {
+    filterLogSend({
+      type: "PERIOD_INPUT",
+      params: {
+        value: {
+          from: e.detail
+        }
+      }
+    });
+  }
+
+  function onToInput(e) {
+    filterLogSend({
+      type: "PERIOD_INPUT",
+      params: {
+        value: {
+          to: e.detail
+        }
+      }
+    });
+  }
 </script>
 
 <style>
@@ -58,7 +105,11 @@
 </style>
 
 <h1>Your Log History</h1>
-<ModuleSearchFilters />
+<SearchFilters
+  on:nameinput={onNameInput}
+  on:dateinput={onDateInput}
+  on:frominput={onFromInput}
+  on:toinput={onToInput} />
 <section class="sessions-ctn">
   <!-- SESSIONS -->
   {#if filterFetchError}
@@ -68,19 +119,17 @@
   {:else}
     {#each sessions as session, i (session._id)}
       <!-- Date title -->
-      {#if !sessions[i - 1] || new Date(session.sessionDate).getMonth() !== new Date(sessions[i - 1].sessionDate).getMonth()}
+      {#if !sessions[i - 1] || new Date(session.date).getMonth() !== new Date(sessions[i - 1].date).getMonth()}
         <h3>
-          {new Date(session.sessionDate).toLocaleString('default', {
-            month: 'long'
-          })}
-          {new Date(session.sessionDate).getFullYear()}
+          {new Date(session.date).toLocaleString('default', { month: 'long' })}
+          {new Date(session.date).getFullYear()}
         </h3>
       {/if}
       <!-- Search results -->
       <CardSearchResult
         sessionName={session.title}
         sessionId={session._id}
-        date={session.sessionDate} />
+        date={session.date} />
     {/each}
   {/if}
   <!-- LOAD MORE -->

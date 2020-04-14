@@ -3,10 +3,6 @@
   import { createEventDispatcher, getContext } from "svelte";
   import { fly } from "svelte/transition";
 
-  // FSM
-  import { useMachine, useService } from "@/fsm/machineStores.js";
-  import { filters } from "@/fsm/log/filterDisplayMachine.js";
-
   // js
   import {
     sessionNameQuery,
@@ -18,62 +14,48 @@
   import Select from "@/components/UI/Select.svelte";
   import Input from "@/components/UI/Input.svelte";
 
-  const { filterLogState, filterLogSend } = getContext("filter");
-  const { filterDisplayState, filterDisplaySend } = useService(
-    $filterLogState.context.filterDisplay
-  );
+  const dispatch = createEventDispatcher();
 
-  let currentFilter;
+  const { filterLogState } = getContext("filter");
+  const { filterDisplayState, filterDisplaySend } = getContext("filterDisplay");
 
-  $: currentFilter = $filterDisplayState.context.currentFilter;
-  $: timePeriodError = $filterLogState.context.filterError;
+  $: currentFilter = $filterDisplayState.context
+    ? $filterDisplayState.context.currentFilter
+    : "";
+  $: timePeriodError = $filterDisplayState.context
+    ? $filterLogState.context.filterError
+    : "";
 
   function onNameFilterInput(e) {
-    const value = e.target.value;
-    filterLogSend({
-      type: "NAME_INPUT",
-      params: {
-        value
-      }
-    });
+    dispatch("nameinput", e.target.value);
   }
 
   function onDateFilterInput(e) {
-    const value = e.target.value;
-    filterLogSend({
-      type: "DATE_INPUT",
-      params: {
-        value
-      }
-    });
+    dispatch("dateinput", e.target.value);
   }
 
   function onTimePeriodFilterFromInput(e) {
-    const value = e.target.value;
-    filterLogSend({
-      type: "PERIOD_INPUT",
-      params: {
-        value: {
-          from: value
-        }
-      }
-    });
+    dispatch("frominput", e.target.value);
   }
 
   function onTimePeriodFilterToInput(e) {
-    const value = e.target.value;
-    filterLogSend({
-      type: "PERIOD_INPUT",
-      params: {
-        value: {
-          to: value
-        }
-      }
-    });
+    dispatch("toinput", e.target.value);
   }
 
   function onFilterClick(filter) {
     filterDisplaySend({ type: "CHANGE", params: { filter } });
+  }
+
+  function onSelectNameFilter() {
+    filterDisplaySend({ type: "NAME_FILTER" });
+  }
+
+  function onSelectDateFilter() {
+    filterDisplaySend({ type: "DATE_FILTER" });
+  }
+
+  function onSelectTimePeriodFilter() {
+    filterDisplaySend({ type: "TIME_PERIOD_FILTER" });
   }
 
   function onOutroEnd() {
@@ -122,13 +104,13 @@
     transition: transform var(--active-state-transition);
   }
 
-  .active-state[data-filter="name"] {
+  .active-state[data-filter*="name"] {
     transform: translateX(0);
   }
-  .active-state[data-filter="date"] {
+  .active-state[data-filter*="date"] {
     transform: translateX(100%);
   }
-  .active-state[data-filter="period"] {
+  .active-state[data-filter*="timeperiod"] {
     transform: translateX(200%);
   }
 
@@ -151,27 +133,29 @@
   <!-- Filter tab selection -->
   <h2>Filter log by</h2>
   <div class="btn-ctn">
-    <div class="active-state" data-filter={currentFilter} />
+    <div
+      class="active-state"
+      data-filter={$filterDisplayState.toStrings()[1]} />
     <button
-      class:active={currentFilter === filters.name}
-      on:click={() => onFilterClick(filters.name)}>
+      class:active={$filterDisplayState.matches('idle.name')}
+      on:click={onSelectNameFilter}>
       Name
     </button>
     <button
-      class:active={currentFilter === filters.date}
-      on:click={() => onFilterClick(filters.date)}>
+      class:active={$filterDisplayState.matches('idle.date')}
+      on:click={onSelectDateFilter}>
       Date
     </button>
     <button
-      class:active={currentFilter === filters.period}
-      on:click={() => onFilterClick(filters.period)}>
+      class:active={$filterDisplayState.matches('idle.timeperiod')}
+      on:click={onSelectTimePeriodFilter}>
       Time Period
     </button>
   </div>
   <!-- Filter forms -->
   <form novalidate>
     <!-- Name form -->
-    {#if $filterDisplayState.matches('idle') && currentFilter === filters.name}
+    {#if $filterDisplayState.matches('idle.name')}
       <div
         in:fly|local={{ x: 30, duration: 150 }}
         out:fly|local={{ x: -30, duration: 150 }}
@@ -181,8 +165,9 @@
           name="session name"
           on:input={onNameFilterInput} />
       </div>
-      <!-- Date form -->
-    {:else if $filterDisplayState.matches('idle') && currentFilter === filters.date}
+    {/if}
+    <!-- Date form -->
+    {#if $filterDisplayState.matches('idle.date')}
       <div
         in:fly|local={{ x: 30, duration: 150 }}
         out:fly|local={{ x: -30, duration: 150 }}
@@ -193,8 +178,9 @@
           name="date date"
           on:input={onDateFilterInput} />
       </div>
-      <!-- Time period form -->
-    {:else if $filterDisplayState.matches('idle') && currentFilter === filters.period}
+    {/if}
+    <!-- Time period form -->
+    {#if $filterDisplayState.matches('idle.timeperiod')}
       <div
         class="period-inputs-ctn"
         in:fly|local={{ x: 30, duration: 150 }}

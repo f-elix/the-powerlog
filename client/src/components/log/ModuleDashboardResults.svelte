@@ -29,9 +29,7 @@
   {/if}
   {#if isSuccess}
     {#each sessions as session (session._id)}
-      <CardSearchResult
-        sessionName={session.title}
-        date={session.sessionDate} />
+      <CardSearchResult sessionName={session.title} date={session.date} />
     {/each}
   {/if}
   {#if isError}

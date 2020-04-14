@@ -12,7 +12,7 @@ const services = {
 					getSessionById(sessionId: $id) {
 						_id
 						title
-						sessionDate
+						date
 						exercises {
 							id
 							movements {
@@ -66,7 +66,7 @@ const services = {
 		const query = {
 			query: `
 					query getCurrentSession($date: Date!) {
-						getSessionsByDate(sessionDate: $date) {
+						getSessionsByDate(date: $date) {
 							_id
 						}
 					}
@@ -111,7 +111,7 @@ const services = {
 					saveSession(sessionData: $sessionData) {
 						_id
 						title
-						sessionDate
+						date
 						exercises {
 							id
 							movements {
@@ -224,7 +224,7 @@ const actions = {
 			const formattedDate = `${date.getFullYear()}-${month}-${day}`;
 			const newSession = {
 				title: 'New Session',
-				sessionDate: formattedDate,
+				date: formattedDate,
 				exercises: [],
 				newSession: true
 			};

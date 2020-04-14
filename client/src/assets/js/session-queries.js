@@ -6,7 +6,7 @@ export function sessionPeriodQuery(from, to) {
                 getSessionsFromTo(fromDate: $fromDate, toDate: $toDate) {
                     _id
                     name
-                    sessionDate
+                    date
                 }
             }
         `,
@@ -25,7 +25,7 @@ export function sessionRangeQuery(from, to) {
 			query: `
 				query getSessionRange($from: Int!, $to: Int!) {
 					getSessionRange(from: $from, to: $to){
-					sessionDate
+					date
 					name
 					_id
 					}
@@ -48,7 +48,7 @@ export function sessionNameQuery(name) {
                     getSessionsByTitle(name: $title) {
                         _id
                         name
-                        sessionDate
+                        date
                     }
                 }
             `,
@@ -65,10 +65,10 @@ export function sessionDateQuery(date) {
 		query: {
 			query: `
                 query searchByDate($date: Date!) {
-                    getSessionsByDate(sessionDate: $date) {
+                    getSessionsByDate(date: $date) {
                     _id
                     name
-                    sessionDate
+                    date
                     }
                 }
             `,
