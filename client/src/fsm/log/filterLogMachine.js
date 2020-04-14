@@ -6,11 +6,14 @@ import { getData, getToken } from '@/assets/js/utils.js';
 const invalidDatesError = 'The second date must be later than the first';
 
 const services = {
-	getSessionsByTitle: async (context, _) => {
+	getSessionsByName: async (context, _) => {
 		const { query, queryName } = sessionNameQuery(context.nameFilter);
 		try {
 			const token = getToken();
 			const data = getData(query, queryName, token);
+			if (data.length === 0) {
+				throw new Error('No sessions found');
+			}
 			return data;
 		} catch (err) {
 			console.log(err);
@@ -88,7 +91,7 @@ export const filterLogMachine = Machine(
 		context: {
 			sessions: [],
 			fetchError: '',
-			filterError: '',
+			periodError: '',
 			nameFilter: '',
 			dateFilter: '',
 			periodFilter: {
@@ -132,6 +135,14 @@ export const filterLogMachine = Machine(
 					}
 				},
 				states: {
+					fetch: {
+						initial: 'idle',
+						states: {
+							idle: {},
+							error: {},
+							success: {}
+						}
+					},
 					nameFilter: {
 						initial: 'valid',
 						states: {
@@ -145,8 +156,8 @@ export const filterLogMachine = Machine(
 										target: 'invalid.empty'
 									},
 									NAME_INPUT: {
-										actions: ['updateNameFilter', 'clearFilterError'],
-										target: 'validating'
+										internal: true,
+										actions: ['updateNameFilter', 'clearFilterError']
 									}
 								},
 								after: {
@@ -249,15 +260,15 @@ export const filterLogMachine = Machine(
 				states: {
 					byName: {
 						invoke: {
-							src: 'getSessionsByTitle',
+							src: 'getSessionsByName',
 							onDone: [
 								{
-									target: '#idle',
+									target: '#idle.fetch.success',
 									actions: ['updateSessions']
 								}
 							],
 							onError: {
-								target: '#idle',
+								target: '#idle.fetch.error',
 								actions: ['updateFetchError', 'clearSessions']
 							}
 						}
@@ -267,12 +278,12 @@ export const filterLogMachine = Machine(
 							src: 'getSessionsByDate',
 							onDone: [
 								{
-									target: '#idle',
+									target: '#idle.fetch.success',
 									actions: ['updateSessions']
 								}
 							],
 							onError: {
-								target: '#idle',
+								target: '#idle.fetch.error',
 								actions: ['updateFetchError', 'clearSessions']
 							}
 						}
@@ -282,12 +293,12 @@ export const filterLogMachine = Machine(
 							src: 'getSessionsFromTo',
 							onDone: [
 								{
-									target: '#idle',
+									target: '#idle.fetch.success',
 									actions: ['updateSessions']
 								}
 							],
 							onError: {
-								target: '#idle',
+								target: '#idle.fetch.error',
 								actions: ['updateFetchError', 'clearSessions']
 							}
 						}

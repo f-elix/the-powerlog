@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { onMount, setContext } from "svelte";
+  import { setContext } from "svelte";
 
   //   FSM
   import { logMachine } from "@/fsm/log/logMachine.js";
@@ -8,7 +8,7 @@
   import { useMachine, useService } from "@/fsm/machineStores.js";
 
   // Components
-  import CardSearchResult from "@/components/log/CardSearchResult.svelte";
+  import SessionsList from "@/components/log/SessionsList.svelte";
   import SearchFilters from "@/components/log/SearchFilters.svelte";
   import Button from "@/components/UI/Button.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
@@ -19,6 +19,8 @@
     $filterLogState.context.filterDisplay
   );
 
+  // $: console.log($filterLogState);
+
   setContext("filter", {
     filterLogState
   });
@@ -28,23 +30,13 @@
     filterDisplaySend
   });
 
-  onMount(() => {
-    onLoadMore();
-  });
-
-  let filteredSessions = [];
-  let loadedSessions = [];
-  let sessions = [];
-  let errorMessage = "No sessions found";
   let error = false;
 
-  $: filteredSessions = $filterLogState.context.sessions;
-  $: loadedSessions = $logState.context.sessions;
-  $: sessions = filteredSessions.length > 0 ? filteredSessions : loadedSessions;
+  $: filteredSessions = $filterLogState.context.sessions || [];
+  $: filterFetchError = $filterLogState.context.fetchError;
+  $: loadedSessions = $logState.context.sessions || [];
   $: loadMoreError = !!$logState.context.error;
-  $: loadMoreErrorMessage =
-    sessions.length > 0 ? "No more sessions found" : errorMessage;
-  $: filterFetchError = !!$filterLogState.context.fetchError;
+  $: loadMoreErrorMessage = "No more sessions found";
 
   function onLoadMore() {
     logSend({ type: "LOAD_MORE" });
@@ -92,7 +84,7 @@
 </script>
 
 <style>
-  .sessions-ctn .error-message {
+  h3 {
     text-align: center;
   }
 
@@ -110,43 +102,31 @@
   on:dateinput={onDateInput}
   on:frominput={onFromInput}
   on:toinput={onToInput} />
+<!-- SESSIONS -->
 <section class="sessions-ctn">
-  <!-- SESSIONS -->
-  {#if filterFetchError}
-    <h3 class="error-message">{errorMessage}</h3>
-  {:else if $filterLogState.matches('filtering')}
+  {#if $logState.matches('fetching') || $filterLogState.matches('filtering')}
     <Spinner />
-  {:else}
-    {#each sessions as session, i (session._id)}
-      <!-- Date title -->
-      {#if !sessions[i - 1] || new Date(session.date).getMonth() !== new Date(sessions[i - 1].date).getMonth()}
-        <h3>
-          {new Date(session.date).toLocaleString('default', { month: 'long' })}
-          {new Date(session.date).getFullYear()}
-        </h3>
-      {/if}
-      <!-- Search results -->
-      <CardSearchResult
-        sessionName={session.title}
-        sessionId={session._id}
-        date={session.date} />
-    {/each}
   {/if}
-  <!-- LOAD MORE -->
-  {#if sessions === loadedSessions && !filterFetchError}
+  <!-- Filtered sessions -->
+  {#if $filterLogState.matches('idle.fetch.error')}
+    <h3 class="error-message">{filterFetchError}</h3>
+  {/if}
+  <!-- @TODO figure out no result state -->
+  {#if $filterLogState.matches('idle.fetch.success')}
+    <!-- {#if filteredSessions.length > 0} -->
+    <SessionsList sessions={filteredSessions} />
+    <!-- {:else}
+      <h3>No sessions found</h3>
+    {/if} -->
+  {/if}
+  <!-- Loaded sessions -->
+  {#if $logState.matches('idle.normal') && $filterLogState.matches('idle.fetch.idle')}
+    <SessionsList sessions={loadedSessions} />
     <div class="load-more-btn">
-      {#if $logState.matches('fetching')}
-        <!-- Spinner -->
-        <Spinner />
-      {:else if $logState.matches('idle') && !error}
-        <!-- Load more btn -->
-        <Button color="action" size="big" on:click={onLoadMore}>
-          Load more
-        </Button>
-      {:else if loadMoreError}
-        <!-- Error message -->
-        <h3>{loadMoreErrorMessage}</h3>
-      {/if}
+      <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
     </div>
+  {/if}
+  {#if $logState.matches('idle.error')}
+    <h3>{loadMoreErrorMessage}</h3>
   {/if}
 </section>

@@ -3,13 +3,6 @@
   import { createEventDispatcher, getContext } from "svelte";
   import { fly } from "svelte/transition";
 
-  // js
-  import {
-    sessionNameQuery,
-    sessionDateQuery,
-    sessionPeriodQuery
-  } from "@/assets/js/session-queries.js";
-
   // Components
   import Select from "@/components/UI/Select.svelte";
   import Input from "@/components/UI/Input.svelte";
@@ -22,9 +15,7 @@
   $: currentFilter = $filterDisplayState.context
     ? $filterDisplayState.context.currentFilter
     : "";
-  $: timePeriodError = $filterDisplayState.context
-    ? $filterLogState.context.filterError
-    : "";
+  $: timePeriodError = $filterLogState.context.periodError;
 
   function onNameFilterInput(e) {
     dispatch("nameinput", e.target.value);

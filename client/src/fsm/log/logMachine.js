@@ -38,10 +38,14 @@ export const logMachine = Machine(
 			rangeFrom: 1,
 			rangeTo: 10
 		},
-		initial: 'idle',
+		initial: 'fetching',
 		states: {
 			idle: {
-				id: 'idle',
+				initial: 'normal',
+				states: {
+					normal: {},
+					error: {}
+				},
 				on: {
 					LOAD_MORE: {
 						target: 'fetching',

@@ -1,5 +1,6 @@
 // Models
 const Session = require('../../../models/Session');
+const User = require('../../../models/User');
 
 const queries = {
 	// SESSION QUERIES
@@ -23,7 +24,7 @@ const queries = {
 			_id: session._id.toString()
 		};
 	},
-	getSessionsByDate: async (_, { sessionDate }, { currentUser }) => {
+	getSessionsByDate: async (_, { date }, { currentUser }) => {
 		// Find user
 		const user = await User.findById(currentUser.userId).populate('log');
 		if (!user) {
@@ -34,7 +35,7 @@ const queries = {
 		// Find sessions in user log
 		const sessions = user.log
 			.filter(session => {
-				return session.sessionDate.getTime() === sessionDate.getTime();
+				return session.date.getTime() === date.getTime();
 			})
 			.reverse();
 		// Return session
@@ -45,7 +46,7 @@ const queries = {
 			};
 		});
 	},
-	getSessionsByTitle: async (_, { name }, { currentUser }) => {
+	getSessionsByName: async (_, { name }, { currentUser }) => {
 		// Find user by ID and populate user's log
 		const user = await User.findById(currentUser.userId).populate('log');
 		if (!user) {
@@ -75,10 +76,10 @@ const queries = {
 			error.statusCode = 401;
 			throw error;
 		}
-		// Filter log by sessionDate
+		// Filter log by date
 		const filteredSessions = user.log
 			.filter(session => {
-				return session.sessionDate >= fromDate && session.sessionDate <= toDate;
+				return session.date >= fromDate && session.date <= toDate;
 			})
 			.reverse();
 		// Return filtered array of sessions

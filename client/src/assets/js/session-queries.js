@@ -44,8 +44,8 @@ export function sessionNameQuery(name) {
 	return {
 		query: {
 			query: `
-                query searchByTitle($title: String!) {
-                    getSessionsByTitle(name: $title) {
+                query searchByName($name: String!) {
+                    getSessionsByName(name: $name) {
                         _id
                         name
                         date
@@ -56,7 +56,7 @@ export function sessionNameQuery(name) {
 				name
 			}
 		},
-		queryName: 'getSessionsByTitle'
+		queryName: 'getSessionsByName'
 	};
 }
 

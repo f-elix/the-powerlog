@@ -34,6 +34,14 @@
     box-shadow: var(--shadow-default);
   }
 
+  h3 {
+    margin-bottom: 0;
+  }
+
+  p {
+    margin-top: 0;
+  }
+
   button {
     width: 4rem;
     height: 4rem;
@@ -59,10 +67,12 @@
 </style>
 
 <article in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
-  <h3>{workout.name}</h3>
-  <!-- {#if workoutType === 'session'}
-  <p>{workout.date}</p>
-  {/if} -->
+  <div>
+    <h3>{workout.name}</h3>
+    {#if workoutType === 'session'}
+      <p>{workout.date}</p>
+    {/if}
+  </div>
   <div>
     <!-- View workout btn -->
     <a
