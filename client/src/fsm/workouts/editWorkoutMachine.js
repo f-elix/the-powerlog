@@ -1,6 +1,7 @@
 import { Machine, assign, spawn, send } from 'xstate';
 import { editWorkoutExerciseMachine } from './editWorkoutExerciseMachine';
 import { getData, getToken } from '@/assets/js/utils.js';
+import { goto } from '@sapper/app';
 
 const reorder = (array, from, to) => {
 	const reorderedArray = array;
@@ -18,6 +19,10 @@ const today = () => {
 
 const services = {
 	saveTemplate: async (context, _) => {
+		const data = {
+			name: context.workout.name,
+			exercises: context.workout.exercises
+		};
 		const queryName = 'saveTemplate';
 		const query = {
 			query: `
@@ -28,7 +33,7 @@ const services = {
 				}
 			`,
 			variables: {
-				data: context.template
+				data
 			}
 		};
 		try {
@@ -165,6 +170,27 @@ const actions = {
 			updatedWorkout.exercises = reorder(context.workout.exercises, draggedExerciseIndex, hoveredExerciseIndex);
 			return updatedWorkout;
 		}
+	}),
+	routeLog: () => {
+		goto('/log');
+	},
+	routeTemplates: () => {
+		goto('/templates');
+	},
+	resetContext: assign({
+		workout: {
+			date: today(),
+			name: '',
+			exercises: []
+		},
+		editedExercise: null,
+		nameError: '',
+		draggedExercise: null,
+		hoveredExercise: null,
+		x: 0,
+		y: 0,
+		pointerx: 0,
+		pointery: 0
 	})
 };
 
@@ -355,7 +381,8 @@ export const editWorkoutMachine = Machine(
 						invoke: {
 							src: 'saveSession',
 							onDone: {
-								target: '#done'
+								target: '#done',
+								actions: ['routeLog']
 							},
 							onError: {
 								target: '#editing'
@@ -366,7 +393,8 @@ export const editWorkoutMachine = Machine(
 						invoke: {
 							src: 'saveTemplate',
 							onDone: {
-								target: '#done'
+								target: '#done',
+								actions: ['routeTemplates']
 							},
 							onError: {
 								target: '#editing'
@@ -375,15 +403,15 @@ export const editWorkoutMachine = Machine(
 					}
 				}
 			},
+			// @TODO reset context
 			done: {
 				id: 'done',
 				type: 'final',
-				data: {
-					workoutData: (context, _) => context.workout
-				}
+				entry: ['resetContext']
 			},
 			canceled: {
-				type: 'final'
+				type: 'final',
+				entry: ['resetContext']
 			}
 		}
 	},
