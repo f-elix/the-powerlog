@@ -1,10 +1,95 @@
 import { Machine, assign } from 'xstate';
-import { sessionRangeQuery } from '@/assets/js/session-queries.js';
+import {
+	sessionRangeQuery,
+	sessionNameQuery,
+	sessionDateQuery,
+	sessionPeriodQuery
+} from '@/assets/js/session-queries.js';
 import { getData, getToken } from '@/assets/js/utils.js';
+
+const errors = {
+	invalidDates: 'The second date must be later than the first',
+	noResults: 'No sessions found',
+	noMoreResults: 'No more sessions found'
+};
 
 const services = {
 	getSessionsRange: async (context, _) => {
 		const { query, queryName } = sessionRangeQuery(context.rangeFrom, context.rangeTo);
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			if (data.length === 0) {
+				const error = new Error();
+				error.message = errors.noMoreResults;
+				throw error;
+			}
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
+	getSessionsByName: async (context, _) => {
+		const { query, queryName } = sessionNameQuery(context.nameFilter);
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			if (data.length === 0) {
+				const error = new Error();
+				error.message = errors.noResults;
+				throw error;
+			}
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
+	getSessionsByDate: async (context, _) => {
+		const { query, queryName } = sessionDateQuery(context.dateFilter);
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			if (data.length === 0) {
+				const error = new Error();
+				error.message = errors.noResults;
+				throw error;
+			}
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
+	getSessionsFromTo: async (context, _) => {
+		const { query, queryName } = sessionPeriodQuery(context.periodFilter.from, context.periodFilter.to);
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			if (data.length === 0) {
+				const error = new Error();
+				error.message = errors.noResults;
+				throw error;
+			}
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
+	deleteSession: async (_, event) => {
+		const queryName = 'deleteSession';
+		const query = {
+			query: `
+				mutation deleteSession($id: ID!) {
+					deleteSession(sessionId: $id)
+				}
+			`,
+			variables: {
+				id: event.params.workoutId
+			}
+		};
 		try {
 			const token = getToken();
 			const data = getData(query, queryName, token);
@@ -17,15 +102,59 @@ const services = {
 };
 
 const actions = {
-	updateSessions: assign({ sessions: (_, event) => event.data }),
-	addSessions: assign({ sessions: (context, event) => [...context.sessions, ...event.data] }),
-	clearSessions: assign({ sessions: [] }),
-	updateError: assign({ error: (_, event) => event.data.message }),
+	updateSessions: assign({
+		sessions: (_, event) => event.data
+	}),
+	addSessions: assign({
+		sessions: (context, event) => [...context.sessions, ...event.data]
+	}),
+	removeSession: assign({
+		sessions: (context, event) => {
+			return context.sessions.filter(session => session._id !== event.params.workoutId);
+		}
+	}),
+	updateFetchError: assign({ fetchError: (_, event) => event.data.message }),
 	clearError: assign({ error: '' }),
 	updateRange: assign({
 		rangeFrom: (context, _) => context.rangeFrom + context.range,
 		rangeTo: (context, _) => context.rangeTo + context.range
-	})
+	}),
+	resetRange: assign({
+		rangeFrom: 1,
+		rangeTo: 10
+	}),
+	updateNameFilter: assign({ nameFilter: (_, event) => event.params.value }),
+	updateDateFilter: assign({ dateFilter: (_, event) => event.params.value }),
+	updatePeriodFilter: assign({
+		periodFilter: (context, event) => {
+			return { ...context.periodFilter, ...event.params.value };
+		}
+	}),
+	resetFilters: assign({
+		nameFilter: '',
+		dateFilter: '',
+		periodFilter: {
+			from: '',
+			to: ''
+		}
+	}),
+	filterErrorInvalidDates: assign({ filterError: errors.invalidDates }),
+	clearFilterError: assign({ filterError: '' })
+};
+
+const guards = {
+	isPeriodEmpty: (context, _) =>
+		context.periodFilter.from.trim().length === 0 && context.periodFilter.to.trim().length === 0,
+	isMissingInput: (context, _) =>
+		context.periodFilter.from.trim().length === 0 || context.periodFilter.to.trim().length === 0,
+	isDatesInvalid: (context, _) => context.periodFilter.from > context.periodFilter.to,
+	isNameEmpty: (context, _) => context.nameFilter.trim().length === 0,
+	isDateEmpty: (context, _) => context.dateFilter.trim().length === 0,
+	isNoreMoreResults: (_, event) => event.data.message === errors.noMoreResults
+};
+
+const delays = {
+	DEBOUNCE: 500
 };
 
 export const logMachine = Machine(
@@ -33,38 +162,258 @@ export const logMachine = Machine(
 		id: 'log',
 		context: {
 			sessions: [],
-			error: '',
 			range: 10,
 			rangeFrom: 1,
-			rangeTo: 10
+			rangeTo: 10,
+			fetchError: '',
+			nameFilter: '',
+			dateFilter: '',
+			periodFilter: {
+				from: '',
+				to: ''
+			},
+			filterError: ''
 		},
 		initial: 'fetching',
 		states: {
 			idle: {
-				initial: 'normal',
+				id: 'idle',
+				type: 'parallel',
 				states: {
-					normal: {},
-					error: {}
+					fetch: {
+						initial: 'success',
+						states: {
+							success: {},
+							empty: {},
+							filtering: {},
+							error: {}
+						}
+					},
+					nameFilter: {
+						initial: 'valid',
+						states: {
+							valid: {},
+							validating: {
+								on: {
+									'': {
+										cond: 'isNameEmpty',
+										target: 'invalid.empty'
+									}
+								},
+								after: {
+									DEBOUNCE: '#filtering.byName'
+								}
+							},
+							invalid: {
+								initial: 'empty',
+								states: {
+									empty: {
+										on: {
+											'': '#fetching.reload'
+										}
+									}
+								}
+							}
+						}
+					},
+					dateFilter: {
+						initial: 'valid',
+						states: {
+							valid: {},
+							validating: {
+								on: {
+									'': [
+										{
+											cond: 'isDateEmpty',
+											target: 'invalid.empty'
+										},
+										{
+											target: '#filtering.byDate'
+										}
+									]
+								}
+							},
+							invalid: {
+								initial: 'empty',
+								states: {
+									empty: {
+										on: {
+											'': '#fetching.reload'
+										}
+									}
+								}
+							}
+						}
+					},
+					periodFilter: {
+						initial: 'valid',
+						states: {
+							valid: {},
+							validating: {
+								on: {
+									'': [
+										{
+											cond: 'isPeriodEmpty',
+											target: 'invalid.empty'
+										},
+										{
+											cond: 'isMissingInput',
+											target: 'invalid.missingInput'
+										},
+										{
+											cond: 'isDatesInvalid',
+											target: 'invalid.invalidDates'
+										},
+										{
+											target: '#filtering.byPeriod'
+										}
+									]
+								}
+							},
+							invalid: {
+								initial: 'empty',
+								states: {
+									empty: {
+										on: {
+											'': '#fetching.reload'
+										}
+									},
+									missingInput: {},
+									invalidDates: {
+										entry: ['filterErrorInvalidDates']
+									}
+								}
+							}
+						}
+					},
+					delete: {
+						initial: 'idle',
+						states: {
+							idle: {},
+							deleting: {
+								invoke: {
+									src: 'deleteSession',
+									onDone: {
+										target: 'idle'
+									},
+									onError: {
+										target: 'idle'
+									}
+								}
+							}
+						}
+					}
 				},
 				on: {
 					LOAD_MORE: {
 						target: 'fetching',
-						actions: ['clearError']
+						actions: ['updateRange']
+					},
+					DELETE: {
+						target: 'idle.delete.deleting',
+						actions: ['removeSession']
+					},
+					NAME_INPUT: {
+						actions: ['updateNameFilter', 'clearFilterError'],
+						target: 'idle.nameFilter.validating'
+					},
+					DATE_INPUT: {
+						actions: ['updateDateFilter', 'clearFilterError'],
+						target: 'idle.dateFilter.validating'
+					},
+					PERIOD_INPUT: {
+						actions: ['updatePeriodFilter', 'clearFilterError'],
+						target: 'idle.periodFilter.validating'
+					}
+				}
+			},
+			filtering: {
+				id: 'filtering',
+				initial: 'byName',
+				states: {
+					byName: {
+						invoke: {
+							src: 'getSessionsByName',
+							onDone: [
+								{
+									target: '#idle.fetch.filtering',
+									actions: ['updateSessions']
+								}
+							],
+							onError: {
+								target: '#idle.fetch.error',
+								actions: ['updateFetchError']
+							}
+						}
+					},
+					byDate: {
+						invoke: {
+							src: 'getSessionsByDate',
+							onDone: [
+								{
+									target: '#idle.fetch.filtering',
+									actions: ['updateSessions']
+								}
+							],
+							onError: {
+								target: '#idle.fetch.error',
+								actions: ['updateFetchError']
+							}
+						}
+					},
+					byPeriod: {
+						invoke: {
+							src: 'getSessionsFromTo',
+							onDone: [
+								{
+									target: '#idle.fetch.filtering',
+									actions: ['updateSessions']
+								}
+							],
+							onError: {
+								target: '#idle.fetch.error',
+								actions: ['updateFetchError']
+							}
+						}
 					}
 				}
 			},
 			fetching: {
-				invoke: {
-					src: 'getSessionsRange',
-					onDone: [
-						{
-							target: 'idle',
-							actions: ['addSessions', 'updateRange']
+				id: 'fetching',
+				initial: 'loadmore',
+				states: {
+					loadmore: {
+						invoke: {
+							src: 'getSessionsRange',
+							onDone: {
+								target: '#idle.fetch.success',
+								actions: ['addSessions']
+							},
+							onError: [
+								{
+									cond: 'isNoreMoreResults',
+									target: '#idle.fetch.empty',
+									actions: ['updateFetchError', 'resetRange']
+								},
+								{
+									target: '#idle.fetch.error',
+									actions: ['updateFetchError']
+								}
+							]
 						}
-					],
-					onError: {
-						target: 'idle',
-						actions: ['updateError']
+					},
+					reload: {
+						invoke: {
+							src: 'getSessionsRange',
+							onDone: {
+								target: '#idle.fetch.success',
+								actions: ['updateSessions']
+							},
+							onError: {
+								target: '#idle.fetch.error',
+								actions: ['updateFetchError']
+							}
+						}
 					}
 				}
 			}
@@ -72,6 +421,8 @@ export const logMachine = Machine(
 	},
 	{
 		services,
-		actions
+		actions,
+		guards,
+		delays
 	}
 );

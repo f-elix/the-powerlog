@@ -34,12 +34,16 @@
     box-shadow: var(--shadow-default);
   }
 
-  h3 {
-    margin-bottom: 0;
+  .workout-info {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    flex-direction: column;
   }
 
-  p {
-    margin-top: 0;
+  .workout-info h3,
+  .workout-info p {
+    margin: 0;
   }
 
   button {
@@ -67,7 +71,7 @@
 </style>
 
 <article in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
-  <div>
+  <div class="workout-info">
     <h3>{workout.name}</h3>
     {#if workoutType === 'session'}
       <p>{workout.date}</p>

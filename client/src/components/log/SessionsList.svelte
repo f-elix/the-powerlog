@@ -18,5 +18,5 @@
     </h3>
   {/if}
   <!-- Search results -->
-  <CardWorkout workout={session} workoutType="session" />
+  <CardWorkout workout={session} workoutType="session" on:delete />
 {/each}

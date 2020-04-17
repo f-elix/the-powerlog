@@ -3,19 +3,22 @@
   import { createEventDispatcher, getContext } from "svelte";
   import { fly } from "svelte/transition";
 
+  // FSM
+  import { filterDisplayMachine } from "@/fsm/log/filterDisplayMachine.js";
+  import { useMachine } from "@/fsm/machineStores.js";
+
   // Components
   import Select from "@/components/UI/Select.svelte";
   import Input from "@/components/UI/Input.svelte";
 
   const dispatch = createEventDispatcher();
 
-  const { filterLogState } = getContext("filter");
-  const { filterDisplayState, filterDisplaySend } = getContext("filterDisplay");
+  const { filterDisplayState, filterDisplaySend } = useMachine(
+    filterDisplayMachine
+  );
+  const { logState } = getContext("log");
 
-  $: currentFilter = $filterDisplayState.context
-    ? $filterDisplayState.context.currentFilter
-    : "";
-  $: timePeriodError = $filterLogState.context.periodError;
+  $: timePeriodError = $logState.context.filterError;
 
   function onNameFilterInput(e) {
     dispatch("nameinput", e.target.value);
@@ -31,10 +34,6 @@
 
   function onTimePeriodFilterToInput(e) {
     dispatch("toinput", e.target.value);
-  }
-
-  function onFilterClick(filter) {
-    filterDisplaySend({ type: "CHANGE", params: { filter } });
   }
 
   function onSelectNameFilter() {

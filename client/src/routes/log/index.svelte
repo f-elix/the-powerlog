@@ -4,8 +4,7 @@
 
   //   FSM
   import { logMachine } from "@/fsm/log/logMachine.js";
-  import { filterLogMachine } from "@/fsm/log/filterLogMachine.js";
-  import { useMachine, useService } from "@/fsm/machineStores.js";
+  import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
   import SessionsList from "@/components/log/SessionsList.svelte";
@@ -14,36 +13,20 @@
   import Spinner from "@/components/UI/Spinner.svelte";
 
   const { logState, logSend } = useMachine(logMachine);
-  const { filterLogState, filterLogSend } = useMachine(filterLogMachine);
-  const { filterDisplayState, filterDisplaySend } = useService(
-    $filterLogState.context.filterDisplay
-  );
 
-  // $: console.log($filterLogState);
-
-  setContext("filter", {
-    filterLogState
+  setContext("log", {
+    logState
   });
 
-  setContext("filterDisplay", {
-    filterDisplayState,
-    filterDisplaySend
-  });
-
-  let error = false;
-
-  $: filteredSessions = $filterLogState.context.sessions || [];
-  $: filterFetchError = $filterLogState.context.fetchError;
-  $: loadedSessions = $logState.context.sessions || [];
-  $: loadMoreError = !!$logState.context.error;
-  $: loadMoreErrorMessage = "No more sessions found";
+  $: sessions = $logState.context.sessions;
+  $: fetchError = $logState.context.fetchError;
 
   function onLoadMore() {
     logSend({ type: "LOAD_MORE" });
   }
 
   function onNameInput(e) {
-    filterLogSend({
+    logSend({
       type: "NAME_INPUT",
       params: {
         value: e.detail
@@ -52,7 +35,7 @@
   }
 
   function onDateInput(e) {
-    filterLogSend({
+    logSend({
       type: "DATE_INPUT",
       params: {
         value: e.detail
@@ -61,7 +44,7 @@
   }
 
   function onFromInput(e) {
-    filterLogSend({
+    logSend({
       type: "PERIOD_INPUT",
       params: {
         value: {
@@ -72,12 +55,21 @@
   }
 
   function onToInput(e) {
-    filterLogSend({
+    logSend({
       type: "PERIOD_INPUT",
       params: {
         value: {
           to: e.detail
         }
+      }
+    });
+  }
+
+  function onDelete(e) {
+    logSend({
+      type: "DELETE",
+      params: {
+        workoutId: e.detail
       }
     });
   }
@@ -104,29 +96,24 @@
   on:toinput={onToInput} />
 <!-- SESSIONS -->
 <section class="sessions-ctn">
-  {#if $logState.matches('fetching') || $filterLogState.matches('filtering')}
-    <Spinner />
-  {/if}
-  <!-- Filtered sessions -->
-  {#if $filterLogState.matches('idle.fetch.error')}
-    <h3 class="error-message">{filterFetchError}</h3>
-  {/if}
-  <!-- @TODO figure out no result state -->
-  {#if $filterLogState.matches('idle.fetch.success')}
-    <!-- {#if filteredSessions.length > 0} -->
-    <SessionsList sessions={filteredSessions} />
-    <!-- {:else}
-      <h3>No sessions found</h3>
-    {/if} -->
-  {/if}
-  <!-- Loaded sessions -->
-  {#if $logState.matches('idle.normal') && $filterLogState.matches('idle.fetch.idle')}
-    <SessionsList sessions={loadedSessions} />
+  <!-- Sessions -->
+  {#if $logState.matches('idle.fetch.success')}
+    <SessionsList {sessions} on:delete={onDelete} />
     <div class="load-more-btn">
       <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
     </div>
   {/if}
-  {#if $logState.matches('idle.error')}
-    <h3>{loadMoreErrorMessage}</h3>
+  {#if $logState.matches('idle.fetch.empty')}
+    <SessionsList {sessions} on:delete={onDelete} />
+    <h3>{fetchError}</h3>
+  {/if}
+  {#if $logState.matches('idle.fetch.filtering')}
+    <SessionsList {sessions} on:delete={onDelete} />
+  {/if}
+  {#if $logState.matches('fetching')}
+    <Spinner />
+  {/if}
+  {#if $logState.matches('idle.fetch.error')}
+    <h3>{fetchError}</h3>
   {/if}
 </section>
