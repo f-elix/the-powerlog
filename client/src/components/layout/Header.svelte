@@ -83,6 +83,7 @@
     outline: none;
     background-color: var(--header-color);
     color: var(--color-primary);
+    cursor: pointer;
   }
 
   .add::before {
