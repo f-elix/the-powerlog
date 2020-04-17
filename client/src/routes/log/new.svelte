@@ -1,8 +1,8 @@
 <script>
-  // svelte
-  import { setContext } from "svelte";
+  // Svelte
+  import { onMount, setContext } from "svelte";
 
-  // fsm
+  // FSM
   import { editWorkoutMachine } from "@/fsm/workouts/editWorkoutMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
@@ -11,10 +11,14 @@
 
   const { editWorkoutState, editWorkoutSend } = useMachine(editWorkoutMachine);
 
+  onMount(() => {
+    editWorkoutSend({ type: "NEW_WORKOUT" });
+  });
+
   setContext("editWorkout", {
     editWorkoutState,
     editWorkoutSend
   });
 </script>
 
-<EditWorkout workoutType="session" />
+<EditWorkout />

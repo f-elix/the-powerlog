@@ -17,6 +17,8 @@
 
   const { workoutState, workoutSend } = useMachine(workoutMachine);
 
+  $: console.log($workoutState);
+
   $: if ($workoutState.children.editWorkout) {
     const { editWorkoutState, editWorkoutSend } = useService(
       $workoutState.children.editWorkout
@@ -77,5 +79,5 @@
 {/if}
 <!-- Edit template -->
 {#if $workoutState.matches('editing')}
-  <EditWorkout isNew={false} on:outroend={onEditOut} />
+  <EditWorkout workoutType="template" isNew={false} on:outroend={onEditOut} />
 {/if}

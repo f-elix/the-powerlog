@@ -1,11 +1,12 @@
 <script>
   // Svelte
   import { goto } from "@sapper/app";
-  import { onMount, getContext, setContext } from "svelte";
+  import { onMount, onDestroy, setContext, getContext } from "svelte";
   import { fly } from "svelte/transition";
 
   // FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
+  import { editWorkoutMachine } from "@/fsm/workouts/editWorkoutMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
   // Components
@@ -14,12 +15,8 @@
   import EditExerciseModal from "@/components/workouts/EditExerciseModal.svelte";
   import EditExecutionModal from "@/components/workouts/EditExecutionModal.svelte";
 
-  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
-
-  setContext("editExercise", {
-    editWorkoutState
-  });
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
   onMount(() => {
     exercisesSend({ type: "LOAD" });
@@ -28,8 +25,8 @@
   export let isNew = true;
   export let workoutType = "session";
 
-  let workoutName = $editWorkoutState.context.workout.name;
-  let workoutDate = $editWorkoutState.context.workout.date;
+  $: workoutName = $editWorkoutState.context.workout.name;
+  $: workoutDate = $editWorkoutState.context.workout.date;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
   $: if ($editWorkoutState.matches("dragging")) {
@@ -205,7 +202,11 @@
   }
 
   function onCancelEdit() {
-    editWorkoutSend({ type: "CANCEL_EDIT" });
+    if (workoutType === "session") {
+      editWorkoutSend({ type: "CANCEL_SESSION" });
+    } else if (workoutType === "template") {
+      editWorkoutSend({ type: "CANCEL_TEMPLATE" });
+    }
   }
 </script>
 

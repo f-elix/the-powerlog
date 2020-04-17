@@ -177,20 +177,14 @@ const actions = {
 	routeTemplates: () => {
 		goto('/templates');
 	},
-	resetContext: assign({
-		workout: {
-			date: today(),
-			name: '',
-			exercises: []
-		},
-		editedExercise: null,
-		nameError: '',
-		draggedExercise: null,
-		hoveredExercise: null,
-		x: 0,
-		y: 0,
-		pointerx: 0,
-		pointery: 0
+	resetWorkout: assign({
+		workout: () => {
+			return {
+				date: today(),
+				name: '',
+				exercises: []
+			};
+		}
 	})
 };
 
@@ -229,6 +223,9 @@ export const editWorkoutMachine = Machine(
 					}
 				},
 				on: {
+					NEW_WORKOUT: {
+						actions: ['resetWorkout']
+					},
 					NAME_INPUT: {
 						actions: ['updateWorkoutName']
 					},
@@ -266,8 +263,11 @@ export const editWorkoutMachine = Machine(
 							target: 'saving.template'
 						}
 					],
-					CANCEL_EDIT: {
-						target: 'canceled'
+					CANCEL_SESSION: {
+						target: 'canceled.session'
+					},
+					CANCEL_TEMPLATE: {
+						target: 'canceled.template'
 					}
 				}
 			},
@@ -403,15 +403,21 @@ export const editWorkoutMachine = Machine(
 					}
 				}
 			},
-			// @TODO reset context
 			done: {
 				id: 'done',
-				type: 'final',
-				entry: ['resetContext']
+				type: 'final'
 			},
 			canceled: {
 				type: 'final',
-				entry: ['resetContext']
+				initial: 'session',
+				states: {
+					session: {
+						entry: ['routeLog']
+					},
+					template: {
+						entry: ['routeTemplates']
+					}
+				}
 			}
 		}
 	},
