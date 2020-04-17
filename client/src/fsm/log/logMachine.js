@@ -5,7 +5,10 @@ import {
 	sessionDateQuery,
 	sessionPeriodQuery
 } from '@/assets/js/session-queries.js';
-import { getData, getToken } from '@/assets/js/utils.js';
+import { getData, getToken, currentWeekDates, lastWeekDates } from '@/assets/js/utils.js';
+
+const { currentMonday, currentSunday } = currentWeekDates();
+const { lastMonday, lastSunday } = lastWeekDates();
 
 const errors = {
 	invalidDates: 'The second date must be later than the first',
@@ -14,6 +17,28 @@ const errors = {
 };
 
 const services = {
+	getCurrentWeek: async () => {
+		const { query, queryName } = sessionPeriodQuery(currentMonday, currentSunday);
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
+	getLastWeek: async () => {
+		const { query, queryName } = sessionPeriodQuery(lastMonday, lastSunday);
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
 	getSessionsRange: async (context, _) => {
 		const { query, queryName } = sessionRangeQuery(context.rangeFrom, context.rangeTo);
 		try {
@@ -174,7 +199,7 @@ export const logMachine = Machine(
 			},
 			filterError: ''
 		},
-		initial: 'fetching',
+		initial: 'idle',
 		states: {
 			idle: {
 				id: 'idle',
@@ -209,7 +234,7 @@ export const logMachine = Machine(
 								states: {
 									empty: {
 										on: {
-											'': '#fetching.reload'
+											'': '#fetching.load'
 										}
 									}
 								}
@@ -238,7 +263,7 @@ export const logMachine = Machine(
 								states: {
 									empty: {
 										on: {
-											'': '#fetching.reload'
+											'': '#fetching.load'
 										}
 									}
 								}
@@ -275,7 +300,7 @@ export const logMachine = Machine(
 								states: {
 									empty: {
 										on: {
-											'': '#fetching.reload'
+											'': '#fetching.load'
 										}
 									},
 									missingInput: {},
@@ -305,9 +330,18 @@ export const logMachine = Machine(
 					}
 				},
 				on: {
+					LOAD: {
+						target: 'fetching'
+					},
 					LOAD_MORE: {
-						target: 'fetching',
+						target: 'fetching.loadmore',
 						actions: ['updateRange']
+					},
+					LOAD_CURRENT_WEEK: {
+						target: 'fetching.currentweek'
+					},
+					LOAD_LAST_WEEK: {
+						target: 'fetching.lastweek'
 					},
 					DELETE: {
 						target: 'idle.delete.deleting',
@@ -380,8 +414,21 @@ export const logMachine = Machine(
 			},
 			fetching: {
 				id: 'fetching',
-				initial: 'loadmore',
+				initial: 'load',
 				states: {
+					load: {
+						invoke: {
+							src: 'getSessionsRange',
+							onDone: {
+								target: '#idle.fetch.success',
+								actions: ['updateSessions']
+							},
+							onError: {
+								target: '#idle.fetch.error',
+								actions: ['updateFetchError']
+							}
+						}
+					},
 					loadmore: {
 						invoke: {
 							src: 'getSessionsRange',
@@ -402,9 +449,22 @@ export const logMachine = Machine(
 							]
 						}
 					},
-					reload: {
+					currentweek: {
 						invoke: {
-							src: 'getSessionsRange',
+							src: 'getCurrentWeek',
+							onDone: {
+								target: '#idle.fetch.success',
+								actions: ['updateSessions']
+							},
+							onError: {
+								target: '#idle.fetch.error',
+								actions: ['updateFetchError']
+							}
+						}
+					},
+					lastweek: {
+						invoke: {
+							src: 'getLastWeek',
 							onDone: {
 								target: '#idle.fetch.success',
 								actions: ['updateSessions']

@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { setContext } from "svelte";
+  import { onMount, setContext } from "svelte";
 
   //   FSM
   import { logMachine } from "@/fsm/log/logMachine.js";
@@ -20,6 +20,10 @@
 
   $: sessions = $logState.context.sessions;
   $: fetchError = $logState.context.fetchError;
+
+  onMount(() => {
+    logSend({ type: "LOAD" });
+  });
 
   function onLoadMore() {
     logSend({ type: "LOAD_MORE" });
