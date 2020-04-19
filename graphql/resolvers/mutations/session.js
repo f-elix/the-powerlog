@@ -1,6 +1,7 @@
 // Models
 const Session = require('../../../models/Session');
 const User = require('../../../models/User');
+const Exercise = require('../../../models/Exercise');
 
 // Utils
 const { createSession } = require('../utils');
