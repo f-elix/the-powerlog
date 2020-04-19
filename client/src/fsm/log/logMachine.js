@@ -13,7 +13,9 @@ const { lastMonday, lastSunday } = lastWeekDates();
 const errors = {
 	invalidDates: 'The second date must be later than the first',
 	noResults: 'No sessions found',
-	noMoreResults: 'No more sessions found'
+	noMoreResults: 'No more sessions found',
+	noResultsLastWeek: 'No sessions were logged last week',
+	noResultsThisWeek: 'No sessions logged yet this week'
 };
 
 const services = {
@@ -22,6 +24,11 @@ const services = {
 		try {
 			const token = getToken();
 			const data = await getData(query, queryName, token);
+			if (data.length === 0) {
+				const error = new Error();
+				error.message = errors.noResultsThisWeek;
+				throw error;
+			}
 			return data;
 		} catch (err) {
 			console.log(err);
@@ -33,6 +40,11 @@ const services = {
 		try {
 			const token = getToken();
 			const data = await getData(query, queryName, token);
+			if (data.length === 0) {
+				const error = new Error();
+				error.message = errors.noResultsLastWeek;
+				throw error;
+			}
 			return data;
 		} catch (err) {
 			console.log(err);

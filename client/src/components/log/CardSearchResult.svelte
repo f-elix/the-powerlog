@@ -1,13 +1,12 @@
 <script>
   // Svelte
+  import { goto } from "@sapper/app";
   import { fly } from "svelte/transition";
 
   // Components
   import Button from "@/components/UI/Button.svelte";
 
-  export let sessionName;
-  export let sessionId;
-  export let date;
+  export let session;
 </script>
 
 <style>
@@ -32,8 +31,13 @@
 
 <article class="search-result" in:fly={{ x: 30 }}>
   <div class="info">
-    <h2>{sessionName}</h2>
-    <p>{date}</p>
+    <h2>{session.name}</h2>
+    <p>{session.date}</p>
   </div>
-  <Button variant="filled" color="info" id={sessionId}>View Session</Button>
+  <Button
+    variant="filled"
+    color="info"
+    on:click={() => goto(`/log/${session._id}`)}>
+    View Session
+  </Button>
 </article>

@@ -10,26 +10,23 @@
 
   // Components
   import Button from "@/components/UI/Button.svelte";
-  import ModuleDashboardResults from "@/components/log/ModuleDashboardResults.svelte";
+  import DashboardResults from "@/components/log/DashboardResults.svelte";
 
   const { authState, authSend } = getContext("auth");
   const { logState, logSend } = useMachine(logMachine);
 
   const currentWeek = {
     label: "This",
-    noResultMessage: "No sessions logged yet this week",
     switchBtnLabel: "last week"
   };
 
   const lastWeek = {
     label: "Last",
-    noResultMessage: "No sessions were logged last week",
     switchBtnLabel: "current week"
   };
 
   let week = currentWeek;
   $: sessions = $logState.context.sessions;
-  $: error = $logState.context.fetchError.length > 0;
 
   function getCurrentWeek() {
     logSend({ type: "LOAD_CURRENT_WEEK" });
@@ -75,11 +72,11 @@
       <Button color="info" on:click={toggleWeek}>{week.switchBtnLabel}</Button>
     </div>
     <!-- Search results -->
-    <ModuleDashboardResults
+    <DashboardResults
       isLoading={$logState.matches('fetching')}
       isSuccess={$logState.matches('idle.fetch.success')}
       isError={$logState.matches('idle.fetch.error')}
-      errorMessage={week.noResultMessage}
+      errorMessage={$logState.context.fetchError}
       {sessions} />
     <Button color="info" size="big" on:click={() => goto('/log')}>
       View full log

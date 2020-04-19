@@ -3,11 +3,11 @@
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
 
-  export let isLoading = false;
-  export let isSuccess = false;
-  export let isError = false;
-  export let errorMessage = "No results found";
   export let sessions = [];
+  export let isLoading;
+  export let isSuccess;
+  export let isError;
+  export let errorMessage;
 </script>
 
 <style>
@@ -23,13 +23,12 @@
 </style>
 
 <div class="result-ctn">
-  <!-- Spinner -->
   {#if isLoading}
     <Spinner />
   {/if}
   {#if isSuccess}
     {#each sessions as session (session._id)}
-      <CardSearchResult sessionName={session.title} date={session.date} />
+      <CardSearchResult {session} />
     {/each}
   {/if}
   {#if isError}
