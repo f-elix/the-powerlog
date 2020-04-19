@@ -34,6 +34,10 @@
     dispatch("addexercise");
   }
 
+  function onUseTemplate() {
+    dispatch("usetemplate");
+  }
+
   function onPointerEnter(e, exercise) {
     const elHeight = e.currentTarget.offsetHeight;
     dispatch("pointerenter", {
@@ -77,6 +81,11 @@
     pointer-events: none;
     transition: none;
   }
+
+  .buttons {
+    display: grid;
+    grid-row-gap: 2rem;
+  }
 </style>
 
 <!-- Date input -->
@@ -119,8 +128,17 @@
     </li>
   {/each}
 </ul>
-<!-- Add exercise button -->
-<Button size="big" color="action" on:click={onAddExercise}>
-  <i class="material-icons">add_box</i>
-  Add Exercise
-</Button>
+<div class="buttons">
+  <!-- Add exercise button -->
+  <Button size="big" color="action" on:click={onAddExercise}>
+    <i class="material-icons">add_box</i>
+    Add Exercise
+  </Button>
+  <!-- Use template button -->
+  {#if workoutType === 'session'}
+    <Button size="big" color="action" on:click={onUseTemplate}>
+      <i class="material-icons">note_add</i>
+      Use Template
+    </Button>
+  {/if}
+</div>

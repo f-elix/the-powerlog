@@ -67,6 +67,53 @@ const services = {
 			console.log(err);
 			throw err;
 		}
+	},
+	getTemplate: async (_, event) => {
+		const queryName = 'getTemplateById';
+		const query = {
+			query: `
+				query getTemplate($id: ID!) {
+					getTemplateById(templateId: $id) {
+                        _id
+                        name
+                        exercises {
+							_id
+                            movements {
+                                exercise {
+                                    _id
+                                    name
+                                }
+                                executions {
+									_id
+                                    sets
+                                    reps
+                                    time {
+                                        amount
+                                        unit
+                                    }
+                                    load {
+                                        amount
+                                        unit
+                                    }
+                                }
+                            }
+                        }
+                        notes
+					}
+				}
+			`,
+			variables: {
+				id: event.params.templateId
+			}
+		};
+		try {
+			const token = getToken();
+			const data = getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 
@@ -84,6 +131,9 @@ const actions = {
 			updatedWorkout.date = event.params.value;
 			return updatedWorkout;
 		}
+	}),
+	updateWorkoutWithTemplate: assign({
+		workout: (_, event) => event.data
 	}),
 	addWorkoutExercise: assign({
 		workout: (context, event) => {
@@ -232,6 +282,9 @@ export const editWorkoutMachine = Machine(
 					DATE_INPUT: {
 						actions: ['updateWorkoutDate']
 					},
+					USE_TEMPLATE: {
+						target: 'selectingtemplate'
+					},
 					ADD_EXERCISE: 'exercise.adding',
 					EDIT_EXERCISE: 'exercise.editing',
 					DELETE_EXERCISE: {
@@ -268,6 +321,33 @@ export const editWorkoutMachine = Machine(
 					},
 					CANCEL_TEMPLATE: {
 						target: 'canceled.template'
+					}
+				}
+			},
+			selectingtemplate: {
+				initial: 'selecting',
+				states: {
+					selecting: {
+						on: {
+							SELECT: {
+								target: 'fetching'
+							},
+							CANCEL: {
+								target: '#editing'
+							}
+						}
+					},
+					fetching: {
+						invoke: {
+							src: 'getTemplate',
+							onDone: {
+								target: '#editing',
+								actions: ['updateWorkoutWithTemplate']
+							},
+							onError: {
+								target: '#editing'
+							}
+						}
 					}
 				}
 			},

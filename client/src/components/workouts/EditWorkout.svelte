@@ -6,6 +6,7 @@
 
   // FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
+  import { templatesMachine } from "@/fsm/templates/templatesMachine.js";
   import { editWorkoutMachine } from "@/fsm/workouts/editWorkoutMachine.js";
   import { useMachine } from "@/fsm/machineStores.js";
 
@@ -14,12 +15,15 @@
   import EditWorkoutForm from "@/components/workouts/EditWorkoutForm.svelte";
   import EditExerciseModal from "@/components/workouts/EditExerciseModal.svelte";
   import EditExecutionModal from "@/components/workouts/EditExecutionModal.svelte";
+  import SelectTemplateModal from "@/components/workouts/SelectTemplateModal.svelte";
 
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
+  const { templatesState, templatesSend } = useMachine(templatesMachine);
   const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
   onMount(() => {
     exercisesSend({ type: "LOAD" });
+    templatesSend({ type: "LOAD" });
   });
 
   export let isNew = true;
@@ -29,6 +33,7 @@
   $: workoutDate = $editWorkoutState.context.workout.date;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
+  $: templates = $templatesState.context.templates;
   $: if ($editWorkoutState.matches("dragging")) {
     document.body.dataset.state = "dragging";
   } else {
@@ -41,6 +46,23 @@
 
   function onDateInput(e) {
     editWorkoutSend({ type: "DATE_INPUT", params: { value: e.detail } });
+  }
+
+  function onUseTemplate() {
+    editWorkoutSend({ type: "USE_TEMPLATE" });
+  }
+
+  function onSelectTemplateCancel() {
+    editWorkoutSend({ type: "CANCEL" });
+  }
+
+  function onSelectTemplate(e) {
+    editWorkoutSend({
+      type: "SELECT",
+      params: {
+        templateId: e.detail
+      }
+    });
   }
 
   function onAddWorkoutExercise() {
@@ -241,6 +263,7 @@
     {workoutDate}
     on:nameinput={onNameInput}
     on:dateinput={onDateInput}
+    on:usetemplate={onUseTemplate}
     on:addexercise={onAddWorkoutExercise}
     on:editexercise={onEditWorkoutExercise}
     on:deleteexercise={onDeleteWorkoutExercise}
@@ -250,6 +273,13 @@
     on:drag={onDrag}
     on:pointerenter={onPointerEnter}
     on:pointerleave={onPointerLeave} />
+  <!-- Template selection modal -->
+  {#if $editWorkoutState.matches('selectingtemplate')}
+    <SelectTemplateModal
+      {templates}
+      on:cancel={onSelectTemplateCancel}
+      on:selecttemplate={onSelectTemplate} />
+  {/if}
   <!-- Edit exercise modal -->
   {#if $editWorkoutState.matches('exercise')}
     <EditExerciseModal
