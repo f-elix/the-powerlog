@@ -31,7 +31,7 @@
   <AppLoader />
 {/if}
 {#if $authState.matches('idle')}
-  <section transition:fade={{ duration: 200 }}>
+  <section transition:fade|local={{ duration: 200 }}>
     <!-- Title -->
     <Title />
     <!-- Forms -->
