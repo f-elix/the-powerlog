@@ -6,7 +6,7 @@ const queries = {
 	// SESSION QUERIES
 	getSessionById: async (_, { sessionId }, { currentUser }) => {
 		// Find session
-		const session = await Session.findById(sessionId);
+		const session = await Session.findById(sessionId).populate('exercises.movements.exercise');
 		if (!session) {
 			const error = new Error('Session not found.');
 			error.statusCode = 404;

@@ -44,7 +44,7 @@ const services = {
 		};
 		try {
 			const token = getToken();
-			const data = getData(query, queryName, token);
+			const data = await getData(query, queryName, token);
 			return data;
 		} catch (err) {
 			console.log(err);
@@ -113,7 +113,7 @@ const services = {
 		};
 		try {
 			const token = getToken();
-			const data = getData(query, queryName, token);
+			const data = await getData(query, queryName, token);
 			return data;
 		} catch (err) {
 			console.log(err);

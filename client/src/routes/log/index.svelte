@@ -103,9 +103,13 @@
   <!-- Sessions -->
   {#if $logState.matches('idle.fetch.success')}
     <SessionsList {sessions} on:delete={onDelete} />
-    <div class="load-more-btn">
-      <Button color="action" size="big" on:click={onLoadMore}>Load more</Button>
-    </div>
+    {#if sessions.length > 10}
+      <div class="load-more-btn">
+        <Button color="action" size="big" on:click={onLoadMore}>
+          Load more
+        </Button>
+      </div>
+    {/if}
   {/if}
   {#if $logState.matches('idle.fetch.empty')}
     <SessionsList {sessions} on:delete={onDelete} />

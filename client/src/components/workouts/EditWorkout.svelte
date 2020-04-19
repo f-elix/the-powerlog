@@ -40,8 +40,6 @@
     delete document.body.dataset.state;
   }
 
-  $: console.log($editWorkoutState);
-
   function onNameInput(e) {
     editWorkoutSend({ type: "NAME_INPUT", params: { value: e.detail } });
   }
