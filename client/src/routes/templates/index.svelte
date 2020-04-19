@@ -80,13 +80,12 @@
     <i class="material-icons">add</i>
     Add new
   </Button>
-
+  <!-- Spinner -->
+  {#if $templatesState.matches('fetching')}
+    <Spinner />
+  {/if}
   <!-- Templates list -->
   <ul>
-    <!-- Spinner -->
-    {#if $templatesState.matches('fetching')}
-      <Spinner />
-    {/if}
     <!-- No results message -->
     {#if $templatesState.matches('idle.error')}
       <h2 class="message">{$templatesState.context.fetchError}</h2>

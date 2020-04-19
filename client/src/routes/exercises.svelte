@@ -94,13 +94,11 @@
 
 <section>
   <h1>your exercises</h1>
-
   <!-- Search form -->
   <SearchForm
     on:input={onSearchInput}
     label="Search Exercises"
     name="exercisesSearch" />
-
   <!-- Add button -->
   <Button
     size="big"
@@ -110,13 +108,12 @@
     <i class="material-icons">add</i>
     Add new
   </Button>
-
+  <!-- Spinner -->
+  {#if $exercisesState.matches('fetching')}
+    <Spinner />
+  {/if}
   <!-- Exercises list -->
   <ul>
-    <!-- Spinner -->
-    {#if $exercisesState.matches('fetching')}
-      <Spinner />
-    {/if}
     <!-- No results message -->
     {#if $exercisesState.matches('idle.error')}
       <h2 class="message">{$exercisesState.context.fetchError}</h2>
