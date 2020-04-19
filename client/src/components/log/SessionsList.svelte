@@ -12,7 +12,7 @@
   ul {
     margin: 2rem auto;
     list-style-type: none;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 </style>
 
