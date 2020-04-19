@@ -92,7 +92,7 @@
       <h2 class="message">{$templatesState.context.fetchError}</h2>
     {/if}
     {#each templates as template (template._id)}
-      <li>
+      <li animate:flip={{ duration: 200 }}>
         <CardWorkout
           workout={template}
           workoutType="template"
