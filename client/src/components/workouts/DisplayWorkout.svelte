@@ -74,6 +74,9 @@
   out:fly|local={{ x: 30, duration: 200 }}
   on:outroend>
   <h1>{workout.name}</h1>
+  {#if workout.date}
+    <h2>{workout.date}</h2>
+  {/if}
   <ul class="exercise-list">
     {#each workout.exercises as exercise (exercise._id)}
       <li>

@@ -79,7 +79,8 @@ const services = {
 				query getSession($id: ID!) {
 					getSessionById(sessionId: $id) {
                         _id
-                        name
+						name
+						date
                         exercises {
 							_id
                             movements {
