@@ -74,6 +74,10 @@
     color: var(--header-color);
   }
 
+  .logout {
+    background-color: var(--color-primary-30);
+  }
+
   .add {
     position: relative;
     box-sizing: content-box;
@@ -173,7 +177,7 @@
 <header>
   <nav>
     <ul>
-      <li on:click={() => authSend({ type: 'LOGOUT' })}>
+      <li class="logout" on:click={() => authSend({ type: 'LOGOUT' })}>
         <a href="/" class="nav-link">
           <i class="material-icons">power_settings_new</i>
           logout
