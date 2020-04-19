@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { onMount, setContext } from "svelte";
+  import { goto } from "@sapper/app";
 
   //   FSM
   import { logMachine } from "@/fsm/log/logMachine.js";
@@ -84,6 +85,10 @@
     text-align: center;
   }
 
+  .sessions-ctn {
+    padding-top: 2rem;
+  }
+
   .load-more-btn {
     display: flex;
     justify-content: center;
@@ -93,6 +98,7 @@
 </style>
 
 <h1>Your Log History</h1>
+
 <SearchFilters
   on:nameinput={onNameInput}
   on:dateinput={onDateInput}
@@ -100,6 +106,15 @@
   on:toinput={onToInput} />
 <!-- SESSIONS -->
 <section class="sessions-ctn">
+  <!-- Add button -->
+  <Button
+    size="big"
+    variant="filled"
+    color="action"
+    on:click={() => goto('/log/new')}>
+    <i class="material-icons">add</i>
+    Add new
+  </Button>
   <!-- Sessions -->
   {#if $logState.matches('idle.fetch.success')}
     <SessionsList {sessions} on:delete={onDelete} />
