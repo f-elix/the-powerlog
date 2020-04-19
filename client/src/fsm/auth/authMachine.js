@@ -104,7 +104,7 @@ const services = {
 
 const actions = {
 	routeDashboard: () => {
-		goto('/templates').catch(err => console.log(err));
+		goto('/dashboard').catch(err => console.log(err));
 	},
 	routeAuth: () => {
 		goto('/').catch(err => console.log(err));
