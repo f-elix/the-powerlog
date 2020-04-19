@@ -64,13 +64,11 @@
 
 <section>
   <h1>your templates</h1>
-
   <!-- Search form -->
   <SearchForm
     label="Search Templates"
     name="searchTemplates"
     on:input={onSearchInput} />
-
   <!-- Add button -->
   <Button
     size="big"
