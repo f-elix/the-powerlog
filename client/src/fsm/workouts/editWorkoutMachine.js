@@ -245,7 +245,8 @@ const actions = {
 };
 
 const guards = {
-	isNameEmpty: (context, _) => context.workout.name.length === 0
+	isNameEmpty: (context, _) => context.workout.name.length === 0,
+	isSession: (_, event) => event.params.workoutType === 'session'
 };
 
 export const editWorkoutMachine = Machine(
@@ -322,12 +323,21 @@ export const editWorkoutMachine = Machine(
 							target: 'saving.template'
 						}
 					],
-					CANCEL_SESSION: {
-						target: 'canceled'
+					CANCEL: {
+						target: 'canceled',
+						actions: sendParent({ type: 'CANCEL' })
 					},
-					CANCEL_TEMPLATE: {
-						target: 'canceled'
-					}
+					DISCARD: [
+						{
+							cond: 'isSession',
+							target: 'canceled',
+							actions: ['routeLog']
+						},
+						{
+							target: 'canceled',
+							actions: ['routeTemplates']
+						}
+					]
 				}
 			},
 			selectingtemplate: {
@@ -492,7 +502,7 @@ export const editWorkoutMachine = Machine(
 				type: 'final'
 			},
 			canceled: {
-				entry: sendParent({ type: 'CANCEL' })
+				type: 'final'
 			}
 		}
 	},

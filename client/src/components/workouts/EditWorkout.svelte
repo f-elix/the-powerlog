@@ -225,10 +225,15 @@
   }
 
   function onCancelEdit() {
-    if (workoutType === "session") {
-      editWorkoutSend({ type: "CANCEL_SESSION" });
-    } else if (workoutType === "template") {
-      editWorkoutSend({ type: "CANCEL_TEMPLATE" });
+    if (isNew) {
+      editWorkoutSend({
+        type: "DISCARD",
+        params: {
+          workoutType
+        }
+      });
+    } else {
+      editWorkoutSend({ type: "CANCEL" });
     }
   }
 </script>
