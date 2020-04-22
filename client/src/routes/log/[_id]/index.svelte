@@ -39,7 +39,7 @@
   $: session = $workoutState.context.workoutData;
 
   function onDelete() {
-    workoutSend({ type: "DELETE_TEMPLATE" });
+    workoutSend({ type: "DELETE_SESSION" });
   }
 
   function onEdit() {
@@ -62,7 +62,7 @@
 </style>
 
 <!-- Loading spinner -->
-{#if $workoutState.matches('fetching')}
+{#if $workoutState.matches('fetching') || $workoutState.matches('deleting') || $workoutState.matches('deleted')}
   <div class="spinner-ctn">
     <Spinner />
   </div>

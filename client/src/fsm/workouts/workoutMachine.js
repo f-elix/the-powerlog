@@ -129,7 +129,7 @@ const services = {
 				}
 			`,
 			variables: {
-				id: context.session._id
+				id: context.workoutData._id
 			}
 		};
 		try {
@@ -224,12 +224,10 @@ export const workoutMachine = Machine(
 				id: 'displaying',
 				on: {
 					DELETE_TEMPLATE: {
-						target: 'deleting.template',
-						actions: ['routeTemplates']
+						target: 'deleting.template'
 					},
 					DELETE_SESSION: {
-						target: 'deleting.session',
-						actions: ['routeLog']
+						target: 'deleting.session'
 					},
 					EDIT: {
 						target: 'transitioning'
@@ -268,14 +266,20 @@ export const workoutMachine = Machine(
 					session: {
 						invoke: {
 							src: 'deleteSession',
-							onDone: '#deleted',
+							onDone: {
+								target: '#deleted',
+								actions: ['routeLog']
+							},
 							onError: '#displaying'
 						}
 					},
 					template: {
 						invoke: {
 							src: 'deleteTemplate',
-							onDone: '#deleted',
+							onDone: {
+								target: '#deleted',
+								actions: ['routeTemplates']
+							},
 							onError: '#displaying'
 						}
 					}
