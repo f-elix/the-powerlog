@@ -12,6 +12,7 @@
 
   // Components
   import Button from "@/components/UI/Button.svelte";
+  import Spinner from "@/components/UI/Spinner.svelte";
   import EditWorkoutForm from "@/components/workouts/EditWorkoutForm.svelte";
   import EditExerciseModal from "@/components/workouts/EditExerciseModal.svelte";
   import EditExecutionModal from "@/components/workouts/EditExecutionModal.svelte";
@@ -249,68 +250,69 @@
   on:pointermove={onMove}
   on:touchmove={onTouchMove} />
 
-<div
-  in:fly|local={{ x: 30 }}
-  out:fly|local={{ x: 30, duration: 200 }}
-  on:outroend>
-  <!-- Header -->
-  <h1>{isNew ? 'Creating' : 'Editing'} {workoutType}...</h1>
-  <!-- Workout form -->
-  <EditWorkoutForm
-    {workoutType}
-    {workoutExercises}
-    {workoutName}
-    {workoutDate}
-    on:nameinput={onNameInput}
-    on:dateinput={onDateInput}
-    on:usetemplate={onUseTemplate}
-    on:addexercise={onAddWorkoutExercise}
-    on:editexercise={onEditWorkoutExercise}
-    on:deleteexercise={onDeleteWorkoutExercise}
-    on:addexecution={onAddExecution}
-    on:editexecution={onEditExecution}
-    on:deleteexecution={onDeleteExecution}
-    on:drag={onDrag}
-    on:pointerenter={onPointerEnter}
-    on:pointerleave={onPointerLeave} />
-  <!-- Template selection modal -->
-  {#if $editWorkoutState.matches('selectingtemplate')}
-    <SelectTemplateModal
-      {templates}
-      on:cancel={onSelectTemplateCancel}
-      on:selecttemplate={onSelectTemplate} />
-  {/if}
-  <!-- Edit exercise modal -->
-  {#if $editWorkoutState.matches('exercise')}
-    <EditExerciseModal
-      {exercises}
-      isEditing={$editWorkoutState.matches('exercise.editing')}
-      editedExercise={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.workoutExercise : null}
-      exerciseError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.exerciseError : ''}
-      on:exerciseinput={onExerciseInput}
-      on:addmovement={onAddMovement}
-      on:deletemovement={onDeleteMovement}
-      on:cancel={onAddCancel}
-      on:save={onSaveWorkoutExercise} />
-  {/if}
-  <!-- Edit execution modal -->
-  {#if $editWorkoutState.matches('execution')}
-    <EditExecutionModal
-      on:cancel={onAddCancel}
-      on:save={onSaveExecution}
-      executionError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.executionError : ''}
-      editedExecution={$editWorkoutState.context.editedExercise.state.context.execution}
-      exerciseName={$editWorkoutState.context.editedExercise.state.context.movement.exercise.name} />
-  {/if}
-  <!-- Workout buttons -->
-  <div class="actions">
-    <Button color="error" variant="filled" on:click={onCancelEdit}>
-      <i class="material-icons">cancel</i>
-      Cancel
-    </Button>
-    <Button color="action" variant="filled" on:click={onSaveWorkout}>
-      <i class="material-icons">done</i>
-      {isNew ? 'Create' : 'Save'}
-    </Button>
+{#if $editWorkoutState.matches('saving') || $editWorkoutState.matches('done')}
+  <Spinner />
+{:else}
+  <div in:fly={{ x: 30 }} out:fly={{ x: 30, duration: 200 }} on:outroend>
+    <!-- Header -->
+    <h1>{isNew ? 'Creating' : 'Editing'} {workoutType}...</h1>
+    <!-- Workout form -->
+    <EditWorkoutForm
+      {workoutType}
+      {workoutExercises}
+      {workoutName}
+      {workoutDate}
+      on:nameinput={onNameInput}
+      on:dateinput={onDateInput}
+      on:usetemplate={onUseTemplate}
+      on:addexercise={onAddWorkoutExercise}
+      on:editexercise={onEditWorkoutExercise}
+      on:deleteexercise={onDeleteWorkoutExercise}
+      on:addexecution={onAddExecution}
+      on:editexecution={onEditExecution}
+      on:deleteexecution={onDeleteExecution}
+      on:drag={onDrag}
+      on:pointerenter={onPointerEnter}
+      on:pointerleave={onPointerLeave} />
+    <!-- Template selection modal -->
+    {#if $editWorkoutState.matches('selectingtemplate')}
+      <SelectTemplateModal
+        {templates}
+        on:cancel={onSelectTemplateCancel}
+        on:selecttemplate={onSelectTemplate} />
+    {/if}
+    <!-- Edit exercise modal -->
+    {#if $editWorkoutState.matches('exercise')}
+      <EditExerciseModal
+        {exercises}
+        isEditing={$editWorkoutState.matches('exercise.editing')}
+        editedExercise={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.workoutExercise : null}
+        exerciseError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.exerciseError : ''}
+        on:exerciseinput={onExerciseInput}
+        on:addmovement={onAddMovement}
+        on:deletemovement={onDeleteMovement}
+        on:cancel={onAddCancel}
+        on:save={onSaveWorkoutExercise} />
+    {/if}
+    <!-- Edit execution modal -->
+    {#if $editWorkoutState.matches('execution')}
+      <EditExecutionModal
+        on:cancel={onAddCancel}
+        on:save={onSaveExecution}
+        executionError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.executionError : ''}
+        editedExecution={$editWorkoutState.context.editedExercise.state.context.execution}
+        exerciseName={$editWorkoutState.context.editedExercise.state.context.movement.exercise.name} />
+    {/if}
+    <!-- Workout buttons -->
+    <div class="actions">
+      <Button color="error" variant="filled" on:click={onCancelEdit}>
+        <i class="material-icons">cancel</i>
+        Cancel
+      </Button>
+      <Button color="action" variant="filled" on:click={onSaveWorkout}>
+        <i class="material-icons">done</i>
+        {isNew ? 'Create' : 'Save'}
+      </Button>
+    </div>
   </div>
-</div>
+{/if}

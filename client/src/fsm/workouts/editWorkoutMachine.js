@@ -1,4 +1,4 @@
-import { Machine, assign, spawn, send } from 'xstate';
+import { Machine, assign, spawn, send, sendParent } from 'xstate';
 import { editWorkoutExerciseMachine } from './editWorkoutExerciseMachine';
 import { getData, getToken } from '@/assets/js/utils.js';
 import { goto } from '@sapper/app';
@@ -28,7 +28,7 @@ const services = {
 			query: `
 				mutation saveTemplate($data: TemplateInput!) {
 					saveTemplate(templateData: $data) {
-						name
+						_id
 					}
 				}
 			`,
@@ -51,7 +51,7 @@ const services = {
 			query: `
 				mutation saveSession($data: SessionInput!) {
 					saveSession(sessionData: $data) {
-						name
+						_id
 					}
 				}
 			`,
@@ -221,10 +221,16 @@ const actions = {
 			return updatedWorkout;
 		}
 	}),
+	routeSession: (_, event) => {
+		goto(`/log/${event.data._id}`);
+	},
 	routeLog: () => {
 		goto('/log');
 	},
-	routeTemplates: () => {
+	routeTemplate: (_, event) => {
+		goto(`/templates/${event.data._id}`);
+	},
+	routeTemplates: (_, event) => {
 		goto('/templates');
 	},
 	resetWorkout: assign({
@@ -317,10 +323,10 @@ export const editWorkoutMachine = Machine(
 						}
 					],
 					CANCEL_SESSION: {
-						target: 'canceled.session'
+						target: 'canceled'
 					},
 					CANCEL_TEMPLATE: {
-						target: 'canceled.template'
+						target: 'canceled'
 					}
 				}
 			},
@@ -461,8 +467,7 @@ export const editWorkoutMachine = Machine(
 						invoke: {
 							src: 'saveSession',
 							onDone: {
-								target: '#done',
-								actions: ['routeLog']
+								target: '#done'
 							},
 							onError: {
 								target: '#editing'
@@ -473,8 +478,7 @@ export const editWorkoutMachine = Machine(
 						invoke: {
 							src: 'saveTemplate',
 							onDone: {
-								target: '#done',
-								actions: ['routeTemplates']
+								target: '#done'
 							},
 							onError: {
 								target: '#editing'
@@ -488,16 +492,7 @@ export const editWorkoutMachine = Machine(
 				type: 'final'
 			},
 			canceled: {
-				type: 'final',
-				initial: 'session',
-				states: {
-					session: {
-						entry: ['routeLog']
-					},
-					template: {
-						entry: ['routeTemplates']
-					}
-				}
+				entry: sendParent({ type: 'CANCEL' })
 			}
 		}
 	},

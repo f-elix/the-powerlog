@@ -246,8 +246,13 @@ export const workoutMachine = Machine(
 						}
 					},
 					onDone: {
-						target: 'transitioning',
+						target: 'displaying',
 						actions: ['updateWorkoutData']
+					}
+				},
+				on: {
+					CANCEL: {
+						target: 'transitioning'
 					}
 				}
 			},
