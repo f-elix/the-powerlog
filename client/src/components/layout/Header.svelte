@@ -44,8 +44,10 @@
   }
 
   nav {
+    max-width: var(--main-width);
     width: 85%;
     height: 100%;
+    margin-left: auto;
   }
 
   nav ul {
@@ -81,7 +83,9 @@
   .add {
     position: relative;
     box-sizing: content-box;
+    max-width: 5rem;
     width: 15%;
+    margin-right: auto;
     padding: 0 1rem;
     border: none;
     outline: none;
