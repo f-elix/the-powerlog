@@ -202,14 +202,14 @@
       });
     } else {
       editWorkoutSend({ type: "LEAVE" });
-      editWorkoutSend({
-        type: "MOVE",
-        params: {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY
-        }
-      });
     }
+    editWorkoutSend({
+      type: "MOVE",
+      params: {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      }
+    });
   }
 
   function onPointerLeave() {
