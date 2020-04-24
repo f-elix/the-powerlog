@@ -9,8 +9,8 @@
 
   // Components
   import AppLoader from "@/components/UI/AppLoader.svelte";
-  import FormBox from "@/components/index/FormBox.svelte";
-  import Title from "@/components/index/Title.svelte";
+  import FormBox from "@/components/Index/FormBox.svelte";
+  import Title from "@/components/Index/Title.svelte";
 
   const { authState, authSend } = getContext("auth");
 </script>
