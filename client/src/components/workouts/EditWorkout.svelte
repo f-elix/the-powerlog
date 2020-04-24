@@ -30,6 +30,8 @@
   export let isNew = true;
   export let workoutType = "session";
 
+  $: console.log($editWorkoutState);
+
   $: workoutName = $editWorkoutState.context.workout.name;
   $: workoutDate = $editWorkoutState.context.workout.date;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
@@ -217,11 +219,12 @@
   }
 
   function onSaveWorkout() {
-    if (workoutType === "session") {
-      editWorkoutSend({ type: "SAVE_SESSION" });
-    } else if (workoutType === "template") {
-      editWorkoutSend({ type: "SAVE_TEMPLATE" });
-    }
+    editWorkoutSend({
+      type: `SAVE_${workoutType}`.toLocaleUpperCase(),
+      params: {
+        isNew
+      }
+    });
   }
 
   function onCancelEdit() {

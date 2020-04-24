@@ -246,7 +246,8 @@ const actions = {
 
 const guards = {
 	isNameEmpty: (context, _) => context.workout.name.length === 0,
-	isSession: (_, event) => event.params.workoutType === 'session'
+	isSession: (_, event) => event.params.workoutType === 'session',
+	isNew: (_, event) => event.params.isNew
 };
 
 export const editWorkoutMachine = Machine(
@@ -311,6 +312,10 @@ export const editWorkoutMachine = Machine(
 							target: 'editing.error'
 						},
 						{
+							cond: 'isNew',
+							target: 'saving.new.session'
+						},
+						{
 							target: 'saving.session'
 						}
 					],
@@ -318,6 +323,10 @@ export const editWorkoutMachine = Machine(
 						{
 							cond: 'isNameEmpty',
 							target: 'editing.error'
+						},
+						{
+							cond: 'isNew',
+							target: 'saving.new.template'
 						},
 						{
 							target: 'saving.template'
@@ -492,6 +501,35 @@ export const editWorkoutMachine = Machine(
 							},
 							onError: {
 								target: '#editing'
+							}
+						}
+					},
+					new: {
+						initial: 'session',
+						states: {
+							session: {
+								invoke: {
+									src: 'saveSession',
+									onDone: {
+										target: '#done',
+										actions: ['routeLog']
+									},
+									onError: {
+										target: '#editing'
+									}
+								}
+							},
+							template: {
+								invoke: {
+									src: 'saveTemplate',
+									onDone: {
+										target: '#done',
+										actions: ['routeTemplates']
+									},
+									onError: {
+										target: '#editing'
+									}
+								}
 							}
 						}
 					}
