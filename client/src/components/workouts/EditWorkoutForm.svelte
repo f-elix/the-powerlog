@@ -18,6 +18,7 @@
   export let workoutName;
   export let workoutNotes;
   export let workoutInstructions;
+  export let workoutTemplateInstructions;
   export let workoutExercises;
 
   const types = {
@@ -144,6 +145,9 @@
   {/each}
 </ul>
 {#if workoutType === types.session}
+  {#if workoutTemplateInstructions}
+    <p>{workoutTemplateInstructions}</p>
+  {/if}
   <Input
     type="textarea"
     name="notes"

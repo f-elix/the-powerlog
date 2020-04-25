@@ -82,6 +82,7 @@ const services = {
 						date
 						name
 						notes
+						templateInstructions
                         exercises {
 							_id
                             movements {

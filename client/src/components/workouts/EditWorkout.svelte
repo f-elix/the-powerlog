@@ -30,10 +30,14 @@
   export let isNew = true;
   export let workoutType = "session";
 
+  $: console.log($editWorkoutState.context.workout);
+
   $: workoutDate = $editWorkoutState.context.workout.date;
   $: workoutName = $editWorkoutState.context.workout.name;
   $: workoutNotes = $editWorkoutState.context.workout.notes;
   $: workoutInstructions = $editWorkoutState.context.workout.instructions;
+  $: workoutTemplateInstructions =
+    $editWorkoutState.context.workout.templateInstructions;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
   $: templates = $templatesState.context.templates;
@@ -283,6 +287,7 @@
       {workoutName}
       {workoutNotes}
       {workoutInstructions}
+      {workoutTemplateInstructions}
       on:dateinput={onDateInput}
       on:nameinput={onNameInput}
       on:notesinput={onNotesInput}

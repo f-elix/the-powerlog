@@ -80,6 +80,9 @@
   {#if workout.instructions}
     <p>{workout.instructions}</p>
   {/if}
+  {#if workout.templateInstructions}
+    <p>{workout.templateInstructions}</p>
+  {/if}
   <ul class="exercise-list">
     {#each workout.exercises as exercise (exercise._id)}
       <li>

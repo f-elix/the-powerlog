@@ -53,6 +53,7 @@ const services = {
 			date: context.workout.date,
 			name: context.workout.name,
 			notes: context.workout.notes,
+			templateInstructions: context.workout.instructions,
 			exercises: context.workout.exercises
 		};
 		const queryName = 'saveSession';
