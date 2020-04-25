@@ -3,6 +3,7 @@
   export let name = "";
   export let options = [];
   export let selected = options[0];
+  export let disabled = false;
 </script>
 
 <style>
@@ -12,6 +13,7 @@
   }
 
   select {
+    width: 100%;
     padding: 0.5rem 1rem;
     border-radius: var(--radius-default);
     border: var(--border-thin) var(--color-primary);
@@ -23,11 +25,17 @@
   option {
     text-transform: capitalize;
   }
+
+  .disabled {
+    user-select: none;
+    pointer-events: none;
+    opacity: 0.5;
+  }
 </style>
 
 <label>
   {label}
-  <select {name} bind:value={selected} on:change>
+  <select class:disabled {name} bind:value={selected} on:change>
     {#each options as option (option)}
       <option value={option}>{option}</option>
     {/each}
