@@ -20,6 +20,7 @@ const today = () => {
 const services = {
 	saveTemplate: async (context, _) => {
 		const data = {
+			_id: context.workout._id,
 			name: context.workout.name,
 			instructions: context.workout.instructions,
 			exercises: context.workout.exercises
@@ -48,6 +49,8 @@ const services = {
 	},
 	saveSession: async (context, _) => {
 		const data = {
+			_id: context.workout._id,
+			date: context.workout.date,
 			name: context.workout.name,
 			notes: context.workout.notes,
 			exercises: context.workout.exercises

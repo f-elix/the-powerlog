@@ -45,7 +45,6 @@ const services = {
 		try {
 			const token = getToken();
 			const data = await getData(query, queryName, token);
-			console.log(data);
 			return data;
 		} catch (err) {
 			console.log(err);
