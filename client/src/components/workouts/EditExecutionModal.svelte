@@ -96,12 +96,14 @@
 
   .input-group .reps-inputs {
     grid-column: 2 / 3;
-    grid-template-rows: 50% 1fr 1fr;
+    grid-template-rows: 35% 1fr 1fr;
+    grid-row-gap: 2rem;
   }
 
   .input-group .load-inputs {
     grid-column: 3 / 4;
-    grid-template-rows: 50% 1fr;
+    grid-template-rows: 35% 1fr;
+    grid-row-gap: 2rem;
   }
 </style>
 
@@ -131,12 +133,13 @@
         name="repsTime"
         options={repsTimeOptions}
         bind:selected={selectedRepsTime} />
-      {#if selectedRepsTime === 'Time'}
-        <Select
-          name="timeUnit"
-          options={timeUnitOptions}
-          bind:selected={selectedTimeUnit} />
-      {/if}
+      <!-- {#if selectedRepsTime === 'Time'} -->
+      <Select
+        name="timeUnit"
+        disabled={selectedRepsTime !== 'Time'}
+        options={timeUnitOptions}
+        bind:selected={selectedTimeUnit} />
+      <!-- {/if} -->
     </div>
     <!-- Load inputs -->
     <div class="load-inputs">
