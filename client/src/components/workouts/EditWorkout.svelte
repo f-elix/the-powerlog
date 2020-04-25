@@ -30,8 +30,9 @@
   export let isNew = true;
   export let workoutType = "session";
 
-  $: workoutName = $editWorkoutState.context.workout.name;
   $: workoutDate = $editWorkoutState.context.workout.date;
+  $: workoutName = $editWorkoutState.context.workout.name;
+  $: workoutNotes = $editWorkoutState.context.workout.notes;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
   $: templates = $templatesState.context.templates;
@@ -41,12 +42,16 @@
     delete document.body.dataset.state;
   }
 
+  function onDateInput(e) {
+    editWorkoutSend({ type: "DATE_INPUT", params: { value: e.detail } });
+  }
+
   function onNameInput(e) {
     editWorkoutSend({ type: "NAME_INPUT", params: { value: e.detail } });
   }
 
-  function onDateInput(e) {
-    editWorkoutSend({ type: "DATE_INPUT", params: { value: e.detail } });
+  function onNotesInput(e) {
+    editWorkoutSend({ type: "NOTES_INPUT", params: { value: e.detail } });
   }
 
   function onUseTemplate() {
@@ -266,10 +271,12 @@
     <EditWorkoutForm
       {workoutType}
       {workoutExercises}
-      {workoutName}
       {workoutDate}
-      on:nameinput={onNameInput}
+      {workoutName}
+      {workoutNotes}
       on:dateinput={onDateInput}
+      on:nameinput={onNameInput}
+      on:notesinput={onNotesInput}
       on:usetemplate={onUseTemplate}
       on:addexercise={onAddWorkoutExercise}
       on:editexercise={onEditWorkoutExercise}

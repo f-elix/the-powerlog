@@ -14,20 +14,25 @@
   const { editWorkoutState } = getContext("editWorkout");
 
   export let workoutType;
-  export let workoutName;
   export let workoutDate = null;
+  export let workoutName;
+  export let workoutNotes;
   export let workoutExercises;
 
   $: draggedExercise = $editWorkoutState.context.draggedExercise;
   $: x = $editWorkoutState.context.x;
   $: y = $editWorkoutState.context.y;
 
+  function onDateInput(e) {
+    dispatch("dateinput", e.target.value);
+  }
+
   function onNameInput(e) {
     dispatch("nameinput", e.target.value);
   }
 
-  function onDateInput(e) {
-    dispatch("dateinput", e.target.value);
+  function onNotesInput(e) {
+    dispatch("notesinput", e.target.value);
   }
 
   function onAddExercise() {
@@ -128,6 +133,12 @@
     </li>
   {/each}
 </ul>
+<Input
+  type="textarea"
+  name="notes"
+  label="Notes"
+  value={workoutNotes}
+  on:input={onNotesInput} />
 <div class="buttons">
   <!-- Add exercise button -->
   <Button size="big" color="action" on:click={onAddExercise}>

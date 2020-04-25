@@ -108,6 +108,9 @@
       </li>
     {/each}
   </ul>
+  {#if workout.notes}
+    <p>{workout.notes}</p>
+  {/if}
   <!-- Actions -->
   <div class="actions">
     <Button color="error" variant="filled" on:click={onDelete}>

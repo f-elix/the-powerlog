@@ -75,7 +75,7 @@ const services = {
 				query getTemplate($id: ID!) {
 					getTemplateById(templateId: $id) {
                         _id
-                        name
+						name
                         exercises {
 							_id
                             movements {
@@ -118,6 +118,13 @@ const services = {
 };
 
 const actions = {
+	updateWorkoutDate: assign({
+		workout: (context, event) => {
+			const updatedWorkout = context.workout;
+			updatedWorkout.date = event.params.value;
+			return updatedWorkout;
+		}
+	}),
 	updateWorkoutName: assign({
 		workout: (context, event) => {
 			const updatedWorkout = context.workout;
@@ -125,10 +132,11 @@ const actions = {
 			return updatedWorkout;
 		}
 	}),
-	updateWorkoutDate: assign({
+	updateWorkoutNotes: assign({
 		workout: (context, event) => {
+			console.log(event);
 			const updatedWorkout = context.workout;
-			updatedWorkout.date = event.params.value;
+			updatedWorkout.notes = event.params.value;
 			return updatedWorkout;
 		}
 	}),
@@ -221,14 +229,8 @@ const actions = {
 			return updatedWorkout;
 		}
 	}),
-	routeSession: (_, event) => {
-		goto(`/log/${event.data._id}`);
-	},
 	routeLog: () => {
 		goto('/log');
-	},
-	routeTemplate: (_, event) => {
-		goto(`/templates/${event.data._id}`);
 	},
 	routeTemplates: (_, event) => {
 		goto('/templates');
@@ -238,6 +240,7 @@ const actions = {
 			return {
 				date: today(),
 				name: '',
+				notes: '',
 				exercises: []
 			};
 		}
@@ -257,6 +260,7 @@ export const editWorkoutMachine = Machine(
 			workout: {
 				date: today(),
 				name: '',
+				notes: '',
 				exercises: []
 			},
 			editedExercise: null,
@@ -284,11 +288,14 @@ export const editWorkoutMachine = Machine(
 					NEW_WORKOUT: {
 						actions: ['resetWorkout']
 					},
+					DATE_INPUT: {
+						actions: ['updateWorkoutDate']
+					},
 					NAME_INPUT: {
 						actions: ['updateWorkoutName']
 					},
-					DATE_INPUT: {
-						actions: ['updateWorkoutDate']
+					NOTES_INPUT: {
+						actions: ['updateWorkoutNotes']
 					},
 					USE_TEMPLATE: {
 						target: 'selectingtemplate'
