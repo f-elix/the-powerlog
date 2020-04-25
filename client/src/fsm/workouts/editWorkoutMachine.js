@@ -565,6 +565,9 @@ export const editWorkoutMachine = Machine(
 			},
 			done: {
 				id: 'done',
+				data: {
+					workoutData: (context, _) => context.workout
+				},
 				type: 'final'
 			},
 			canceled: {
