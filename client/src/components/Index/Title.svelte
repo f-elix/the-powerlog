@@ -1,5 +1,31 @@
 <script>
+  // Svelte
+  import { onMount } from "svelte";
+
+  // Components
   import Button from "../UI/Button.svelte";
+
+  let deferredPrompt = null;
+
+  onMount(() => {
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      return false;
+    });
+  });
+
+  function promptInstall() {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choiceResult => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("The Strength Log has been successfully installed.");
+      } else {
+        console.log("User dismissed installation.");
+      }
+    });
+    deferredPrompt = null;
+  }
 </script>
 
 <style>
@@ -30,7 +56,7 @@
   </h2>
 
   <!-- Install btn -->
-  <Button variant="filled" color="primary-30">
+  <Button variant="filled" color="primary-30" on:click={promptInstall}>
     <i class="material-icons">get_app</i>
     Install
   </Button>
