@@ -61,7 +61,7 @@ const services = {
 				}
 			`,
 			variables: {
-				id: context.template._id
+				id: context.workoutData._id
 			}
 		};
 		try {
