@@ -1,4 +1,4 @@
-# The Strength Log
+# The Power Log
 
 A simple strength training log PWA, perfect for tracking workouts.
 
@@ -8,7 +8,6 @@ A simple strength training log PWA, perfect for tracking workouts.
 
 -   Svelte / Sapper
 -   XState
--   Workbox
 
 ### Server side
 
