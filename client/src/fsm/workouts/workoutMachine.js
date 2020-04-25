@@ -146,7 +146,6 @@ const services = {
 const actions = {
 	updateWorkoutData: assign({
 		workoutData: (context, event) => {
-			console.log(event);
 			if (!event.data) {
 				return context.workoutData;
 			}

@@ -143,7 +143,6 @@ const actions = {
 	}),
 	updateWorkoutNotes: assign({
 		workout: (context, event) => {
-			console.log(event);
 			const updatedWorkout = context.workout;
 			updatedWorkout.notes = event.params.value;
 			return updatedWorkout;
@@ -151,14 +150,21 @@ const actions = {
 	}),
 	updateWorkoutInstructions: assign({
 		workout: (context, event) => {
-			console.log(event);
 			const updatedWorkout = context.workout;
 			updatedWorkout.instructions = event.params.value;
 			return updatedWorkout;
 		}
 	}),
 	updateWorkoutWithTemplate: assign({
-		workout: (_, event) => event.data
+		workout: (context, event) => {
+			const updatedWorkout = {
+				...context.workout,
+				name: event.data.name,
+				exercises: event.data.exercises,
+				instructions: event.data.instructions
+			};
+			return updatedWorkout;
+		}
 	}),
 	addWorkoutExercise: assign({
 		workout: (context, event) => {
