@@ -3,7 +3,7 @@ type Template {
 	_id: ID!
 	name: String!
 	exercises: [SessionExercise]
-	notes: String
+	instructions: String
 	creator: User
 }
 
@@ -12,7 +12,7 @@ input TemplateInput {
 	_id: ID
 	name: String!
 	exercises: [SessionExerciseInput]
-	notes: String
+	instructions: String
 }
 
 # ROOT

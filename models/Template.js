@@ -37,7 +37,7 @@ const TemplateSchema = new mongoose.Schema({
 			]
 		}
 	],
-	notes: {
+	instructions: {
 		type: String
 	},
 	creator: {
