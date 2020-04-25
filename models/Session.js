@@ -48,6 +48,9 @@ const SessionSchema = new mongoose.Schema({
 	notes: {
 		type: String
 	},
+	templateInstructions: {
+		type: String
+	},
 	creator: {
 		type: mongoose.Schema.Types.ObjectId,
 		required: true,

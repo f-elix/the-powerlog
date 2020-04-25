@@ -7,6 +7,7 @@ type Session {
 	date: Date!
 	exercises: [SessionExercise]
 	notes: String
+	templateInstructions: String
 	bodyweigth: Bodyweight
 	creator: User
 }
@@ -53,6 +54,7 @@ input SessionInput {
 	exercises: [SessionExerciseInput]
 	bodyweight: BodyweightInput
 	notes: String
+	templateInstructions: String
 }
 
 input BodyweightInput {

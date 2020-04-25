@@ -37,6 +37,7 @@ const mutations = {
 		session.exercises = sessionData.exercises;
 		session.bodyweight = sessionData.bodyweight;
 		session.notes = sessionData.notes;
+		session.templateInstructions = sessionData.templateInstructions;
 		const updatedSession = await session.save();
 		// Update exercises history
 		const movements = session.exercises.map(exercise => exercise.movements).flat();
