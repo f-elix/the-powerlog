@@ -11,7 +11,8 @@ const services = {
 				query getTemplate($id: ID!) {
 					getTemplateById(templateId: $id) {
                         _id
-                        name
+						name
+						instructions
                         exercises {
 							_id
                             movements {
@@ -34,7 +35,6 @@ const services = {
                                 }
                             }
                         }
-                        notes
 					}
 				}
 			`,
@@ -45,6 +45,7 @@ const services = {
 		try {
 			const token = getToken();
 			const data = await getData(query, queryName, token);
+			console.log(data);
 			return data;
 		} catch (err) {
 			console.log(err);
@@ -104,7 +105,6 @@ const services = {
                                 }
                             }
                         }
-                        notes
 					}
 				}
 			`,

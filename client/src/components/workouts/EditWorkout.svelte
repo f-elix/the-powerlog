@@ -33,6 +33,7 @@
   $: workoutDate = $editWorkoutState.context.workout.date;
   $: workoutName = $editWorkoutState.context.workout.name;
   $: workoutNotes = $editWorkoutState.context.workout.notes;
+  $: workoutInstructions = $editWorkoutState.context.workout.instructions;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
   $: templates = $templatesState.context.templates;
@@ -52,6 +53,13 @@
 
   function onNotesInput(e) {
     editWorkoutSend({ type: "NOTES_INPUT", params: { value: e.detail } });
+  }
+
+  function onInstructionsInput(e) {
+    editWorkoutSend({
+      type: "INSTRUCTIONS_INPUT",
+      params: { value: e.detail }
+    });
   }
 
   function onUseTemplate() {
@@ -274,9 +282,11 @@
       {workoutDate}
       {workoutName}
       {workoutNotes}
+      {workoutInstructions}
       on:dateinput={onDateInput}
       on:nameinput={onNameInput}
       on:notesinput={onNotesInput}
+      on:instructionsinput={onInstructionsInput}
       on:usetemplate={onUseTemplate}
       on:addexercise={onAddWorkoutExercise}
       on:editexercise={onEditWorkoutExercise}

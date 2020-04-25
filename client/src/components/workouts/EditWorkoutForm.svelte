@@ -17,7 +17,13 @@
   export let workoutDate = null;
   export let workoutName;
   export let workoutNotes;
+  export let workoutInstructions;
   export let workoutExercises;
+
+  const types = {
+    session: "session",
+    template: "template"
+  };
 
   $: draggedExercise = $editWorkoutState.context.draggedExercise;
   $: x = $editWorkoutState.context.x;
@@ -33,6 +39,10 @@
 
   function onNotesInput(e) {
     dispatch("notesinput", e.target.value);
+  }
+
+  function onInstructionsInput(e) {
+    dispatch("instructionsinput", e.target.value);
   }
 
   function onAddExercise() {
@@ -94,7 +104,7 @@
 </style>
 
 <!-- Date input -->
-{#if workoutType === 'session'}
+{#if workoutType === types.session}
   <Input
     type="date"
     label="Date"
@@ -133,12 +143,22 @@
     </li>
   {/each}
 </ul>
-<Input
-  type="textarea"
-  name="notes"
-  label="Notes"
-  value={workoutNotes}
-  on:input={onNotesInput} />
+{#if workoutType === types.session}
+  <Input
+    type="textarea"
+    name="notes"
+    label="Notes"
+    value={workoutNotes}
+    on:input={onNotesInput} />
+{/if}
+{#if workoutType === types.template}
+  <Input
+    type="textarea"
+    name="notes"
+    label="Instructions"
+    value={workoutInstructions}
+    on:input={onInstructionsInput} />
+{/if}
 <div class="buttons">
   <!-- Add exercise button -->
   <Button size="big" color="action" on:click={onAddExercise}>
@@ -146,7 +166,7 @@
     Add Exercise
   </Button>
   <!-- Use template button -->
-  {#if workoutType === 'session'}
+  {#if workoutType === types.session}
     <Button size="big" color="action" on:click={onUseTemplate}>
       <i class="material-icons">note_add</i>
       Use Template

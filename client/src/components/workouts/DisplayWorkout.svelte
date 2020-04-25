@@ -77,6 +77,9 @@
   {#if workout.date}
     <h2>{workout.date}</h2>
   {/if}
+  {#if workout.instructions}
+    <p>{workout.instructions}</p>
+  {/if}
   <ul class="exercise-list">
     {#each workout.exercises as exercise (exercise._id)}
       <li>

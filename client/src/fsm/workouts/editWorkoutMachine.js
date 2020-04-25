@@ -21,6 +21,7 @@ const services = {
 	saveTemplate: async (context, _) => {
 		const data = {
 			name: context.workout.name,
+			instructions: context.workout.instructions,
 			exercises: context.workout.exercises
 		};
 		const queryName = 'saveTemplate';
@@ -46,6 +47,11 @@ const services = {
 		}
 	},
 	saveSession: async (context, _) => {
+		const data = {
+			name: context.workout.name,
+			notes: context.workout.notes,
+			exercises: context.workout.exercises
+		};
 		const queryName = 'saveSession';
 		const query = {
 			query: `
@@ -56,7 +62,7 @@ const services = {
 				}
 			`,
 			variables: {
-				data: context.workout
+				data: data
 			}
 		};
 		try {
@@ -76,6 +82,7 @@ const services = {
 					getTemplateById(templateId: $id) {
                         _id
 						name
+						instructions
                         exercises {
 							_id
                             movements {
@@ -98,7 +105,6 @@ const services = {
                                 }
                             }
                         }
-                        notes
 					}
 				}
 			`,
@@ -137,6 +143,14 @@ const actions = {
 			console.log(event);
 			const updatedWorkout = context.workout;
 			updatedWorkout.notes = event.params.value;
+			return updatedWorkout;
+		}
+	}),
+	updateWorkoutInstructions: assign({
+		workout: (context, event) => {
+			console.log(event);
+			const updatedWorkout = context.workout;
+			updatedWorkout.instructions = event.params.value;
 			return updatedWorkout;
 		}
 	}),
@@ -261,6 +275,7 @@ export const editWorkoutMachine = Machine(
 				date: today(),
 				name: '',
 				notes: '',
+				instructions: '',
 				exercises: []
 			},
 			editedExercise: null,
@@ -296,6 +311,9 @@ export const editWorkoutMachine = Machine(
 					},
 					NOTES_INPUT: {
 						actions: ['updateWorkoutNotes']
+					},
+					INSTRUCTIONS_INPUT: {
+						actions: ['updateWorkoutInstructions']
 					},
 					USE_TEMPLATE: {
 						target: 'selectingtemplate'

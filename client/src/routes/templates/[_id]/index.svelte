@@ -17,8 +17,6 @@
 
   const { workoutState, workoutSend } = useMachine(workoutMachine);
 
-  $: console.log($workoutState);
-
   $: if ($workoutState.children.editWorkout) {
     const { editWorkoutState, editWorkoutSend } = useService(
       $workoutState.children.editWorkout
