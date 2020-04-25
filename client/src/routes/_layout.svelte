@@ -8,6 +8,7 @@
 
   // Components
   import Header from "@/components/layout/Header.svelte";
+  import UpdateBanner from "@/components/UI/UpdateBanner.svelte";
 
   const { authState, authSend } = useMachine(authMachine);
 
@@ -23,9 +24,10 @@
   }
 </style>
 
+<UpdateBanner />
+{#if $authState.matches('authenticated')}
+  <Header />
+{/if}
 <main>
-  {#if $authState.matches('authenticated')}
-    <Header />
-  {/if}
   <slot />
 </main>
