@@ -33,7 +33,7 @@ const mutations = {
 		// Update template
 		template.name = templateData.name;
 		template.exercises = templateData.exercises;
-		template.notes = templateData.notes;
+		template.instructions = templateData.instructions;
 		let updatedTemplate = await template.save();
 		updatedTemplate = await updatedTemplate.populate('exercises.movements.exercise').execPopulate();
 		// Return template
