@@ -58,7 +58,7 @@ const services = {
 			const data = await getData(query, queryName, token);
 			if (data.length === 0) {
 				const error = new Error();
-				error.message = errors.noMoreResults;
+				error.message = context.sessions.length ? errors.noMoreResults : errors.noResults;
 				throw error;
 			}
 			return data;
