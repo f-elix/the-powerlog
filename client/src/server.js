@@ -2,8 +2,8 @@ import sirv from 'sirv';
 import polka from 'polka';
 import compression from 'compression';
 import * as sapper from '@sapper/server';
-import './assets/css/global.css';
 import './assets/css/reset.css';
+import './assets/css/global.css';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
