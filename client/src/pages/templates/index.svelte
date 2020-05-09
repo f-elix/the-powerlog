@@ -1,8 +1,9 @@
 <script>
   // Svelte
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
+  import { fly } from "svelte/transition";
   import { flip } from "svelte/animate";
-  import { goto } from "@sapper/app";
+  import { goto } from "@sveltech/routify";
 
   // FSM
   import { templatesMachine } from "@/fsm/templates/templatesMachine.js";
@@ -16,6 +17,8 @@
   import Spinner from "@/components/UI/Spinner.svelte";
   import ModalLayout from "@/components/UI/ModalLayout.svelte";
   import SearchForm from "@/components/UI/SearchForm.svelte";
+
+  const pageTransition = getContext("page-transition");
 
   const { templatesState, templatesSend } = useMachine(templatesMachine);
 
@@ -62,7 +65,7 @@
   }
 </style>
 
-<section>
+<section in:fly={pageTransition}>
   <h1>your templates</h1>
   <!-- Search form -->
   <SearchForm
@@ -74,7 +77,7 @@
     size="big"
     variant="filled"
     color="action"
-    on:click={() => goto('/templates/new')}>
+    on:click={() => $goto('/templates/new')}>
     <i class="material-icons">add</i>
     Add new
   </Button>

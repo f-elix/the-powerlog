@@ -1,7 +1,7 @@
 <script>
   // Svelte
   import { onMount, setContext } from "svelte";
-  import { stores } from "@sapper/app";
+  import { params } from "@sveltech/routify";
 
   // FSM
   import { useMachine, useService } from "@/fsm/machineStores.js";
@@ -12,8 +12,7 @@
   import EditWorkout from "@/components/workouts/EditWorkout.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
 
-  const { page } = stores();
-  const { _id } = $page.params;
+  const { _id } = $params;
 
   const { workoutState, workoutSend } = useMachine(workoutMachine);
 

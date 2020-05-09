@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { goto } from "@sapper/app";
+  import { goto } from "@sveltech/routify";
   import { fly } from "svelte/transition";
 
   // Components
@@ -29,7 +29,7 @@
   }
 </style>
 
-<article class="search-result" in:fly={{ x: 30 }}>
+<article class="search-result">
   <div class="info">
     <h2>{session.name}</h2>
     <p>{session.date}</p>
@@ -37,7 +37,7 @@
   <Button
     variant="filled"
     color="info"
-    on:click={() => goto(`/log/${session._id}`)}>
+    on:click={() => $goto(`/log/${session._id}`)}>
     View Session
   </Button>
 </article>

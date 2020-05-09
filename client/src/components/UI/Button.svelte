@@ -6,6 +6,7 @@
 
   let outlinedColor;
 
+  export let id = "";
   export let size = "small";
   // Small, big, fab
   export let color = "primary";
@@ -111,6 +112,7 @@
   on:click
   bind:this={btn}
   {type}
+  id={id || undefined}
   class="{size}
   {variant}
   {position}"

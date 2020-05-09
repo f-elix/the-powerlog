@@ -1,7 +1,8 @@
 <script>
   // Svelte
-  import { onMount, setContext } from "svelte";
-  import { goto } from "@sapper/app";
+  import { onMount, setContext, getContext } from "svelte";
+  import { fly } from "svelte/transition";
+  import { goto } from "@sveltech/routify";
 
   //   FSM
   import { logMachine } from "@/fsm/log/logMachine.js";
@@ -12,6 +13,8 @@
   import SearchFilters from "@/components/log/SearchFilters.svelte";
   import Button from "@/components/UI/Button.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
+
+  const pageTransition = getContext("page-transition");
 
   const { logState, logSend } = useMachine(logMachine);
 
@@ -97,46 +100,49 @@
   }
 </style>
 
-<h1>Your Log History</h1>
-
-<SearchFilters
-  on:nameinput={onNameInput}
-  on:dateinput={onDateInput}
-  on:frominput={onFromInput}
-  on:toinput={onToInput} />
-<!-- SESSIONS -->
-<section class="sessions-ctn">
-  <!-- Add button -->
-  <Button
-    size="big"
-    variant="filled"
-    color="action"
-    on:click={() => goto('/log/new')}>
-    <i class="material-icons">add</i>
-    Add new
-  </Button>
-  <!-- Sessions -->
-  {#if $logState.matches('idle.fetch.success')}
-    <SessionsList {sessions} on:delete={onDelete} />
-    {#if sessions.length > 10}
-      <div class="load-more-btn">
-        <Button color="action" size="big" on:click={onLoadMore}>
-          Load more
-        </Button>
-      </div>
+<div in:fly={pageTransition}>
+  <section>
+    <h1>Your Log History</h1>
+    <SearchFilters
+      on:nameinput={onNameInput}
+      on:dateinput={onDateInput}
+      on:frominput={onFromInput}
+      on:toinput={onToInput} />
+  </section>
+  <!-- SESSIONS -->
+  <section class="sessions-ctn">
+    <!-- Add button -->
+    <Button
+      size="big"
+      variant="filled"
+      color="action"
+      on:click={() => $goto('/log/new')}>
+      <i class="material-icons">add</i>
+      Add new
+    </Button>
+    <!-- Sessions -->
+    {#if $logState.matches('idle.fetch.success')}
+      <SessionsList {sessions} on:delete={onDelete} />
+      {#if sessions.length > 10}
+        <div class="load-more-btn">
+          <Button color="action" size="big" on:click={onLoadMore}>
+            Load more
+          </Button>
+        </div>
+      {/if}
     {/if}
-  {/if}
-  {#if $logState.matches('idle.fetch.empty')}
-    <SessionsList {sessions} on:delete={onDelete} />
-    <h3>{fetchError}</h3>
-  {/if}
-  {#if $logState.matches('idle.fetch.filtering')}
-    <SessionsList {sessions} on:delete={onDelete} />
-  {/if}
-  {#if $logState.matches('fetching')}
-    <Spinner />
-  {/if}
-  {#if $logState.matches('idle.fetch.error')}
-    <h3>{fetchError}</h3>
-  {/if}
-</section>
+    {#if $logState.matches('idle.fetch.empty')}
+      <SessionsList {sessions} on:delete={onDelete} />
+      <h3>{fetchError}</h3>
+    {/if}
+    {#if $logState.matches('idle.fetch.filtering')}
+      <SessionsList {sessions} on:delete={onDelete} />
+    {/if}
+    {#if $logState.matches('fetching')}
+      <Spinner />
+    {/if}
+    {#if $logState.matches('idle.fetch.error')}
+      <h3>{fetchError}</h3>
+    {/if}
+  </section>
+</div>

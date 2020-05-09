@@ -1,7 +1,6 @@
 import { Machine, assign, spawn, send, sendParent } from 'xstate';
 import { editWorkoutExerciseMachine } from './editWorkoutExerciseMachine';
-import { getData, getToken } from '@/assets/js/utils.js';
-import { goto } from '@sapper/app';
+import { getData, getToken } from '@/js/utils.js';
 
 const reorder = (array, from, to) => {
 	const reorderedArray = array;
@@ -253,12 +252,6 @@ const actions = {
 			return updatedWorkout;
 		}
 	}),
-	routeLog: () => {
-		goto('/log');
-	},
-	routeTemplates: (_, event) => {
-		goto('/templates');
-	},
 	resetWorkout: assign({
 		workout: () => {
 			return {

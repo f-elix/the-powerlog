@@ -1,21 +1,25 @@
-const sapperEnv = require('sapper-environment');
-import path from 'path';
+require('dotenv').config();
+const path = require('path');
 import alias from '@rollup/plugin-alias';
-import resolve from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
-import commonjs from '@rollup/plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
-import babel from 'rollup-plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import livereload from 'rollup-plugin-livereload';
+import globals from 'rollup-plugin-node-globals';
+import replace from '@rollup/plugin-replace';
 import { terser } from 'rollup-plugin-terser';
-import config from 'sapper/config/rollup.js';
-import pkg from './package.json';
+import copy from 'rollup-plugin-copy';
+import del from 'del';
 
-const mode = process.env.NODE_ENV;
-const dev = mode === 'development';
-const legacy = !!process.env.SAPPER_LEGACY_BUILD;
-
-const onwarn = (warning, onwarn) =>
-	(warning.code === 'CIRCULAR_DEPENDENCY' && /[/\\]@sapper[/\\]/.test(warning.message)) || onwarn(warning);
+const env = (filterPrefix = 'APP_', targetPrefix = 'process.env.', excluded = []) => {
+	const APP_ENV_VARS = {};
+	for (let key in process.env) {
+		if (key.startsWith(filterPrefix) && !excluded.includes(key)) {
+			APP_ENV_VARS[targetPrefix + key] = "'" + process.env[key] + "'";
+		}
+	}
+	return APP_ENV_VARS;
+};
 
 const aliases = () => ({
 	resolve: ['.js', '.svelte', '.css'],
@@ -27,101 +31,139 @@ const aliases = () => ({
 	]
 });
 
-const dedupe = importee => importee === 'svelte' || importee.startsWith('svelte/');
+const staticDir = 'static';
+const distDir = 'dist';
+const buildDir = `${distDir}/build`;
+const production = !process.env.ROLLUP_WATCH;
+const bundling = process.env.BUNDLING || production ? 'dynamic' : 'bundle';
+const shouldPrerender = typeof process.env.PRERENDER !== 'undefined' ? process.env.PRERENDER : !!production;
 
-export default {
-	client: {
-		input: config.client.input(),
-		output: config.client.output(),
+del.sync(distDir + '/**');
+
+function createConfig({ output, inlineDynamicImports, plugins = [] }) {
+	const transform = inlineDynamicImports ? bundledTransform : dynamicTransform;
+
+	return {
+		inlineDynamicImports,
+		input: `src/main.js`,
+		output: {
+			name: 'app',
+			sourcemap: true,
+			...output
+		},
 		plugins: [
 			alias(aliases()),
 			replace({
-				...sapperEnv('APP'),
-				'process.browser': true,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				...env()
+			}),
+			copy({
+				targets: [
+					{ src: [staticDir + '/*', '!**/__index.html'], dest: distDir },
+					{ src: `${staticDir}/__index.html`, dest: distDir, rename: '__app.html', transform }
+				],
+				copyOnce: true
 			}),
 			svelte({
-				dev,
+				// enable run-time checks when not in production
+				dev: !production,
 				hydratable: true,
-				emitCss: true,
-				css: true
+				// we'll extract any component CSS out into
+				// a separate file — better for performance
+				css: css => {
+					css.write(`${buildDir}/bundle.css`);
+				}
 			}),
+
+			// If you have external dependencies installed from
+			// npm, you'll most likely need these plugins. In
+			// some cases you'll need additional configuration —
+			// consult the documentation for details:
+			// https://github.com/rollup/rollup-plugin-commonjs
 			resolve({
 				browser: true,
-				dedupe
+				dedupe: importee => importee === 'svelte' || importee.startsWith('svelte/')
 			}),
 			commonjs(),
-			legacy &&
-			babel({
-				extensions: ['.js', '.mjs', '.html', '.svelte'],
-				runtimeHelpers: true,
-				exclude: ['node_modules/@babel/**'],
-				presets: [
-					[
-						'@babel/preset-env',
-						{
-							targets: '> 0.25%, not dead'
-						}
-					]
-				],
-				plugins: [
-					'@babel/plugin-syntax-dynamic-import',
-					[
-						'@babel/plugin-transform-runtime',
-						{
-							useESModules: true
-						}
-					]
-				]
-			}),
+			globals(),
 
-			!dev &&
-			terser({
-				module: true
-			})
+			// If we're building for production (npm run build
+			// instead of npm run dev), minify
+			production && terser(),
+
+			...plugins
 		],
+		watch: {
+			clearScreen: false
+		}
+	};
+}
 
-		onwarn
+const bundledConfig = {
+	inlineDynamicImports: true,
+	output: {
+		format: 'iife',
+		file: `${buildDir}/bundle.js`
 	},
-
-	server: {
-		input: config.server.input(),
-		output: config.server.output(),
-		plugins: [
-			alias(aliases()),
-			replace({
-				'process.browser': false,
-				'process.env.NODE_ENV': JSON.stringify(mode)
-			}),
-			svelte({
-				generate: 'ssr',
-				dev
-			}),
-			resolve({
-				dedupe
-			}),
-			commonjs()
-		],
-		external: Object.keys(pkg.dependencies).concat(
-			require('module').builtinModules || Object.keys(process.binding('natives'))
-		),
-
-		onwarn
-	},
-
-	serviceworker: {
-		input: config.serviceworker.input(),
-		output: config.serviceworker.output(),
-		plugins: [
-			resolve(),
-			replace({
-				'process.browser': true,
-				'process.env.NODE_ENV': JSON.stringify(mode)
-			}),
-			commonjs(),
-			!dev && terser()
-		],
-
-		onwarn
-	}
+	plugins: [!production && serve(), !production && livereload(distDir)]
 };
+
+const dynamicConfig = {
+	inlineDynamicImports: false,
+	output: {
+		format: 'esm',
+		dir: buildDir
+	},
+	plugins: [!production && livereload(distDir)]
+};
+
+const configs = [createConfig(bundledConfig)];
+if (bundling === 'dynamic') configs.push(createConfig(dynamicConfig));
+if (shouldPrerender) [...configs].pop().plugins.push(prerender());
+export default configs;
+
+function serve() {
+	let started = false;
+	return {
+		writeBundle() {
+			if (!started) {
+				started = true;
+				require('child_process').spawn('npm', ['run', 'serve'], {
+					stdio: ['ignore', 'inherit', 'inherit'],
+					shell: true
+				});
+			}
+		}
+	};
+}
+
+function prerender() {
+	return {
+		writeBundle() {
+			if (shouldPrerender) {
+				require('child_process').spawn('npm', ['run', 'export'], {
+					stdio: ['ignore', 'inherit', 'inherit'],
+					shell: true
+				});
+			}
+		}
+	};
+}
+
+function bundledTransform(contents) {
+	return contents.toString().replace(
+		'__SCRIPT__',
+		`
+	<script defer src="/build/bundle.js" ></script>
+	`
+	);
+}
+
+function dynamicTransform(contents) {
+	return contents.toString().replace(
+		'__SCRIPT__',
+		`
+	<script type="module" defer src="https://unpkg.com/dimport@1.0.0/dist/index.mjs?module" data-main="/build/main.js"></script>
+	<script nomodule defer src="https://unpkg.com/dimport/nomodule" data-main="/build/main.js"></script>
+	`
+	);
+}

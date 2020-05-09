@@ -1,4 +1,7 @@
 <script>
+  // Svelte
+  import { fade } from "svelte/transition";
+
   // Components
   import CardSearchResult from "@/components/log/CardSearchResult.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
@@ -27,9 +30,13 @@
     <Spinner />
   {/if}
   {#if isSuccess}
-    {#each sessions as session (session._id)}
-      <CardSearchResult {session} />
-    {/each}
+    <ul class="results-list">
+      {#each sessions as session (session._id)}
+        <li in:fade={{ duration: 200 }}>
+          <CardSearchResult {session} />
+        </li>
+      {/each}
+    </ul>
   {/if}
   {#if isError}
     <h2 class="error-message">{errorMessage}</h2>

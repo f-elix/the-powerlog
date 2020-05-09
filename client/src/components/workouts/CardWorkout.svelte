@@ -70,7 +70,7 @@
   }
 </style>
 
-<article in:fly|local={{ x: 30 }} out:fly|local={{ x: 30, duration: 200 }}>
+<article>
   <div class="workout-info">
     <h3>{workout.name}</h3>
     {#if workoutType === 'session'}

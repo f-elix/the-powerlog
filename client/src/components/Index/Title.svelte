@@ -45,7 +45,7 @@
 
 <div class="title">
   <!-- Logo -->
-  <img src="/img/icons/icon.svg" alt="" width="144" height="144" />
+  <img src="/icons/icon.svg" alt="" width="144" height="144" />
 
   <!-- Title -->
   <h1>The Power Log</h1>

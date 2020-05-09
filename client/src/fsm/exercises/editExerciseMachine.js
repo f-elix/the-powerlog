@@ -1,5 +1,5 @@
 import { Machine, assign, sendParent } from 'xstate';
-import { getData, getToken } from '@/assets/js/utils.js';
+import { getData, getToken } from '@/js/utils.js';
 
 const services = {
 	saveExercise: async (context, _) => {
@@ -43,7 +43,7 @@ const actions = {
 
 const guards = {
 	isInputEmpty: (context, _) => context.name.trim().length === 0
-}
+};
 
 export const editExerciseMachine = exercise => {
 	return Machine(
@@ -65,7 +65,7 @@ export const editExerciseMachine = exercise => {
 							{
 								target: 'saving',
 								actions: ['updateExercise']
-							},
+							}
 						],
 						DISCARD: 'success',
 						INPUT: {

@@ -1,6 +1,7 @@
 <script>
   // Svelte
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
+  import { fly, fade } from "svelte/transition";
   import { flip } from "svelte/animate";
 
   // FSM
@@ -14,6 +15,8 @@
   import Spinner from "@/components/UI/Spinner.svelte";
   import ModalLayout from "@/components/UI/ModalLayout.svelte";
   import SearchForm from "@/components/UI/SearchForm.svelte";
+
+  const pageTransition = getContext("page-transition");
 
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
 
@@ -92,7 +95,8 @@
   }
 </style>
 
-<section>
+<!-- routify:options index=1 -->
+<section in:fly={pageTransition}>
   <h1>your exercises</h1>
   <!-- Search form -->
   <SearchForm
@@ -119,7 +123,10 @@
       <h2 class="message">{$exercisesState.context.fetchError}</h2>
     {/if}
     {#each exercises as exercise (exercise._id)}
-      <li animate:flip={{ duration: 200 }}>
+      <li
+        animate:flip={{ duration: 200 }}
+        out:fly|local={{ duration: 200, x: 30 }}
+        in:fade|local={{ duration: 200 }}>
         <CardExercise
           {exercise}
           {editService}

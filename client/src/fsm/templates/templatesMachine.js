@@ -1,5 +1,5 @@
 import { Machine, assign } from 'xstate';
-import { getData, getToken } from '@/assets/js/utils.js';
+import { getData, getToken } from '@/js/utils.js';
 
 const services = {
 	getTemplates: async () => {
@@ -67,10 +67,7 @@ const actions = {
 	filterTemplates: assign({
 		filteredTemplates: (context, _) => {
 			return context.templates.filter(t => {
-				return t.name
-					.trim()
-					.toLowerCase()
-					.includes(context.searchFilter.trim().toLowerCase());
+				return t.name.trim().toLowerCase().includes(context.searchFilter.trim().toLowerCase());
 			});
 		}
 	}),

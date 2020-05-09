@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { onMount, setContext } from "svelte";
+  import { goto } from "@sveltech/routify";
 
   // FSM
   import { editWorkoutMachine } from "@/fsm/workouts/editWorkoutMachine.js";
@@ -9,7 +10,14 @@
   // Components
   import EditWorkout from "@/components/workouts/EditWorkout.svelte";
 
-  const { editWorkoutState, editWorkoutSend } = useMachine(editWorkoutMachine);
+  const { editWorkoutState, editWorkoutSend } = useMachine(
+    editWorkoutMachine.withConfig({
+      actions: {
+        routeLog: () => $goto("/log"),
+        routeTemplates: () => $goto("/templates")
+      }
+    })
+  );
 
   onMount(() => {
     editWorkoutSend({ type: "NEW_WORKOUT" });
@@ -21,4 +29,4 @@
   });
 </script>
 
-<EditWorkout workoutType="template" />
+<EditWorkout />

@@ -1,7 +1,6 @@
 import { Machine, assign } from 'xstate';
 import { editWorkoutMachine } from './editWorkoutMachine';
-import { getData, getToken } from '@/assets/js/utils.js';
-import { goto } from '@sapper/app';
+import { getData, getToken } from '@/js/utils.js';
 
 const services = {
 	getTemplate: async (_, event) => {
@@ -158,13 +157,7 @@ const actions = {
 	}),
 	clearFetchError: assign({
 		fetchError: ''
-	}),
-	routeTemplates: () => {
-		goto('/templates');
-	},
-	routeLog: () => {
-		goto('/log');
-	}
+	})
 };
 
 export const workoutMachine = Machine(

@@ -1,7 +1,8 @@
 <script>
   // Svelte
-  import { onMount, setContext } from "svelte";
-  import { stores } from "@sapper/app";
+  import { onMount, setContext, getContext } from "svelte";
+  import { fly } from "svelte/transition";
+  import { params } from "@sveltech/routify";
 
   // FSM
   import { useMachine, useService } from "@/fsm/machineStores.js";
@@ -12,8 +13,9 @@
   import EditWorkout from "@/components/workouts/EditWorkout.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
 
-  const { page } = stores();
-  const { _id } = $page.params;
+  const pageTransition = getContext("page-transition");
+
+  const { _id } = $params;
 
   const { workoutState, workoutSend } = useMachine(workoutMachine);
 
@@ -61,21 +63,23 @@
   }
 </style>
 
-<!-- Loading spinner -->
-{#if $workoutState.matches('fetching') || $workoutState.matches('deleting') || $workoutState.matches('deleted')}
-  <div class="spinner-ctn">
-    <Spinner />
-  </div>
-{/if}
-<!-- Display session -->
-{#if $workoutState.matches('displaying')}
-  <DisplayWorkout
-    workout={session}
-    on:delete={onDelete}
-    on:edit={onEdit}
-    on:outroend={onDisplayOut} />
-{/if}
-<!-- Edit session -->
-{#if $workoutState.matches('editing')}
-  <EditWorkout isNew={false} on:outroend={onEditOut} />
-{/if}
+<div in:fly={pageTransition}>
+  <!-- Loading spinner -->
+  {#if $workoutState.matches('fetching') || $workoutState.matches('deleting') || $workoutState.matches('deleted')}
+    <div class="spinner-ctn">
+      <Spinner />
+    </div>
+  {/if}
+  <!-- Display session -->
+  {#if $workoutState.matches('displaying')}
+    <DisplayWorkout
+      workout={session}
+      on:delete={onDelete}
+      on:edit={onEdit}
+      on:outroend={onDisplayOut} />
+  {/if}
+  <!-- Edit session -->
+  {#if $workoutState.matches('editing')}
+    <EditWorkout isNew={false} on:outroend={onEditOut} />
+  {/if}
+</div>

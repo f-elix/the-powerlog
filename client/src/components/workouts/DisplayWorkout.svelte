@@ -2,6 +2,7 @@
   // Svelte
   import { createEventDispatcher } from "svelte";
   import { fly } from "svelte/transition";
+  import { goto, params } from "@sveltech/routify";
 
   // Components
   import Button from "@/components/UI/Button.svelte";
@@ -16,6 +17,7 @@
 
   function onEdit() {
     dispatch("edit");
+    // $goto(`/log/${$params._id}/edit`);
   }
 </script>
 

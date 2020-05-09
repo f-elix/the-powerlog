@@ -1,5 +1,5 @@
 import { Machine, assign, spawn, send } from 'xstate';
-import { getData, getToken } from '@/assets/js/utils.js';
+import { getData, getToken } from '@/js/utils.js';
 import { editExerciseMachine } from './editExerciseMachine';
 
 const services = {
@@ -55,7 +55,7 @@ const services = {
 		const query = {
 			query: `
 				mutation deleteExercise($id: ID!) {
-					deleteExercise(exerciseId: $id) 
+					deleteExercise(exerciseId: $id)
 				}
 			`,
 			variables: {
@@ -105,10 +105,7 @@ const actions = {
 	filterExercises: assign({
 		filteredExercises: (context, _) => {
 			return context.exercises.filter(exercise => {
-				return exercise.name
-					.trim()
-					.toLowerCase()
-					.includes(context.searchFilter.trim().toLowerCase());
+				return exercise.name.trim().toLowerCase().includes(context.searchFilter.trim().toLowerCase());
 			});
 		}
 	}),

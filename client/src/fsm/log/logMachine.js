@@ -1,11 +1,6 @@
 import { Machine, assign } from 'xstate';
-import {
-	sessionRangeQuery,
-	sessionNameQuery,
-	sessionDateQuery,
-	sessionPeriodQuery
-} from '@/assets/js/session-queries.js';
-import { getData, getToken, currentWeekDates, lastWeekDates } from '@/assets/js/utils.js';
+import { sessionRangeQuery, sessionNameQuery, sessionDateQuery, sessionPeriodQuery } from '@/js/session-queries.js';
+import { getData, getToken, currentWeekDates, lastWeekDates } from '@/js/utils.js';
 
 const { currentMonday, currentSunday } = currentWeekDates();
 const { lastMonday, lastSunday } = lastWeekDates();

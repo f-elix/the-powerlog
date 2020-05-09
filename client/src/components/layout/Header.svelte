@@ -1,7 +1,7 @@
 <script>
   // Svelte
   import { getContext } from "svelte";
-  import { stores } from "@sapper/app";
+  import { isActive, url } from "@sveltech/routify";
 
   // Components
   import MenuButton from "@/components/UI/MenuButton.svelte";
@@ -9,7 +9,28 @@
 
   const { authState, authSend } = getContext("auth");
 
-  const { page } = stores();
+  const links = [
+    {
+      href: "/dashboard",
+      icon: "dashboard",
+      label: "dashboard"
+    },
+    {
+      href: "/log",
+      icon: "view_list",
+      label: "log"
+    },
+    {
+      href: "/exercises",
+      icon: "fitness_center",
+      label: "exercises"
+    },
+    {
+      href: "/templates",
+      icon: "insert_drive_file",
+      label: "templates"
+    }
+  ];
 
   let isSubMenuOpen = false;
 
@@ -187,42 +208,14 @@
           logout
         </a>
       </li>
-      <li>
-        <a
-          href="/dashboard"
-          class="nav-link"
-          class:current-link={$page.path.includes('/dashboard')}>
-          <i class="material-icons">dashboard</i>
-          dashboard
-        </a>
-      </li>
-      <li>
-        <a
-          href="/log"
-          class="nav-link"
-          class:current-link={$page.path.includes('/log')}>
-          <i class="material-icons">view_list</i>
-          log
-        </a>
-      </li>
-      <li>
-        <a
-          href="/exercises"
-          class="nav-link"
-          class:current-link={$page.path.includes('/exercises')}>
-          <i class="material-icons">fitness_center</i>
-          exercises
-        </a>
-      </li>
-      <li>
-        <a
-          href="/templates"
-          class="nav-link"
-          class:current-link={$page.path.includes('/templates')}>
-          <i class="material-icons">insert_drive_file</i>
-          templates
-        </a>
-      </li>
+      {#each links as { href, icon, label }}
+        <li>
+          <a {href} class="nav-link" class:current-link={$isActive(href)}>
+            <i class="material-icons">{icon}</i>
+            {label}
+          </a>
+        </li>
+      {/each}
     </ul>
   </nav>
   <button class="add" on:click={toggleMenu}>
