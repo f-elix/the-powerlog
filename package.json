@@ -13,7 +13,7 @@
 	"devDependencies": {
 		"@mdi/font": "^4.9.95",
 		"@mdi/js": "^4.9.95",
-		"concurrently": "^5.0.0",
+		"concurrently": "^5.2.0",
 		"nodemon": "^2.0.1"
 	},
 	"dependencies": {
