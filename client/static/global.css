@@ -111,12 +111,14 @@ html {
 	font-size: 10px;
 	font-family: 'Roboto', sans-serif;
 	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+	overflow-x: hidden;
 }
 
 body {
 	background-color: var(--color-bg);
 	color: var(--color-primary);
 	font-size: var(--text-normal);
+	overflow-x: hidden;
 }
 
 #app {
