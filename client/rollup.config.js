@@ -116,9 +116,19 @@ const dynamicConfig = {
 	plugins: [!production && livereload(distDir)]
 };
 
+const swConfig = {
+	input: `${staticDir}/registerServiceWorker.js`,
+	output: {
+		file: `${distDir}/registerServiceWorker.js`,
+		format: 'iife'
+	},
+	plugins: [resolve(), commonjs(), terser()]
+};
+
 const configs = [createConfig(bundledConfig)];
 if (bundling === 'dynamic') configs.push(createConfig(dynamicConfig));
 if (shouldPrerender) [...configs].pop().plugins.push(prerender());
+configs.push(swConfig);
 export default configs;
 
 function serve() {
