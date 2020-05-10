@@ -3,6 +3,7 @@
   import { expoOut } from "svelte/easing";
   import { Router } from "@sveltech/routify";
   import { routes } from "@sveltech/routify/tmp/routes";
+  import "../static/registerServiceWorker.js";
 
   setContext("page-transition", {
     duration: 800,

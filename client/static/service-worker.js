@@ -1,26 +1,30 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
+var CACHE_STATIC_NAME = 'static-v1';
+var CACHE_DYNAMIC_NAME = 'dynamic-v1';
 
-workbox.core.setCacheNameDetails({ prefix: 'the-power-log' });
+self.addEventListener('install', function (event) {
+	event.waitUntil(
+		caches.open(CACHE_STATIC_NAME).then(function (cache) {
+			cache.addAll(['/', '/index.html']);
+		})
+	);
+});
 
-// Cache Google fonts:
-workbox.routing.registerRoute(
-	new RegExp('https://fonts.(?:googleapis|gstatic).com/(.*)'),
-	workbox.strategies.cacheFirst({
-		cacheName: 'googleapis',
-		plugins: [
-			new workbox.expiration.Plugin({
-				maxEntries: 30,
-				maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
-			})
-		]
-	})
-);
+self.addEventListener('activate', function (event) {
+	event.waitUntil(
+		caches.keys().then(function (keyList) {
+			return Promise.all(
+				keyList.map(function (key) {
+					if (key !== CACHE_STATIC_NAME) {
+						return caches.delete(key);
+					}
+				})
+			);
+		})
+	);
+});
 
 self.addEventListener('message', event => {
 	if (event.data && event.data.type === 'SKIP_WAITING') {
 		self.skipWaiting();
 	}
 });
-
-self.__precacheManifest = [].concat(self.__precacheManifest || []);
-workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
