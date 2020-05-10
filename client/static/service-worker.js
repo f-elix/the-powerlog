@@ -4,7 +4,7 @@ var CACHE_DYNAMIC_NAME = 'dynamic-v1';
 self.addEventListener('install', function (event) {
 	event.waitUntil(
 		caches.open(CACHE_STATIC_NAME).then(function (cache) {
-			cache.addAll(['/', '/index.html']);
+			cache.addAll(['/index.html']);
 		})
 	);
 });
