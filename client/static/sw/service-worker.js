@@ -38,7 +38,13 @@ self.addEventListener('fetch', event => {
 				if (response) {
 					return response;
 				} else {
-					return fetch(event.request);
+					return fetch(event.request)
+						.then(res => {
+							return caches.open(STATIC_ASSETS).then(cache => {
+								cache.put(event.request.url, res.clone());
+							});
+						})
+						.catch(err => console.log(err));
 				}
 			})
 		);
