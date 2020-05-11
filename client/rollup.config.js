@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const fs = require('fs');
 import alias from '@rollup/plugin-alias';
 import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
@@ -58,7 +59,7 @@ function createConfig({ output, inlineDynamicImports, plugins = [] }) {
 			}),
 			copy({
 				targets: [
-					{ src: [staticDir + '/*', '!**/__index.html'], dest: distDir },
+					{ src: [staticDir + '/*', '!**/__index.html', '!**/sw'], dest: distDir },
 					{ src: `${staticDir}/__index.html`, dest: distDir, rename: '__app.html', transform }
 				],
 				copyOnce: true
@@ -85,6 +86,7 @@ function createConfig({ output, inlineDynamicImports, plugins = [] }) {
 			}),
 			commonjs(),
 			globals(),
+			generateCacheManifest(),
 
 			// If we're building for production (npm run build
 			// instead of npm run dev), minify
@@ -116,20 +118,71 @@ const dynamicConfig = {
 	plugins: [!production && livereload(distDir)]
 };
 
-const swConfig = {
+const registerSwConfig = {
 	input: `${staticDir}/registerServiceWorker.js`,
 	output: {
 		file: `${distDir}/registerServiceWorker.js`,
-		format: 'iife'
+		format: 'esm'
 	},
-	plugins: [resolve(), commonjs(), terser()]
+	plugins: [resolve(), terser()]
+};
+
+const swConfig = {
+	input: `${staticDir}/sw/service-worker.js`,
+	output: {
+		file: `${distDir}/service-worker.js`,
+		format: 'esm'
+	},
+	plugins: [
+		resolve(),
+		replace({
+			'process.browser': true,
+			__timestamp__: Date.now()
+		}),
+		terser()
+	]
 };
 
 const configs = [createConfig(bundledConfig)];
 if (bundling === 'dynamic') configs.push(createConfig(dynamicConfig));
 if (shouldPrerender) [...configs].pop().plugins.push(prerender());
-configs.push(swConfig);
+if (!!production) {
+	configs.push(registerSwConfig);
+	configs.push(swConfig);
+}
 export default configs;
+
+function generateCacheManifest() {
+	return {
+		name: 'generate-cache-manifest',
+		writeBundle(options, bundle) {
+			const filePaths = generatePathsArray(distDir);
+			const files = filePaths.filter(f => !f.endsWith('.map')).map(f => f.replace(/\\/g, '/'));
+			const code = `export const static_files = [\n\t${files.map(f => JSON.stringify(f)).join(',\n\t')}\n]`;
+			fs.writeFileSync(`${staticDir}/sw/cache-manifest.js`, code);
+		}
+	};
+}
+
+function generatePathsArray(dir) {
+	let urls = [];
+	try {
+		const files = fs.readdirSync(dir);
+		for (const file of files) {
+			const _path = path.join(dir, file);
+			const stats = fs.statSync(_path);
+			if (stats.isFile()) {
+				urls.push(_path);
+			} else if (stats.isDirectory()) {
+				urls = [...urls, ...generatePathsArray(_path)];
+			}
+		}
+		return urls;
+	} catch (err) {
+		console.log(err);
+		throw err;
+	}
+}
 
 function serve() {
 	let started = false;
