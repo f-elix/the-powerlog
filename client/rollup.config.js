@@ -157,7 +157,10 @@ function generateCacheManifest() {
 		name: 'generate-cache-manifest',
 		writeBundle(options, bundle) {
 			const filePaths = generatePathsArray(distDir);
-			const files = filePaths.filter(f => !f.endsWith('.map')).map(f => f.replace(/\\/g, '/'));
+			const files = filePaths
+				.filter(f => !f.endsWith('.map'))
+				.map(f => f.replace(/\\/g, '/'))
+				.map(f => f.replace('dist/', ''));
 			const code = `export const static_files = [\n\t${files.map(f => JSON.stringify(f)).join(',\n\t')}\n]`;
 			fs.writeFileSync(`${staticDir}/sw/cache-manifest.js`, code);
 		}
