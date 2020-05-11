@@ -34,9 +34,11 @@ self.addEventListener('fetch', event => {
 	// always serve static files and bundler-generated assets from cache
 	if (url.host === self.location.host) {
 		event.respondWith(
-			caches.match(event.request).then(function (response) {
+			caches.match(event.request).then(response => {
 				if (response) {
 					return response;
+				} else {
+					return fetch(event.request);
 				}
 			})
 		);
