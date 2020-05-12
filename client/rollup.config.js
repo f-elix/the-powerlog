@@ -119,9 +119,9 @@ const dynamicConfig = {
 };
 
 const registerSwConfig = {
-	input: `${staticDir}/registerServiceWorker.js`,
+	input: `${staticDir}/register-service-worker.js`,
 	output: {
-		file: `${distDir}/registerServiceWorker.js`,
+		file: `${distDir}/register-service-worker.js`,
 		format: 'esm'
 	},
 	plugins: [resolve(), terser()]

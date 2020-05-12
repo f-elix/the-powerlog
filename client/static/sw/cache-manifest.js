@@ -44,6 +44,6 @@ export const static_files = [
 	"icons/icon.svg",
 	"icons/msapplication-icon-144x144.png",
 	"manifest.json",
-	"registerServiceWorker.js",
+	"register-service-worker.js",
 	"__app.html"
 ]
