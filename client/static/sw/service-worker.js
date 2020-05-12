@@ -32,7 +32,11 @@ self.addEventListener('fetch', event => {
 	if (url.hostname === self.location.hostname && url.port !== self.location.port) return;
 
 	// always serve static files and bundler-generated assets from cache
-	if (url.host === self.location.host) {
+	if (
+		url.host === self.location.host ||
+		url.origin === 'https://fonts.gstatic.com' ||
+		url.origin === 'https://fonts.googleapis.com'
+	) {
 		event.respondWith(
 			caches.match(event.request).then(response => {
 				if (response) {
