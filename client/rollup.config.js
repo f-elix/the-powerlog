@@ -59,7 +59,10 @@ function createConfig({ output, inlineDynamicImports, plugins = [] }) {
 			}),
 			copy({
 				targets: [
-					{ src: [staticDir + '/*', '!**/__index.html', '!**/sw'], dest: distDir },
+					{
+						src: [staticDir + '/*', '!**/__index.html', '!**/sw', '!**/register-service-worker.js'],
+						dest: distDir
+					},
 					{ src: `${staticDir}/__index.html`, dest: distDir, rename: '__app.html', transform }
 				],
 				copyOnce: true

@@ -6,11 +6,15 @@
   import Button from "../UI/Button.svelte";
 
   let deferredPrompt = null;
+  let installBtn;
 
   onMount(() => {
+    installBtn = document.querySelector("#installBtn");
+    installBtn.style.display = "none";
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
       deferredPrompt = e;
+      installBtn.style.removeProperty("display");
       return false;
     });
   });
@@ -56,7 +60,11 @@
   </h2>
 
   <!-- Install btn -->
-  <Button variant="filled" color="primary-30" on:click={promptInstall}>
+  <Button
+    variant="filled"
+    color="primary-30"
+    on:click={promptInstall}
+    id="installBtn">
     <i class="material-icons">get_app</i>
     Install
   </Button>
