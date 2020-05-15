@@ -11,6 +11,7 @@
   onMount(() => {
     installBtn = document.querySelector("#installBtn");
     installBtn.style.display = "none";
+
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
       deferredPrompt = e;
@@ -20,15 +21,17 @@
   });
 
   function promptInstall() {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choiceResult => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("The Strength Log has been successfully installed.");
-      } else {
-        console.log("User dismissed installation.");
-      }
-    });
-    deferredPrompt = null;
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choiceResult => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("The Strength Log has been successfully installed.");
+        } else {
+          console.log("User dismissed installation.");
+        }
+      });
+      deferredPrompt = null;
+    }
   }
 </script>
 

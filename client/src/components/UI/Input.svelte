@@ -17,6 +17,7 @@
   export let rows = 5;
   export let errorMessage = "";
   export let autofocus = false;
+  export let autocomplete = "";
 
   let input;
 
@@ -140,6 +141,7 @@
         {name}
         class:label-padding={label}
         {placeholder}
+        {autocomplete}
         {value}
         on:input />
       <span class="label">{label}</span>

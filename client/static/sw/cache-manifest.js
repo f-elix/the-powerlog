@@ -18,5 +18,6 @@ export const static_files = [
 	"icons/icon.svg",
 	"icons/msapplication-icon-144x144.png",
 	"manifest.json",
+	"_redirects",
 	"__app.html"
 ]

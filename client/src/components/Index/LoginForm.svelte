@@ -29,6 +29,7 @@
     type="password"
     name="password"
     label="Password"
+    autocomplete="current-password"
     errorMessage={$validationState.context.passwordError}
     value={$validationState.context.password}
     on:input={e => validationSend({
