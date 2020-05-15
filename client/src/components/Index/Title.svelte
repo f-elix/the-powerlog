@@ -6,18 +6,12 @@
   import Button from "../UI/Button.svelte";
 
   $: deferredPrompt = null;
-  $: installBtn = null;
 
   onMount(() => {
-    installBtn = document.querySelector("#installBtn");
-    installBtn.style.display = "none";
-
     window.addEventListener("beforeinstallprompt", e => {
-      e.preventDefault();
       console.log("Install prompt event fired");
+      e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.removeProperty("display");
-      return false;
     });
   });
 
@@ -64,12 +58,14 @@
   </h2>
 
   <!-- Install btn -->
-  <Button
-    variant="filled"
-    color="primary-30"
-    on:click={promptInstall}
-    id="installBtn">
-    <i class="material-icons">get_app</i>
-    Install
-  </Button>
+  {#if deferredPrompt !== null}
+    <Button
+      variant="filled"
+      color="primary-30"
+      on:click={promptInstall}
+      id="installBtn">
+      <i class="material-icons">get_app</i>
+      Install
+    </Button>
+  {/if}
 </div>
