@@ -5,8 +5,8 @@
   // Components
   import Button from "../UI/Button.svelte";
 
-  let deferredPrompt = null;
-  let installBtn;
+  $: deferredPrompt = null;
+  $: installBtn = null;
 
   onMount(() => {
     installBtn = document.querySelector("#installBtn");
@@ -14,7 +14,7 @@
 
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
-      console.log("before install prompt fired");
+      console.log("Install prompt event fired");
       deferredPrompt = e;
       installBtn.style.removeProperty("display");
       return false;
