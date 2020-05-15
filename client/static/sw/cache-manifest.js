@@ -1,6 +1,7 @@
 export const static_files = [
 	"build/bundle.css",
 	"build/bundle.js",
+	"build/main.js",
 	"favicon.png",
 	"global.css",
 	"icons/app-icon-144x144.png",
