@@ -14,6 +14,7 @@
 
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
+      console.log("before install prompt fired");
       deferredPrompt = e;
       installBtn.style.removeProperty("display");
       return false;
