@@ -32,11 +32,34 @@ self.addEventListener('fetch', event => {
 	if (url.hostname === self.location.hostname && url.port !== self.location.port) return;
 
 	// always serve static files and bundler-generated assets from cache
-	if (
-		url.host === self.location.host ||
-		url.origin === 'https://fonts.gstatic.com' ||
-		url.origin === 'https://fonts.googleapis.com'
-	) {
+	if (url.host === self.location.host) {
+		event.respondWith(
+			caches
+				.match(
+					// Necessary to match es modules script request
+					// Reference: https://medium.com/@filipbech/the-gotchas-of-caching-es-modules-f92c9429fe26
+					new Request(event.request.url, {
+						mode: 'cors',
+						credentials: 'omit'
+					})
+				)
+				.then(response => {
+					if (response) {
+						return response;
+					} else {
+						return fetch(event.request)
+							.then(res => {
+								return caches.open(STATIC_ASSETS).then(cache => {
+									cache.put(event.request.url, res.clone());
+								});
+							})
+							.catch(err => console.log(err));
+					}
+				})
+		);
+	}
+
+	if (url.origin === 'https://fonts.gstatic.com' || url.origin === 'https://fonts.googleapis.com') {
 		event.respondWith(
 			caches.match(event.request).then(response => {
 				if (response) {
