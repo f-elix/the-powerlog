@@ -271,8 +271,8 @@
   on:touchmove={onTouchMove} />
 
 <div
-  in:fly|local={{ x: 30 }}
-  out:fly|local={{ x: 30, duration: 200 }}
+  in:fly|local={{ x: 30, duration: 200 }}
+  out:fly|local={{ x: 30, duration: isNew ? 0 : 200 }}
   on:outroend>
   {#if $editWorkoutState.matches('saving') || $editWorkoutState.matches('done')}
     <Spinner />
