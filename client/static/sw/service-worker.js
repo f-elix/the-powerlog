@@ -70,6 +70,7 @@ self.addEventListener('fetch', event => {
 						.then(res => {
 							return caches.open(STATIC_ASSETS).then(cache => {
 								cache.put(event.request.url, res.clone());
+								return res;
 							});
 						})
 						.catch(err => console.log(err));
