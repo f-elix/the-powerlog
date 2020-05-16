@@ -95,7 +95,8 @@ function createConfig({ output, inlineDynamicImports, plugins = [] }) {
 			// instead of npm run dev), minify
 			production && terser(),
 
-			...plugins
+			...plugins,
+			addRegisterSWScript()
 		],
 		watch: {
 			clearScreen: false
@@ -154,6 +155,21 @@ if (!!production) {
 	configs.push(swConfig);
 }
 export default configs;
+
+function addRegisterSWScript() {
+	return {
+		name: 'add-register-sw',
+		writeBundle() {
+			const indexFile = `${distDir}/__app.html`;
+			const replacementString = production ? '<script defer src="/register-service-worker.js"></script>' : '';
+			const indexContent = fs.readFileSync(indexFile, {
+				encoding: 'utf-8'
+			});
+			const code = indexContent.replace('__REGISTER_SW_SCRIPT__', replacementString);
+			fs.writeFileSync(indexFile, code);
+		}
+	};
+}
 
 function generateCacheManifest() {
 	return {
