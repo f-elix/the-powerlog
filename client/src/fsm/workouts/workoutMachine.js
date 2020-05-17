@@ -233,8 +233,8 @@ export const workoutMachine = Machine(
 					id: 'editWorkout',
 					src: editWorkoutMachine.withConfig({
 						actions: {
-							routeLog: () => $goto('/log'),
-							routeTemplates: () => $goto('/templates')
+							routeLog: actions.routeLog,
+							routeTemplates: actions.routeTemplates
 						}
 					}),
 					data: {
