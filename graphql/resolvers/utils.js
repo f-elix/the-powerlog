@@ -93,10 +93,11 @@ exports.createSession = async (userId, sessionData) => {
 		creator: userId
 	});
 	const newSession = await session.save();
-	user.log.push(newSession);
-	await user.save();
 	// Update exercises history
 	updateExerciseHistory(userId, newSession, sessionData.exercises);
+	// Update user
+	user.log.push(newSession);
+	await user.save();
 	// Return session
 	return {
 		...newSession._doc,
@@ -114,8 +115,20 @@ exports.createTemplate = async (userId, templateData) => {
 	});
 	let newTemplate = await template.save();
 	newTemplate = await newTemplate.populate('exercises.movements.exercise').execPopulate();
+	// Create exercises if they don't already exist
+	const movements = templateData.exercises.map(exercise => exercise.movements).flat();
+	for (const movement of movements) {
+		console.log(movement);
+		const exerciseData = {
+			_id: movement.exercise._id,
+			name: movement.exercise.name
+		};
+		await createExercise(userId, exerciseData, true);
+	}
+	// Update user
 	user.templates.push(newTemplate);
 	await user.save();
+	// Return new template
 	return {
 		...newTemplate._doc,
 		_id: newTemplate._id.toString()
