@@ -118,7 +118,6 @@ exports.createTemplate = async (userId, templateData) => {
 	// Create exercises if they don't already exist
 	const movements = templateData.exercises.map(exercise => exercise.movements).flat();
 	for (const movement of movements) {
-		console.log(movement);
 		const exerciseData = {
 			_id: movement.exercise._id,
 			name: movement.exercise.name
