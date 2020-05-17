@@ -1,6 +1,7 @@
 <script>
   // Svelte
-  import { onMount, setContext } from "svelte";
+  import { onMount, setContext, getContext } from "svelte";
+  import { fly } from "svelte/transition";
   import { params, goto } from "@sveltech/routify";
 
   // FSM
@@ -11,6 +12,8 @@
   import DisplayWorkout from "@/components/workouts/DisplayWorkout.svelte";
   import EditWorkout from "@/components/workouts/EditWorkout.svelte";
   import Spinner from "@/components/UI/Spinner.svelte";
+
+  const pageTransition = getContext("page-transition");
 
   const { _id } = $params;
 
@@ -67,21 +70,23 @@
   }
 </style>
 
-<!-- Loading spinner -->
-{#if $workoutState.matches('fetching')}
-  <div class="spinner-ctn">
-    <Spinner />
-  </div>
-{/if}
-<!-- Display template -->
-{#if $workoutState.matches('displaying')}
-  <DisplayWorkout
-    workout={template}
-    on:delete={onDelete}
-    on:edit={onEdit}
-    on:outroend={onDisplayOut} />
-{/if}
-<!-- Edit template -->
-{#if $workoutState.matches('editing')}
-  <EditWorkout workoutType="template" isNew={false} on:outroend={onEditOut} />
-{/if}
+<div in:fly={pageTransition}>
+  <!-- Loading spinner -->
+  {#if $workoutState.matches('fetching')}
+    <div class="spinner-ctn">
+      <Spinner />
+    </div>
+  {/if}
+  <!-- Display template -->
+  {#if $workoutState.matches('displaying')}
+    <DisplayWorkout
+      workout={template}
+      on:delete={onDelete}
+      on:edit={onEdit}
+      on:outroend={onDisplayOut} />
+  {/if}
+  <!-- Edit template -->
+  {#if $workoutState.matches('editing')}
+    <EditWorkout workoutType="template" isNew={false} on:outroend={onEditOut} />
+  {/if}
+</div>

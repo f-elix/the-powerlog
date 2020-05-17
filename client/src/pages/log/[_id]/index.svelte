@@ -72,7 +72,7 @@
 
 <div in:fly={pageTransition}>
   <!-- Loading spinner -->
-  {#if $workoutState.matches('fetching') || $workoutState.matches('deleting') || $workoutState.matches('deleted')}
+  {#if $workoutState.matches('fetching')}
     <div class="spinner-ctn">
       <Spinner />
     </div>
