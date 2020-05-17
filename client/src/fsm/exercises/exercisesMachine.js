@@ -1,6 +1,7 @@
 import { Machine, assign, spawn, send } from 'xstate';
-import { getData, getToken } from '@/js/utils.js';
 import { editExerciseMachine } from './editExerciseMachine';
+import { getData, getToken } from '@/js/utils.js';
+import ObjectID from 'bson-objectid';
 
 const services = {
 	getAllExercises: async () => {
@@ -37,7 +38,8 @@ const services = {
             `,
 			variables: {
 				data: {
-					name: context.newExercise
+					name: context.newExercise,
+					_id: ObjectID()
 				}
 			}
 		};

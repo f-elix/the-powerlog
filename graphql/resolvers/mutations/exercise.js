@@ -13,16 +13,11 @@ const mutations = {
 			error.statusCode = 401;
 			throw error;
 		}
-		// If no id, exercise doesn't exist so create one and return it
-		if (!exerciseData._id) {
-			return await createExercise(currentUser.userId, exerciseData);
-		}
 		// Find exercise
-		const exercise = await (await Exercise.findById(exerciseData._id)).populate('history');
+		const exercise = await Exercise.findById(exerciseData._id);
+		// If no exercise found, create one and return it
 		if (!exercise) {
-			const error = new Error('No exercise created yet.');
-			error.statusCode = 404;
-			throw error;
+			return await createExercise(currentUser.userId, exerciseData);
 		}
 		// Validate user
 		if (exercise.creator._id.toString() !== currentUser.userId) {
