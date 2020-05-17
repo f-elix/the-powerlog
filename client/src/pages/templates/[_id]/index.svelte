@@ -1,7 +1,7 @@
 <script>
   // Svelte
   import { onMount, setContext } from "svelte";
-  import { params } from "@sveltech/routify";
+  import { params, goto } from "@sveltech/routify";
 
   // FSM
   import { useMachine, useService } from "@/fsm/machineStores.js";
@@ -14,7 +14,14 @@
 
   const { _id } = $params;
 
-  const { workoutState, workoutSend } = useMachine(workoutMachine);
+  const { workoutState, workoutSend } = useMachine(
+    workoutMachine.withConfig({
+      actions: {
+        routeLog: () => $goto("/log"),
+        routeTemplates: () => $goto("/templates")
+      }
+    })
+  );
 
   $: if ($workoutState.children.editWorkout) {
     const { editWorkoutState, editWorkoutSend } = useService(

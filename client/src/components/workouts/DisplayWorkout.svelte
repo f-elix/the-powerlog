@@ -17,7 +17,6 @@
 
   function onEdit() {
     dispatch("edit");
-    // $goto(`/log/${$params._id}/edit`);
   }
 </script>
 

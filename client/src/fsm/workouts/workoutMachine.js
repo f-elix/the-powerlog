@@ -231,7 +231,12 @@ export const workoutMachine = Machine(
 			editing: {
 				invoke: {
 					id: 'editWorkout',
-					src: editWorkoutMachine,
+					src: editWorkoutMachine.withConfig({
+						actions: {
+							routeLog: () => $goto('/log'),
+							routeTemplates: () => $goto('/templates')
+						}
+					}),
 					data: {
 						workout: (context, _) => {
 							return { ...context.workoutData };
