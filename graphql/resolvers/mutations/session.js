@@ -4,7 +4,7 @@ const User = require('../../../models/User');
 const Exercise = require('../../../models/Exercise');
 
 // Utils
-const { createSession } = require('../utils');
+const { createSession, updateExerciseHistory } = require('../utils');
 
 const mutations = {
 	// SESSION MUTATIONS
@@ -40,18 +40,7 @@ const mutations = {
 		session.templateInstructions = sessionData.templateInstructions;
 		const updatedSession = await session.save();
 		// Update exercises history
-		const movements = session.exercises.map(exercise => exercise.movements).flat();
-		for (const movement of movements) {
-			const newHistory = {
-				session,
-				date: session.date,
-				executions: movement.executions
-			};
-			const exerciseId = movement.exercise._id;
-			const exerciseToUpdate = await Exercise.findById(exerciseId);
-			exerciseToUpdate.history.push(newHistory);
-			await exerciseToUpdate.save();
-		}
+		updateExerciseHistory(currentUser.userId, session, sessionData.exercises);
 		// Return session
 		return {
 			...updatedSession._doc,
@@ -78,6 +67,14 @@ const mutations = {
 		const user = await User.findById(currentUser.userId);
 		user.log.pull(sessionId);
 		await user.save();
+		// Update exercises history
+		const movements = session.exercises.map(exercise => exercise.movements).flat();
+		for (const movement of movements) {
+			const exerciseId = movement.exercise._id;
+			const exerciseToUpdate = await Exercise.findById(exerciseId);
+			exerciseToUpdate.history = exerciseToUpdate.history.filter(h => h.session.toString() !== sessionId);
+			await exerciseToUpdate.save();
+		}
 		// Return
 		return true;
 	}

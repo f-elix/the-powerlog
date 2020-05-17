@@ -17,7 +17,7 @@ const mutations = {
 		const exercise = await Exercise.findById(exerciseData._id);
 		// If no exercise found, create one and return it
 		if (!exercise) {
-			return await createExercise(currentUser.userId, exerciseData);
+			return await createExercise(currentUser.userId, exerciseData, false);
 		}
 		// Validate user
 		if (exercise.creator._id.toString() !== currentUser.userId) {

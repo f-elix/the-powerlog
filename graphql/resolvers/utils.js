@@ -20,13 +20,20 @@ exports.signToken = async (userId, email) => {
 	);
 };
 
-exports.createExercise = async (userId, exerciseData) => {
+const createExercise = (exports.createExercise = async (userId, exerciseData, returnDuplicate) => {
 	const user = await User.findById(userId).populate('exercises');
 	const duplicate = user.exercises.find(exercise => {
 		return exercise.name.trim().toLowerCase() === exerciseData.name.trim().toLowerCase();
 	});
 	if (duplicate) {
-		throw new Error('Exercise already exists.');
+		if (returnDuplicate) {
+			return {
+				...duplicate._doc,
+				_id: duplicate._id.toString()
+			};
+		} else {
+			throw new Error(`An exercise with the name "${duplicate.name}" already exists.`);
+		}
 	}
 	const exercise = new Exercise({
 		...exerciseData,
@@ -39,7 +46,31 @@ exports.createExercise = async (userId, exerciseData) => {
 		...newExercise._doc,
 		_id: newExercise._id.toString()
 	};
-};
+});
+
+const updateExerciseHistory = (exports.updateExerciseHistory = async (userId, session, exercises) => {
+	const movements = exercises.map(exercise => exercise.movements).flat();
+	for (const movement of movements) {
+		const newHistory = {
+			session,
+			date: session.date,
+			executions: movement.executions
+		};
+		const exerciseId = movement.exercise._id;
+		let exerciseToUpdate = await Exercise.findById(exerciseId);
+		if (!exerciseToUpdate) {
+			const exerciseData = {
+				_id: exerciseId,
+				name: movement.exercise.name,
+				history: []
+			};
+			const exercise = await createExercise(userId, exerciseData, true);
+			exerciseToUpdate = await Exercise.findById(exercise._id);
+		}
+		exerciseToUpdate.history.push(newHistory);
+		await exerciseToUpdate.save();
+	}
+});
 
 exports.createSession = async (userId, sessionData) => {
 	// Find user
@@ -53,18 +84,8 @@ exports.createSession = async (userId, sessionData) => {
 	user.log.push(newSession);
 	await user.save();
 	// Update exercises history
-	const movements = newSession.exercises.map(exercise => exercise.movements).flat();
-	for (const movement of movements) {
-		const newHistory = {
-			session,
-			date: session.date,
-			executions: movement.executions
-		};
-		const exerciseId = movement.exercise._id;
-		const exerciseToUpdate = await Exercise.findById(exerciseId);
-		exerciseToUpdate.history.push(newHistory);
-		await exerciseToUpdate.save();
-	}
+	updateExerciseHistory(userId, newSession, sessionData.exercises);
+	// Return session
 	return {
 		...newSession._doc,
 		_id: newSession._id.toString()

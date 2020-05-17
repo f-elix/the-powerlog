@@ -1,5 +1,4 @@
 import { Machine, assign, sendParent } from 'xstate';
-// const ObjectID = require('bson-objectid');
 import ObjectID from 'bson-objectid';
 
 const actions = {
