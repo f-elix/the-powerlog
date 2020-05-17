@@ -4,7 +4,7 @@ const User = require('../../../models/User');
 const Exercise = require('../../../models/Exercise');
 
 // Utils
-const { createSession, updateExerciseHistory } = require('../utils');
+const { createSession, updateExerciseHistory, removeFromExerciseHistory } = require('../utils');
 
 const mutations = {
 	// SESSION MUTATIONS
@@ -67,14 +67,8 @@ const mutations = {
 		const user = await User.findById(currentUser.userId);
 		user.log.pull(sessionId);
 		await user.save();
-		// Update exercises history
-		const movements = session.exercises.map(exercise => exercise.movements).flat();
-		for (const movement of movements) {
-			const exerciseId = movement.exercise._id;
-			const exerciseToUpdate = await Exercise.findById(exerciseId);
-			exerciseToUpdate.history = exerciseToUpdate.history.filter(h => h.session.toString() !== sessionId);
-			await exerciseToUpdate.save();
-		}
+		// Remove from exercises history
+		removeFromExerciseHistory(session);
 		// Return
 		return true;
 	}

@@ -72,6 +72,18 @@ const updateExerciseHistory = (exports.updateExerciseHistory = async (userId, se
 	}
 });
 
+exports.removeFromExerciseHistory = async session => {
+	const movements = session.exercises.map(exercise => exercise.movements).flat();
+	for (const movement of movements) {
+		const exerciseId = movement.exercise._id;
+		const exerciseToUpdate = await Exercise.findById(exerciseId);
+		exerciseToUpdate.history = exerciseToUpdate.history.filter(
+			h => h.session.toString() !== session._id.toString()
+		);
+		await exerciseToUpdate.save();
+	}
+};
+
 exports.createSession = async (userId, sessionData) => {
 	// Find user
 	const user = await User.findById(userId);
