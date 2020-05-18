@@ -17,15 +17,14 @@ const ExerciseSchema = new mongoose.Schema({
 					sets: {
 						type: Number
 					},
-					repsOrTime: {
+					reps: {
+						type: Number
+					},
+					time: {
 						amount: Number,
 						unit: String
 					},
-					weight: {
-						amount: Number,
-						unit: String
-					},
-					restTime: {
+					load: {
 						amount: Number,
 						unit: String
 					}

@@ -10,11 +10,14 @@
 
   const { exerciseState, exerciseSend } = useMachine(exerciseMachine(_id));
 
-  $: console.log($exerciseState);
+  $: pr = $exerciseState.context.prDisplay;
 </script>
 
 <style>
 
 </style>
 
-<h1>Exercise {_id} history</h1>
+{#if $exerciseState.matches('idle')}
+  <h1>{$exerciseState.context.exercise.name}</h1>
+  <p>Personnal best: {pr}</p>
+{/if}
