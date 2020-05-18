@@ -1,6 +1,7 @@
 <script>
   // Svelte
   import { createEventDispatcher } from "svelte";
+  import { goto } from "@sveltech/routify";
 
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
@@ -10,6 +11,10 @@
 
   export let exercise;
   export let editService;
+
+  function onSeeHistory() {
+    $goto(`/exercises/${exercise._id}`);
+  }
 
   function onDelete() {
     dispatch("delete", exercise);
@@ -68,8 +73,12 @@
     line-height: 1;
   }
 
-  button.edit {
+  button.history {
     color: var(--color-info);
+  }
+
+  button.edit {
+    color: var(--color-action);
   }
 
   button.delete {
@@ -108,6 +117,12 @@
   {:else}
     <h3>{exercise.name}</h3>
     <div>
+      <!-- History btn -->
+      <button class="history" on:click={onSeeHistory}>
+        <i class="material-icons">bar_chart</i>
+        <span class="screen-reader-text">See history</span>
+        <Ripple />
+      </button>
       <!-- Edit btn -->
       <button class="edit" on:click={onEdit}>
         <i class="material-icons">edit</i>

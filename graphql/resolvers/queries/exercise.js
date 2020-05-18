@@ -24,9 +24,29 @@ const queries = {
 			_id: exercise._id.toString()
 		};
 	},
+	getExerciseHistory: async (_, { exerciseId }, { currentUser }) => {
+		// Find exercise
+		const exercise = await Exercise.findById(exerciseId);
+		if (!exercise) {
+			const error = new Error('Exercise not found.');
+			error.statusCode = 404;
+			throw error;
+		}
+		// Validate user
+		if (exercise.creator.toString() !== currentUser.userId) {
+			const error = new Error('Not authorized.');
+			error.statusCode = 403;
+			throw error;
+		}
+		// Return exercise
+		return {
+			...exercise._doc,
+			_id: exercise._id.toString()
+		};
+	},
 	getExercisesByName: async (_, { name }, { currentUser }) => {
 		// Find user by ID and populate user's exercises
-		const user = await User.findById(currentUser.userId).populate('exercises');
+		const user = await await User.findById(currentUser.userId).populate('exercises');
 		if (!user) {
 			const error = new Error('Your session has ended. Please sign in again.');
 			error.statusCode = 401;

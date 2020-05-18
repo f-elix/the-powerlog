@@ -38,6 +38,7 @@ input ExerciseGroupInput {
 # ROOT
 type Query {
 	getExerciseById(exerciseId: ID!): Exercise
+	getExerciseHistory(exerciseId: ID!): Exercise
 	getExercisesByName(name: String!): [Exercise]
 	getAllExercises: [Exercise]
 }

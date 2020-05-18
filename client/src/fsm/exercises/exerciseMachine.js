@@ -3,15 +3,15 @@ import { getData, getToken } from '@/js/utils.js';
 
 const services = {
 	getExercise: async (context, _) => {
-		const queryName = 'getExerciseById';
+		const queryName = 'getExerciseHistory';
 		const query = {
 			query: `
 				query getExercise($exerciseId: ID!) {
-					getExerciseById(exerciseId: $exerciseId) {
+					getExerciseHistory(exerciseId: $exerciseId) {
 						history {
+							date
 							session {
 								_id
-								date
 							}
 							executions {
 								_id

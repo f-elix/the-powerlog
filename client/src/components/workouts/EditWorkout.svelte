@@ -232,7 +232,7 @@
 
   function onSaveWorkout() {
     editWorkoutSend({
-      type: `SAVE_${workoutType}`.toLocaleUpperCase(),
+      type: `SAVE_${workoutType.toUpperCase()}`,
       params: {
         isNew
       }
