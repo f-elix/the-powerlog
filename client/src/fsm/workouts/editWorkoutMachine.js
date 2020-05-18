@@ -16,6 +16,14 @@ const today = () => {
 	return formattedDate;
 };
 
+const emptyWorkout = {
+	date: today(),
+	name: '',
+	notes: '',
+	instructions: '',
+	exercises: []
+};
+
 const services = {
 	saveTemplate: async (context, _) => {
 		const data = {
@@ -255,10 +263,7 @@ const actions = {
 	resetWorkout: assign({
 		workout: () => {
 			return {
-				date: today(),
-				name: '',
-				notes: '',
-				exercises: []
+				...emptyWorkout
 			};
 		}
 	})
@@ -275,11 +280,7 @@ export const editWorkoutMachine = Machine(
 		id: 'editWorkout',
 		context: {
 			workout: {
-				date: today(),
-				name: '',
-				notes: '',
-				instructions: '',
-				exercises: []
+				...emptyWorkout
 			},
 			editedExercise: null,
 			nameError: '',
