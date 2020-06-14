@@ -18,7 +18,7 @@
   }
 
   function onInput(e) {
-    let option = document.querySelector(`option[value=${e.target.value}]`);
+    let option = document.querySelector(`option[value="${e.target.value}"]`);
     if (!option) return;
     selectedTemplateId = option.dataset.id;
   }
