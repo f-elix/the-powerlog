@@ -203,6 +203,7 @@
   <button
     class="handle"
     on:pointerdown={onDrag}
+    on:touchstart|preventDefault={() => {}}
     class:cursor-grab={!$editWorkoutState.matches('dragging')}>
     <i class="material-icons">reorder</i>
     <span class="screen-reader-text">Re-order</span>
