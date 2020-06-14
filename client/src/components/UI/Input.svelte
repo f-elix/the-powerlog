@@ -57,6 +57,10 @@
     border-top-left-radius: var(--radius-default);
   }
 
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    color: white;
+  }
+
   textarea {
     border: var(--border-thin) var(--color-greyedout);
     border-radius: var(--radius-default);
