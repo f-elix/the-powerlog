@@ -203,9 +203,11 @@
   function onTouchMove(e) {
     const pagex = e.touches[0].pageX;
     const pagey = e.touches[0].pageY;
-    const targetEl = document
-      .elementFromPoint(pagex, pagey)
-      .closest("[data-exercise-id]");
+    const point = document.elementFromPoint(pagex, pagey);
+    let targetEl = null;
+    if (point !== null) {
+      targetEl = point.closest("[data-exercise-id]");
+    }
     if (targetEl) {
       editWorkoutSend({
         type: "ENTER",
