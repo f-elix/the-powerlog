@@ -201,14 +201,14 @@
   }
 
   function onTouchMove(e) {
-    const pagex = e.touches[0].pageX;
-    const pagey = e.touches[0].pageY;
-    const point = document.elementFromPoint(pagex, pagey);
+    const clientx = e.touches[0].clientX;
+    const clienty = e.touches[0].clientY;
+    const point = document.elementFromPoint(clientx, clienty);
     let targetEl = null;
     if (point !== null) {
       targetEl = point.closest("[data-exercise-id]");
     }
-    if (targetEl) {
+    if (targetEl !== null) {
       editWorkoutSend({
         type: "ENTER",
         params: {
@@ -222,13 +222,16 @@
     editWorkoutSend({
       type: "MOVE",
       params: {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY
+        x: clientx,
+        y: clienty
       }
     });
   }
 
-  function onPointerLeave() {
+  function onPointerLeave(e) {
+    if (e.pointerType === "touch") {
+      return;
+    }
     editWorkoutSend({ type: "LEAVE" });
   }
 
