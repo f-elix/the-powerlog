@@ -484,15 +484,15 @@ export const editWorkoutMachine = Machine(
 					outside: {
 						on: {
 							ENTER: {
-								actions: ['updateExerciseOrder', 'updatePointerPosition'],
 								target: 'inside'
 							}
 						}
 					},
 					inside: {
+						entry: ['updateExerciseOrder', 'updatePointerPosition'],
 						on: {
 							LEAVE: {
-								target: 'outside'
+								target: 'outside',
 							}
 						}
 					}
