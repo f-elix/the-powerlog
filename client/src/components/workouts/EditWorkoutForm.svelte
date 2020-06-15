@@ -125,7 +125,7 @@
 <ul class="exercise-list">
   {#each workoutExercises as exercise (exercise._id)}
     <li
-      style={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id ? `transform: translate3d(${x}px, ${y}px, 0px) scale(1.025);` : ''}
+      style={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id ? `transform: scale(1.025) translate3d(${x}px, ${y}px, 0px);` : ''}
       class:dragged={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id}
       data-exercise-id={exercise._id}
       animate:move={{ exercise }}
