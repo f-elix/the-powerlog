@@ -220,15 +220,11 @@ const actions = {
 	forwardToEditedExercise: send((_, event) => event, {
 		to: context => context.editedExercise
 	}),
-	updateDraggedExercise: assign({
-		draggedExercise: (_, event) => event.params.exercise
-	}),
-	clearDraggedExercise: assign({
-		draggedExercise: null
-	}),
-	updatePointer: assign({
+	setDrag: assign({
 		pointerx: (_, event) => event.params.x,
-		pointery: (_, event) => event.params.y
+		pointery: (_, event) => event.params.y,
+		draggedEl: (_, event) => event.params.el,
+		draggedExerciseId: (_, event) => event.params.exerciseId
 	}),
 	updateCoords: assign({
 		x: (context, event) => event.params.x - context.pointerx,
@@ -236,24 +232,37 @@ const actions = {
 	}),
 	updatePointerPosition: assign({
 		pointery: (context, event) => {
-			if (context.y < 0) {
-				return context.pointery - event.params.elHeight;
+			const elHeight = context.draggedEl.offsetHeight;
+			const hoveredElHeight = event.params.hoveredEl.offsetHeight;
+			const offset = (elHeight / 2) + (hoveredElHeight / 2);
+			const pointery = context.pointery;
+			let updatedPointery;
+			if (event.params.direction === 'previous') {
+				updatedPointery = pointery - offset;
 			} else {
-				return context.pointery + event.params.elHeight;
+				updatedPointery = pointery + offset;
 			}
+			// if (updatedPointery < elHeight) {
+			// 	window.scrollTo({
+			// 		top: window.scrollY - elHeight,
+			// 		behavior: 'smooth'
+			// 	});
+			// }
+			return updatedPointery;
 		}
 	}),
 	clearDragging: assign({
 		x: 0,
 		y: 0,
 		pointerx: 0,
-		pointery: 0
+		pointery: 0,
+		draggedExerciseId: null
 	}),
 	updateExerciseOrder: assign({
 		workout: (context, event) => {
 			const updatedWorkout = context.workout;
 			const draggedExerciseIndex = context.workout.exercises.findIndex(
-				e => e._id === context.draggedExercise._id
+				e => e._id === context.draggedExerciseId
 			);
 			const hoveredExerciseIndex = context.workout.exercises.findIndex(e => e._id === event.params.exerciseId);
 			updatedWorkout.exercises = reorder(context.workout.exercises, draggedExerciseIndex, hoveredExerciseIndex);
@@ -284,8 +293,8 @@ export const editWorkoutMachine = Machine(
 			},
 			editedExercise: null,
 			nameError: '',
-			draggedExercise: null,
-			hoveredExercise: null,
+			draggedExerciseId: null,
+			draggedEl: null,
 			x: 0,
 			y: 0,
 			pointerx: 0,
@@ -478,7 +487,7 @@ export const editWorkoutMachine = Machine(
 				})
 			},
 			dragging: {
-				entry: ['updatePointer', 'updateDraggedExercise'],
+				entry: ['setDrag'],
 				initial: 'outside',
 				states: {
 					outside: {
@@ -492,7 +501,7 @@ export const editWorkoutMachine = Machine(
 						entry: ['updateExerciseOrder', 'updatePointerPosition'],
 						on: {
 							LEAVE: {
-								target: 'outside',
+								target: 'outside'
 							}
 						}
 					}
@@ -506,7 +515,7 @@ export const editWorkoutMachine = Machine(
 						target: 'editing'
 					}
 				},
-				exit: ['clearDragging', 'clearDraggedExercise']
+				exit: ['clearDragging']
 			},
 			saving: {
 				initial: 'session',
