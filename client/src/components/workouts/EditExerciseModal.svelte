@@ -1,18 +1,22 @@
 <script>
   // Svelte
-  import { createEventDispatcher } from "svelte";
+  import { getContext } from "svelte";
 
   // Components
   import Input from "@/components/UI/Input.svelte";
   import Ripple from "@/components/UI/Ripple.svelte";
   import EditFormModalLayout from "./EditFormModalLayout.svelte";
 
-  const dispatch = createEventDispatcher();
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
   export let exercises;
-  export let isEditing = false;
-  export let editedExercise;
-  export let exerciseError = "";
+
+  let editedExercise = $editWorkoutState.context.editedExercise
+    ? $editWorkoutState.context.editedExercise.state.context.workoutExercise
+    : null;
+  let exerciseError = $editWorkoutState.context.editedExercise
+    ? $editWorkoutState.context.editedExercise.state.context.exerciseError
+    : "";
 
   function onInput(e, id) {
     let exercise;
@@ -24,23 +28,33 @@
         name: e.target.value
       };
     }
-    dispatch("exerciseinput", { movementId: id, exercise });
+    editWorkoutSend({
+      type: "EXERCISE_INPUT",
+      params: { movementId: id, exercise }
+    });
   }
 
   function onAddMovement() {
-    dispatch("addmovement");
+    editWorkoutSend({ type: "ADD_MOVEMENT" });
   }
 
   function onDeleteMovement(movementId) {
-    dispatch("deletemovement", movementId);
+    editWorkoutSend({
+      type: "DELETE_MOVEMENT",
+      params: {
+        movementId
+      }
+    });
   }
 
   function onCancel() {
-    dispatch("cancel");
+    editWorkoutSend({ type: "CANCEL" });
   }
 
   function onSave() {
-    dispatch("save");
+    editWorkoutSend({
+      type: "SAVE_EXERCISE"
+    });
   }
 </script>
 
@@ -96,7 +110,9 @@
 </style>
 
 <EditFormModalLayout on:cancel={onCancel} on:submit={onSave}>
-  <h2>{isEditing ? 'Edit' : 'Add'} Exercise</h2>
+  <h2>
+    {$editWorkoutState.matches('exercise.editing') ? 'Edit' : 'Add'} Exercise
+  </h2>
   {#if exerciseError}
     <p class="error-message">{exerciseError}</p>
   {/if}

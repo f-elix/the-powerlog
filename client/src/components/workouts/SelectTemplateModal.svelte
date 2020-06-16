@@ -1,20 +1,20 @@
 <script>
   // Svelte
-  import { createEventDispatcher } from "svelte";
+  import { getContext } from "svelte";
 
   // Components
   import Input from "@/components/UI/Input.svelte";
   import Ripple from "@/components/UI/Ripple.svelte";
   import EditFormModalLayout from "./EditFormModalLayout.svelte";
 
-  const dispatch = createEventDispatcher();
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
   export let templates;
 
   let selectedTemplateId;
 
   function onCancel() {
-    dispatch("cancel");
+    editWorkoutSend({ type: "CANCEL" });
   }
 
   function onInput(e) {
@@ -24,7 +24,12 @@
   }
 
   function onSelectTemplate() {
-    dispatch("selecttemplate", selectedTemplateId);
+    editWorkoutSend({
+      type: "SELECT",
+      params: {
+        templateId: selectedTemplateId
+      }
+    });
   }
 </script>
 

@@ -1,6 +1,6 @@
 <script>
   // svelte
-  import { createEventDispatcher, getContext } from "svelte";
+  import { getContext } from "svelte";
   import { flip } from "svelte/animate";
   import { fly } from "svelte/transition";
 
@@ -9,64 +9,30 @@
   import Button from "@/components/UI/Button.svelte";
   import EditWorkoutCardExercise from "./EditWorkoutCardExercise.svelte";
 
-  const dispatch = createEventDispatcher();
-
-  const { editWorkoutState } = getContext("editWorkout");
-
-  export let workoutType;
-  export let workoutDate = null;
-  export let workoutName;
-  export let workoutNotes;
-  export let workoutInstructions;
-  export let workoutTemplateInstructions;
-  export let workoutExercises;
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
   const types = {
     session: "session",
     template: "template"
   };
 
-  $: draggedExercise = $editWorkoutState.context.draggedExercise;
+  export let workoutType;
+  $: workoutDate = $editWorkoutState.context.workout.date;
+  $: workoutName = $editWorkoutState.context.workout.name;
+  $: workoutNotes = $editWorkoutState.context.workout.notes;
+  $: workoutInstructions = $editWorkoutState.context.workout.instructions;
+  $: workoutTemplateInstructions =
+    $editWorkoutState.context.workout.templateInstructions;
+  $: workoutExercises = $editWorkoutState.context.workout.exercises;
+  $: draggedExerciseId = $editWorkoutState.context.draggedExerciseId;
   $: x = $editWorkoutState.context.x;
   $: y = $editWorkoutState.context.y;
-
-  function onDateInput(e) {
-    dispatch("dateinput", e.target.value);
-  }
-
-  function onNameInput(e) {
-    dispatch("nameinput", e.target.value);
-  }
-
-  function onNotesInput(e) {
-    dispatch("notesinput", e.target.value);
-  }
-
-  function onInstructionsInput(e) {
-    dispatch("instructionsinput", e.target.value);
-  }
-
-  function onAddExercise() {
-    dispatch("addexercise");
-  }
-
-  function onUseTemplate() {
-    dispatch("usetemplate");
-  }
-
-  function onPointerEnter(e, exercise) {
-    const elHeight = e.currentTarget.offsetHeight;
-    dispatch("pointerenter", {
-      exerciseId: exercise._id,
-      elHeight
-    });
-  }
 
   function move(node, animation, params) {
     const { exercise } = params;
     if (
       $editWorkoutState.matches("dragging") &&
-      draggedExercise._id === exercise._id
+      draggedExerciseId === exercise._id
     ) {
       return {
         easing: _ => 0
@@ -74,6 +40,33 @@
     }
 
     return flip(node, animation, { duration: 200 });
+  }
+
+  function onDateInput(e) {
+    editWorkoutSend({ type: "DATE_INPUT", params: { value: e.target.value } });
+  }
+
+  function onNameInput(e) {
+    editWorkoutSend({ type: "NAME_INPUT", params: { value: e.target.value } });
+  }
+
+  function onNotesInput(e) {
+    editWorkoutSend({ type: "NOTES_INPUT", params: { value: e.target.value } });
+  }
+
+  function onInstructionsInput(e) {
+    editWorkoutSend({
+      type: "INSTRUCTIONS_INPUT",
+      params: { value: e.detail }
+    });
+  }
+
+  function onUseTemplate() {
+    editWorkoutSend({ type: "USE_TEMPLATE" });
+  }
+
+  function onAddExercise() {
+    editWorkoutSend({ type: "ADD_EXERCISE" });
   }
 </script>
 
@@ -125,14 +118,12 @@
 <ul class="exercise-list">
   {#each workoutExercises as exercise (exercise._id)}
     <li
-      style={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id ? `transform: scale(1.025) translate3d(${x}px, ${y}px, 0px);` : ''}
-      class:dragged={$editWorkoutState.matches('dragging') && draggedExercise._id === exercise._id}
+      style={$editWorkoutState.matches('dragging') && draggedExerciseId === exercise._id ? `transform: scale(1.025) translate3d(${x}px, ${y}px, 0px);` : ''}
+      class:dragged={$editWorkoutState.matches('dragging') && draggedExerciseId === exercise._id}
       data-exercise-id={exercise._id}
       animate:move={{ exercise }}
       in:fly|local={{ x: 30 }}
-      out:fly|local={{ x: 30, duration: 200 }}
-      on:pointerenter={e => onPointerEnter(e, exercise)}
-      on:pointerleave>
+      out:fly|local={{ x: 30, duration: 200 }}>
       <EditWorkoutCardExercise
         {exercise}
         on:editexercise

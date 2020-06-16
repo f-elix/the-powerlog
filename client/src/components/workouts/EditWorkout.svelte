@@ -29,13 +29,6 @@
   export let isNew = true;
   export let workoutType = "session";
 
-  $: workoutDate = $editWorkoutState.context.workout.date;
-  $: workoutName = $editWorkoutState.context.workout.name;
-  $: workoutNotes = $editWorkoutState.context.workout.notes;
-  $: workoutInstructions = $editWorkoutState.context.workout.instructions;
-  $: workoutTemplateInstructions =
-    $editWorkoutState.context.workout.templateInstructions;
-  $: workoutExercises = $editWorkoutState.context.workout.exercises;
   $: exercises = $exercisesState.context.exercises;
   $: templates = $templatesState.context.templates;
   $: if ($editWorkoutState.matches("dragging")) {
@@ -44,146 +37,10 @@
     delete document.body.dataset.state;
   }
 
-  function onDateInput(e) {
-    editWorkoutSend({ type: "DATE_INPUT", params: { value: e.detail } });
-  }
-
-  function onNameInput(e) {
-    editWorkoutSend({ type: "NAME_INPUT", params: { value: e.detail } });
-  }
-
-  function onNotesInput(e) {
-    editWorkoutSend({ type: "NOTES_INPUT", params: { value: e.detail } });
-  }
-
-  function onInstructionsInput(e) {
-    editWorkoutSend({
-      type: "INSTRUCTIONS_INPUT",
-      params: { value: e.detail }
-    });
-  }
-
-  function onUseTemplate() {
-    editWorkoutSend({ type: "USE_TEMPLATE" });
-  }
-
-  function onSelectTemplateCancel() {
-    editWorkoutSend({ type: "CANCEL" });
-  }
-
-  function onSelectTemplate(e) {
-    editWorkoutSend({
-      type: "SELECT",
-      params: {
-        templateId: e.detail
-      }
-    });
-  }
-
-  function onAddWorkoutExercise() {
-    editWorkoutSend({ type: "ADD_EXERCISE" });
-  }
-
-  function onEditWorkoutExercise(e) {
-    editWorkoutSend({
-      type: "EDIT_EXERCISE",
-      params: {
-        exercise: e.detail
-      }
-    });
-  }
-
-  function onSaveWorkoutExercise(e) {
-    editWorkoutSend({
-      type: "SAVE_EXERCISE",
-      params: {
-        exercise: e.detail
-      }
-    });
-  }
-
-  function onDeleteWorkoutExercise(e) {
-    editWorkoutSend({
-      type: "DELETE_EXERCISE",
-      params: {
-        exerciseId: e.detail
-      }
-    });
-  }
-
-  function onAddMovement() {
-    editWorkoutSend({ type: "ADD_MOVEMENT" });
-  }
-
-  function onDeleteMovement(e) {
-    editWorkoutSend({
-      type: "DELETE_MOVEMENT",
-      params: {
-        movementId: e.detail
-      }
-    });
-  }
-
-  function onExerciseInput(e) {
-    editWorkoutSend({
-      type: "EXERCISE_INPUT",
-      params: e.detail
-    });
-  }
-
-  function onAddExecution(e) {
-    editWorkoutSend({
-      type: "ADD_EXECUTION",
-      params: e.detail
-    });
-  }
-
-  function onDeleteExecution(e) {
-    editWorkoutSend({
-      type: "DELETE_EXECUTION",
-      params: e.detail
-    });
-  }
-
-  function onEditExecution(e) {
-    editWorkoutSend({
-      type: "EDIT_EXECUTION",
-      params: e.detail
-    });
-  }
-
-  function onSaveExecution(e) {
-    editWorkoutSend({
-      type: "SAVE_EXECUTION",
-      params: {
-        executionData: e.detail
-      }
-    });
-  }
-
-  function onAddCancel() {
-    editWorkoutSend({ type: "CANCEL" });
-  }
-
-  function onDrag(e) {
-    editWorkoutSend({
-      type: "DRAG",
-      params: {
-        exercise: e.detail.exercise,
-        x: e.detail.x,
-        y: e.detail.y
-      }
-    });
-  }
-
-  function onPointerEnter(e) {
-    editWorkoutSend({
-      type: "ENTER",
-      params: {
-        exerciseId: e.detail.exerciseId,
-        elHeight: e.detail.elHeight
-      }
-    });
+  function isAbove(nodeA, nodeB) {
+    const rectA = nodeA.getBoundingClientRect();
+    const rectB = nodeB.getBoundingClientRect();
+    return rectA.top + rectA.height / 2 < rectB.bottom;
   }
 
   function onDrop() {
@@ -198,6 +55,37 @@
         y: e.clientY
       }
     });
+    const el = $editWorkoutState.context.draggedEl;
+    if (!el) {
+      return;
+    }
+    const prevEl = el.previousElementSibling;
+    const nextEl = el.nextElementSibling;
+    if (prevEl && isAbove(el, prevEl)) {
+      const prevExerciseId = prevEl.closest("[data-exercise-id]").dataset
+        .exerciseId;
+      editWorkoutSend({
+        type: "ENTER",
+        params: {
+          exerciseId: prevExerciseId,
+          hoveredEl: prevEl,
+          direction: "previous"
+        }
+      });
+    } else if (nextEl && isAbove(nextEl, el)) {
+      const nextExerciseId = nextEl.closest("[data-exercise-id]").dataset
+        .exerciseId;
+      editWorkoutSend({
+        type: "ENTER",
+        params: {
+          exerciseId: nextExerciseId,
+          hoveredEl: nextEl,
+          direction: "next"
+        }
+      });
+    } else {
+      editWorkoutSend({ type: "LEAVE" });
+    }
   }
 
   function onTouchMove(e) {
@@ -226,13 +114,6 @@
         y: clienty
       }
     });
-  }
-
-  function onPointerLeave(e) {
-    if (e.pointerType === "touch") {
-      return;
-    }
-    editWorkoutSend({ type: "LEAVE" });
   }
 
   function onSaveWorkout() {
@@ -273,7 +154,7 @@
   on:pointerup={onDrop}
   on:touchend={onDrop}
   on:pointermove={onMove}
-  on:touchmove={onTouchMove} />
+  on:touchmove={onMove} />
 
 <div
   in:fly|local={{ x: 30, duration: 200 }}
@@ -286,56 +167,18 @@
       <!-- Header -->
       <h1>{isNew ? 'Creating' : 'Editing'} {workoutType}...</h1>
       <!-- Workout form -->
-      <EditWorkoutForm
-        {workoutType}
-        {workoutExercises}
-        {workoutDate}
-        {workoutName}
-        {workoutNotes}
-        {workoutInstructions}
-        {workoutTemplateInstructions}
-        on:dateinput={onDateInput}
-        on:nameinput={onNameInput}
-        on:notesinput={onNotesInput}
-        on:instructionsinput={onInstructionsInput}
-        on:usetemplate={onUseTemplate}
-        on:addexercise={onAddWorkoutExercise}
-        on:editexercise={onEditWorkoutExercise}
-        on:deleteexercise={onDeleteWorkoutExercise}
-        on:addexecution={onAddExecution}
-        on:editexecution={onEditExecution}
-        on:deleteexecution={onDeleteExecution}
-        on:drag={onDrag}
-        on:pointerenter={onPointerEnter}
-        on:pointerleave={onPointerLeave} />
+      <EditWorkoutForm {workoutType} />
       <!-- Template selection modal -->
       {#if $editWorkoutState.matches('selectingtemplate')}
-        <SelectTemplateModal
-          {templates}
-          on:cancel={onSelectTemplateCancel}
-          on:selecttemplate={onSelectTemplate} />
+        <SelectTemplateModal {templates} />
       {/if}
       <!-- Edit exercise modal -->
       {#if $editWorkoutState.matches('exercise')}
-        <EditExerciseModal
-          {exercises}
-          isEditing={$editWorkoutState.matches('exercise.editing')}
-          editedExercise={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.workoutExercise : null}
-          exerciseError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.exerciseError : ''}
-          on:exerciseinput={onExerciseInput}
-          on:addmovement={onAddMovement}
-          on:deletemovement={onDeleteMovement}
-          on:cancel={onAddCancel}
-          on:save={onSaveWorkoutExercise} />
+        <EditExerciseModal {exercises} />
       {/if}
       <!-- Edit execution modal -->
       {#if $editWorkoutState.matches('execution')}
-        <EditExecutionModal
-          on:cancel={onAddCancel}
-          on:save={onSaveExecution}
-          executionError={$editWorkoutState.context.editedExercise ? $editWorkoutState.context.editedExercise.state.context.executionError : ''}
-          editedExecution={$editWorkoutState.context.editedExercise.state.context.execution}
-          exerciseName={$editWorkoutState.context.editedExercise.state.context.movement.exercise.name} />
+        <EditExecutionModal />
       {/if}
       <!-- Workout buttons -->
       <div class="actions">

@@ -1,42 +1,64 @@
 <script>
   // Svelte
-  import { createEventDispatcher, getContext } from "svelte";
+  import { getContext } from "svelte";
 
   // Components
   import Ripple from "@/components/UI/Ripple.svelte";
   import Button from "@/components/UI/Button.svelte";
 
-  const dispatch = createEventDispatcher();
-
-  const { editWorkoutState } = getContext("editWorkout");
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
   export let exercise;
 
   function onEditExercise() {
-    dispatch("editexercise", exercise);
+    editWorkoutSend({
+      type: "EDIT_EXERCISE",
+      params: {
+        exercise
+      }
+    });
   }
 
   function onDeleteExercise() {
-    dispatch("deleteexercise", exercise._id);
+    editWorkoutSend({
+      type: "DELETE_EXERCISE",
+      params: {
+        exerciseId: exercise._id
+      }
+    });
   }
 
   function onAddExecution(movement) {
-    dispatch("addexecution", { exercise, movement });
+    editWorkoutSend({
+      type: "ADD_EXECUTION",
+      params: { exercise, movement }
+    });
   }
 
   function onEditExecution(movement, execution) {
-    dispatch("editexecution", { exercise, movement, execution });
+    editWorkoutSend({
+      type: "EDIT_EXECUTION",
+      params: { exercise, movement, execution }
+    });
   }
 
   function onDeleteExecution(movement, execution) {
-    dispatch("deleteexecution", { exercise, movement, execution });
+    editWorkoutSend({
+      type: "DELETE_EXECUTION",
+      params: { exercise, movement, execution }
+    });
   }
 
   function onDrag(e) {
-    dispatch("drag", {
-      exercise,
-      x: e.clientX,
-      y: e.clientY
+    const el = e.target.closest("[data-exercise-id]");
+    editWorkoutSend({
+      type: "DRAG",
+      params: {
+        exerciseId: exercise._id,
+        x: e.clientX,
+        y: e.clientY,
+        el
+      }
     });
   }
 </script>
@@ -155,7 +177,6 @@
     {#each exercise.movements as movement}
       <p class="movement-name">
         <span>{movement.exercise.name}</span>
-
       </p>
       {#each movement.executions as execution, i}
         <div class="set-ctn">

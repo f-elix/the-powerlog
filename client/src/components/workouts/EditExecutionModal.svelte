@@ -1,6 +1,6 @@
 <script>
   // Svelte
-  import { createEventDispatcher } from "svelte";
+  import { getContext } from "svelte";
 
   //FSM
   import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
@@ -11,11 +11,16 @@
   import Select from "@/components/UI/Select.svelte";
   import EditFormModalLayout from "./EditFormModalLayout.svelte";
 
-  const dispatch = createEventDispatcher();
+  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
-  export let exerciseName;
-  export let editedExecution;
-  export let executionError = "";
+  let exerciseName =
+    $editWorkoutState.context.editedExercise.state.context.movement.exercise
+      .name;
+  let editedExecution =
+    $editWorkoutState.context.editedExercise.state.context.execution;
+  let executionError = $editWorkoutState.context.editedExercise
+    ? $editWorkoutState.context.editedExercise.state.context.executionError
+    : "";
 
   const options = {
     reps: "Reps",
@@ -53,7 +58,7 @@
   }
 
   function onCancel() {
-    dispatch("cancel");
+    editWorkoutSend({ type: "CANCEL" });
   }
 
   function onDone() {
@@ -71,7 +76,12 @@
     if (editedExecution) {
       newExecution._id = editedExecution._id;
     }
-    dispatch("save", newExecution);
+    editWorkoutSend({
+      type: "SAVE_EXECUTION",
+      params: {
+        executionData: newExecution
+      }
+    });
   }
 </script>
 
