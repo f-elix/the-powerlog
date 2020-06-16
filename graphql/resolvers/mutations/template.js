@@ -30,6 +30,15 @@ const mutations = {
 			error.statusCode = 403;
 			throw error;
 		}
+		// Create exercises if they don't already exist
+		const movements = templateData.exercises.map(exercise => exercise.movements).flat();
+		for (const movement of movements) {
+			const exerciseData = {
+				_id: movement.exercise._id,
+				name: movement.exercise.name
+			};
+			await createExercise(userId, exerciseData, true);
+		}
 		// Update template
 		template.name = templateData.name;
 		template.exercises = templateData.exercises;
