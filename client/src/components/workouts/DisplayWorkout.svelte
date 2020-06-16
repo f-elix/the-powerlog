@@ -57,6 +57,16 @@
     margin: 0;
   }
 
+  .execution .sets {
+    display: flex;
+    justify-content: space-between;
+    flex-basis: 40%;
+  }
+
+  .execution .load {
+    flex-basis: 35%;
+  }
+
   .execution .bold {
     font-weight: bold;
   }
@@ -93,18 +103,20 @@
             <div class="executions">
               {#each movement.executions as execution (execution._id)}
                 <p class="execution">
-                  <span class="bold">{execution.sets}</span>
-                  <span>x</span>
-                  {#if execution.reps}
-                    <span class="bold">{execution.reps}</span>
-                  {:else}
-                    <span class="bold">{execution.time.amount}</span>
-                    <span class="bold">
-                      {execution.time.unit.toLowerCase()}
-                    </span>
-                  {/if}
+                  <span class="sets">
+                    <span class="bold">{execution.sets}</span>
+                    <span>x</span>
+                    {#if execution.reps}
+                      <span class="bold">{execution.reps}</span>
+                    {:else}
+                      <span class="bold">{execution.time.amount}</span>
+                      <span class="bold">
+                        {execution.time.unit.toLowerCase()}
+                      </span>
+                    {/if}
+                  </span>
                   <span>|</span>
-                  <span class="bold">
+                  <span class="load bold">
                     {execution.load.amount} {execution.load.unit.toLowerCase()}
                   </span>
                 </p>
