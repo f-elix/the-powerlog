@@ -59,6 +59,7 @@
   }
 
   h3 {
+    flex-basis: 60%;
     margin: 0;
   }
 
