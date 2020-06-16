@@ -10,6 +10,8 @@
 
   export let exercise;
 
+  $: console.log(exercise);
+
   function onEditExercise() {
     editWorkoutSend({
       type: "EDIT_EXERCISE",
@@ -183,7 +185,7 @@
           <p class="set">
             <span>{execution.sets}</span>
             <span>x</span>
-            {#if execution.reps}
+            {#if execution.reps !== undefined}
               <span>{execution.reps}</span>
             {:else}
               <span>{execution.time.amount}</span>
