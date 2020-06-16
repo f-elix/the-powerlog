@@ -13,7 +13,7 @@ type Session {
 }
 
 type Bodyweight {
-	amount: Int
+	amount: Float
 	unit: String
 }
 
@@ -30,19 +30,19 @@ type Movement {
 
 type Execution {
 	_id: ID
-	sets: Int
-	reps: Int
+	sets: Float
+	reps: Float
 	time: Time
 	load: Load
 }
 
 type Time {
-	amount: Int
+	amount: Float
 	unit: String
 }
 
 type Load {
-	amount: Int
+	amount: Float
 	unit: String
 }
 
@@ -58,7 +58,7 @@ input SessionInput {
 }
 
 input BodyweightInput {
-	amount: Int
+	amount: Float
 	unit: String
 }
 
@@ -75,19 +75,19 @@ input MovementInput {
 
 input ExecutionInput {
 	_id: ID
-	sets: Int
-	reps: Int
+	sets: Float
+	reps: Float
 	time: TimeInput
 	load: LoadInput
 }
 
 input TimeInput {
-	amount: Int
+	amount: Float
 	unit: String
 }
 
 input LoadInput {
-	amount: Int
+	amount: Float
 	unit: String
 }
 
