@@ -10,8 +10,6 @@
 
   export let exercise;
 
-  $: console.log(exercise);
-
   function onEditExercise() {
     editWorkoutSend({
       type: "EDIT_EXERCISE",
