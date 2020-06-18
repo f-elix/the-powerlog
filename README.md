@@ -6,7 +6,7 @@ A simple strength training log PWA, perfect for tracking workouts.
 
 ### Client side
 
--   Svelte / Sapper
+-   Svelte / Routify
 -   XState
 
 ### Server side
