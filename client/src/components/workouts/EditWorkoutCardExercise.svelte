@@ -51,13 +51,17 @@
 
   function onDrag(e) {
     const el = e.target.closest("[data-exercise-id]");
+    const draggedIndex = +el.dataset.index;
+    const draggedElHeight = el.offsetHeight;
+    const draggedId = el.dataset.exerciseId;
     editWorkoutSend({
       type: "DRAG",
       params: {
-        exerciseId: exercise._id,
+        draggedIndex,
+        draggedElHeight,
+        draggedId,
         x: e.clientX,
-        y: e.clientY,
-        el
+        y: e.clientY
       }
     });
   }

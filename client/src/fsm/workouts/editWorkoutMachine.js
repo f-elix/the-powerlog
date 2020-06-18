@@ -223,32 +223,26 @@ const actions = {
 	setDrag: assign({
 		pointerx: (_, event) => event.params.x,
 		pointery: (_, event) => event.params.y,
-		draggedEl: (_, event) => event.params.el,
-		draggedExerciseId: (_, event) => event.params.exerciseId
+		draggedIndex: (_, event) => event.params.draggedIndex,
+		draggedElHeight: (_, event) => event.params.draggedElHeight,
+		draggedId: (_, event) => event.params.draggedId
 	}),
 	updateCoords: assign({
 		x: (context, event) => event.params.x - context.pointerx,
 		y: (context, event) => event.params.y - context.pointery
 	}),
+	updateScroll: (context, _) => {
+		// if (context.y < window.offsetTop + 50) {
+		// 	window.scrollTo(window.scrollTop - 50, {
+		// 		behavior: 'smooth'
+		// 	});
+		// }
+	},
 	updatePointerPosition: assign({
-		pointery: (context, event) => {
-			const elHeight = context.draggedEl.offsetHeight;
-			const hoveredElHeight = event.params.hoveredEl.offsetHeight;
-			const offset = (elHeight / 2) + (hoveredElHeight / 2);
-			const pointery = context.pointery;
-			let updatedPointery;
-			if (event.params.direction === 'previous') {
-				updatedPointery = pointery - offset;
-			} else {
-				updatedPointery = pointery + offset;
-			}
-			// if (updatedPointery < elHeight) {
-			// 	window.scrollTo({
-			// 		top: window.scrollY - elHeight,
-			// 		behavior: 'smooth'
-			// 	});
-			// }
-			return updatedPointery;
+		pointery: (_, event) => {
+			const hoveredElTop = event.params.hoveredElTop;
+			const hoveredElHeight = event.params.hoveredElHeight;
+			return hoveredElTop + (hoveredElHeight / 2);
 		}
 	}),
 	clearDragging: assign({
@@ -256,18 +250,19 @@ const actions = {
 		y: 0,
 		pointerx: 0,
 		pointery: 0,
-		draggedExerciseId: null
+		draggedIndex: null,
+		draggedElHeight: null,
+		draggedId: null
 	}),
 	updateExerciseOrder: assign({
 		workout: (context, event) => {
 			const updatedWorkout = context.workout;
-			const draggedExerciseIndex = context.workout.exercises.findIndex(
-				e => e._id === context.draggedExerciseId
-			);
-			const hoveredExerciseIndex = context.workout.exercises.findIndex(e => e._id === event.params.exerciseId);
-			updatedWorkout.exercises = reorder(context.workout.exercises, draggedExerciseIndex, hoveredExerciseIndex);
+			const draggedIndex = context.draggedIndex;
+			const hoveredIndex = event.params.hoveredIndex;
+			updatedWorkout.exercises = reorder(context.workout.exercises, draggedIndex, hoveredIndex);
 			return updatedWorkout;
-		}
+		},
+		draggedIndex: (_, event) => event.params.hoveredIndex
 	}),
 	resetWorkout: assign({
 		workout: () => {
@@ -293,8 +288,9 @@ export const editWorkoutMachine = Machine(
 			},
 			editedExercise: null,
 			nameError: '',
-			draggedExerciseId: null,
-			draggedEl: null,
+			draggedIndex: null,
+			draggedId: null,
+			draggedElHeight: null,
 			x: 0,
 			y: 0,
 			pointerx: 0,
@@ -493,12 +489,13 @@ export const editWorkoutMachine = Machine(
 					outside: {
 						on: {
 							ENTER: {
-								target: 'inside'
+								target: 'inside',
+								actions: ['updateHoveredEl']
 							}
 						}
 					},
 					inside: {
-						entry: ['updateExerciseOrder', 'updatePointerPosition'],
+						entry: ['updatePointerPosition', 'updateExerciseOrder'],
 						on: {
 							LEAVE: {
 								target: 'outside'
@@ -509,7 +506,7 @@ export const editWorkoutMachine = Machine(
 				on: {
 					MOVE: {
 						internal: true,
-						actions: ['updateCoords']
+						actions: ['updateCoords', 'updateScroll']
 					},
 					DROP: {
 						target: 'editing'

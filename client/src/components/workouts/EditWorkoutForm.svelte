@@ -24,22 +24,21 @@
   $: workoutTemplateInstructions =
     $editWorkoutState.context.workout.templateInstructions;
   $: workoutExercises = $editWorkoutState.context.workout.exercises;
-  $: draggedExerciseId = $editWorkoutState.context.draggedExerciseId;
+  $: draggedExerciseId = $editWorkoutState.context.draggedId;
   $: x = $editWorkoutState.context.x;
   $: y = $editWorkoutState.context.y;
 
   function move(node, animation, params) {
-    const { exercise } = params;
+    const { exerciseId } = params;
     if (
       $editWorkoutState.matches("dragging") &&
-      draggedExerciseId === exercise._id
+      draggedExerciseId === exerciseId
     ) {
       return {
         easing: _ => 0
       };
     }
-
-    return flip(node, animation, { duration: 200 });
+    return flip(node, animation, { duration: 100 });
   }
 
   function onDateInput(e) {
@@ -116,22 +115,16 @@
   value={workoutName} />
 <!-- Exercises list -->
 <ul class="exercise-list">
-  {#each workoutExercises as exercise (exercise._id)}
+  <!-- animate:move={{ exerciseId: exercise._id }} -->
+  {#each workoutExercises as exercise, index (exercise._id)}
     <li
       style={$editWorkoutState.matches('dragging') && draggedExerciseId === exercise._id ? `transform: scale(1.025) translate3d(${x}px, ${y}px, 0px);` : ''}
       class:dragged={$editWorkoutState.matches('dragging') && draggedExerciseId === exercise._id}
       data-exercise-id={exercise._id}
-      animate:move={{ exercise }}
+      data-index={index}
       in:fly|local={{ x: 30 }}
       out:fly|local={{ x: 30, duration: 200 }}>
-      <EditWorkoutCardExercise
-        {exercise}
-        on:editexercise
-        on:deleteexercise
-        on:addexecution
-        on:editexecution
-        on:deleteexecution
-        on:drag />
+      <EditWorkoutCardExercise {exercise} />
     </li>
   {/each}
 </ul>

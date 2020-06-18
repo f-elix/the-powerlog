@@ -37,17 +37,12 @@
     delete document.body.dataset.state;
   }
 
-  function isAbove(nodeA, nodeB) {
-    const rectA = nodeA.getBoundingClientRect();
-    const rectB = nodeB.getBoundingClientRect();
-    return rectA.top + rectA.height / 2 < rectB.bottom;
-  }
-
   function onDrop() {
     editWorkoutSend({ type: "DROP" });
   }
 
   function onMove(e) {
+    e = e.touches ? e.touches[0] : e;
     editWorkoutSend({
       type: "MOVE",
       params: {
@@ -55,65 +50,29 @@
         y: e.clientY
       }
     });
-    const el = $editWorkoutState.context.draggedEl;
+    const el = document.querySelector(
+      `[data-exercise-id="${$editWorkoutState.context.draggedId}"]`
+    );
     if (!el) {
       return;
     }
-    const prevEl = el.previousElementSibling;
-    const nextEl = el.nextElementSibling;
-    if (prevEl && isAbove(el, prevEl)) {
-      const prevExerciseId = prevEl.closest("[data-exercise-id]").dataset
-        .exerciseId;
+    const hoveredEl = document
+      .elementFromPoint(e.clientX, e.clientY)
+      .closest("[data-exercise-id]");
+    if (hoveredEl) {
+      const exerciseId = hoveredEl.dataset.exerciseId;
       editWorkoutSend({
         type: "ENTER",
         params: {
-          exerciseId: prevExerciseId,
-          hoveredEl: prevEl,
-          direction: "previous"
-        }
-      });
-    } else if (nextEl && isAbove(nextEl, el)) {
-      const nextExerciseId = nextEl.closest("[data-exercise-id]").dataset
-        .exerciseId;
-      editWorkoutSend({
-        type: "ENTER",
-        params: {
-          exerciseId: nextExerciseId,
-          hoveredEl: nextEl,
-          direction: "next"
+          exerciseId,
+          hoveredElHeight: hoveredEl.offsetHeight,
+          hoveredElTop: hoveredEl.getBoundingClientRect().top,
+          hoveredIndex: +hoveredEl.dataset.index
         }
       });
     } else {
       editWorkoutSend({ type: "LEAVE" });
     }
-  }
-
-  function onTouchMove(e) {
-    const clientx = e.touches[0].clientX;
-    const clienty = e.touches[0].clientY;
-    const point = document.elementFromPoint(clientx, clienty);
-    let targetEl = null;
-    if (point !== null) {
-      targetEl = point.closest("[data-exercise-id]");
-    }
-    if (targetEl !== null) {
-      editWorkoutSend({
-        type: "ENTER",
-        params: {
-          exerciseId: targetEl.dataset.exerciseId,
-          elHeight: targetEl.offsetHeight
-        }
-      });
-    } else {
-      editWorkoutSend({ type: "LEAVE" });
-    }
-    editWorkoutSend({
-      type: "MOVE",
-      params: {
-        x: clientx,
-        y: clienty
-      }
-    });
   }
 
   function onSaveWorkout() {
