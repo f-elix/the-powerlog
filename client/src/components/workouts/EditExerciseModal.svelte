@@ -11,10 +11,10 @@
 
   export let exercises;
 
-  let editedExercise = $editWorkoutState.context.editedExercise
+  $: editedExercise = $editWorkoutState.context.editedExercise
     ? $editWorkoutState.context.editedExercise.state.context.workoutExercise
     : null;
-  let exerciseError = $editWorkoutState.context.editedExercise
+  $: exerciseError = $editWorkoutState.context.editedExercise
     ? $editWorkoutState.context.editedExercise.state.context.exerciseError
     : "";
 
