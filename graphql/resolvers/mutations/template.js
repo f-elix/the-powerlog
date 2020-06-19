@@ -3,7 +3,7 @@ const Template = require('../../../models/Template');
 const User = require('../../../models/User');
 
 // Utils
-const { createTemplate } = require('../utils');
+const { createTemplate, createExercise } = require('../utils');
 
 const mutations = {
 	// TEMPLATE MUTATIONS
@@ -37,7 +37,7 @@ const mutations = {
 				_id: movement.exercise._id,
 				name: movement.exercise.name
 			};
-			await createExercise(userId, exerciseData, true);
+			await createExercise(currentUser.userId, exerciseData, true);
 		}
 		// Update template
 		template.name = templateData.name;
