@@ -43,11 +43,13 @@
 
   function onMove(e) {
     e = e.touches ? e.touches[0] : e;
+    const x = e.clientX;
+    const y = e.clientY;
     editWorkoutSend({
       type: "MOVE",
       params: {
-        x: e.clientX,
-        y: e.clientY
+        x,
+        y
       }
     });
     const el = document.querySelector(
@@ -57,7 +59,7 @@
       return;
     }
     const hoveredEl = document
-      .elementFromPoint(e.clientX, e.clientY)
+      .elementFromPoint(x, y)
       .closest("[data-exercise-id]");
     if (hoveredEl) {
       const exerciseId = hoveredEl.dataset.exerciseId;

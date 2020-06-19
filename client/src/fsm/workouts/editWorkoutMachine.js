@@ -231,13 +231,6 @@ const actions = {
 		x: (context, event) => event.params.x - context.pointerx,
 		y: (context, event) => event.params.y - context.pointery
 	}),
-	updateScroll: (context, _) => {
-		// if (context.y < window.offsetTop + 50) {
-		// 	window.scrollTo(window.scrollTop - 50, {
-		// 		behavior: 'smooth'
-		// 	});
-		// }
-	},
 	updatePointerPosition: assign({
 		pointery: (_, event) => {
 			const hoveredElTop = event.params.hoveredElTop;
@@ -489,8 +482,7 @@ export const editWorkoutMachine = Machine(
 					outside: {
 						on: {
 							ENTER: {
-								target: 'inside',
-								actions: ['updateHoveredEl']
+								target: 'inside'
 							}
 						}
 					},
@@ -506,7 +498,7 @@ export const editWorkoutMachine = Machine(
 				on: {
 					MOVE: {
 						internal: true,
-						actions: ['updateCoords', 'updateScroll']
+						actions: ['updateCoords']
 					},
 					DROP: {
 						target: 'editing'
