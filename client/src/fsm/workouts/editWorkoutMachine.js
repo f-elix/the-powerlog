@@ -174,6 +174,15 @@ const actions = {
 			return updatedWorkout;
 		}
 	}),
+	spawnEditedExercise: assign({
+		editedExercise: (_, event) => {
+			if (event.type === 'EDIT_EXERCISE') {
+				return spawn(editWorkoutExerciseMachine(event.params.exercise));
+			} else {
+				return spawn(editWorkoutExerciseMachine());
+			}
+		}
+	}),
 	addWorkoutExercise: assign({
 		workout: (context, event) => {
 			const updatedWorkout = context.workout;
@@ -190,6 +199,9 @@ const actions = {
 			updatedWorkout.exercises = updatedExercises;
 			return updatedWorkout;
 		}
+	}),
+	clearEditedExercise: assign({
+		editedExercise: null
 	}),
 	deleteExercise: assign({
 		workout: (context, event) => {
@@ -404,12 +416,10 @@ export const editWorkoutMachine = Machine(
 				}
 			},
 			exercise: {
+				entry: ['spawnEditedExercise'],
 				initial: 'adding',
 				states: {
 					adding: {
-						entry: assign({
-							editedExercise: (_, event) => spawn(editWorkoutExerciseMachine())
-						}),
 						on: {
 							DONE: {
 								target: '#editing',
@@ -418,9 +428,6 @@ export const editWorkoutMachine = Machine(
 						}
 					},
 					editing: {
-						entry: assign({
-							editedExercise: (_, event) => spawn(editWorkoutExerciseMachine(event.params.exercise))
-						}),
 						on: {
 							DONE: {
 								target: '#editing',
@@ -444,9 +451,7 @@ export const editWorkoutMachine = Machine(
 					},
 					CANCEL: 'editing'
 				},
-				exit: assign({
-					editedExercise: null
-				})
+				exit: ['clearEditedExercise']
 			},
 			execution: {
 				entry: assign({
