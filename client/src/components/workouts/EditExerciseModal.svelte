@@ -11,11 +11,12 @@
 
   export let exercises;
 
-  $: editedExercise = $editWorkoutState.context.editedExercise
-    ? $editWorkoutState.context.editedExercise.state.context.workoutExercise
+  $: editedExercise = $editWorkoutState.context.editedExercise;
+  $: exercise = editedExercise
+    ? editedExercise.state.context.workoutExercise
     : null;
-  $: exerciseError = $editWorkoutState.context.editedExercise
-    ? $editWorkoutState.context.editedExercise.state.context.exerciseError
+  $: exerciseError = editedExercise
+    ? editedExercise.state.context.exerciseError
     : "";
 
   function onInput(e, id) {
@@ -117,27 +118,29 @@
     <p class="error-message">{exerciseError}</p>
   {/if}
   <!-- Movement input(s) -->
-  {#each editedExercise.movements as movement, i (movement._id)}
-    <div class="input-ctn">
-      <Input
-        label={`Movement ${i + 1}`}
-        list="exercises"
-        autofocus={true}
-        on:input={e => onInput(e, movement._id)}
-        value={movement ? movement.exercise.name : ''} />
-      {#if i > 0}
-        <!-- Delete movement btn -->
-        <button
-          class="delete-movement"
-          type="button"
-          on:click={onDeleteMovement(movement._id)}>
-          <i class="material-icons">clear</i>
-          <span class="screen-reader-text">Delete</span>
-          <Ripple />
-        </button>
-      {/if}
-    </div>
-  {/each}
+  {#if editedExercise}
+    {#each exercise.movements as movement, i (movement._id)}
+      <div class="input-ctn">
+        <Input
+          label={`Movement ${i + 1}`}
+          list="exercises"
+          autofocus={true}
+          on:input={e => onInput(e, movement._id)}
+          value={movement ? movement.exercise.name : ''} />
+        {#if i > 0}
+          <!-- Delete movement btn -->
+          <button
+            class="delete-movement"
+            type="button"
+            on:click={onDeleteMovement(movement._id)}>
+            <i class="material-icons">clear</i>
+            <span class="screen-reader-text">Delete</span>
+            <Ripple />
+          </button>
+        {/if}
+      </div>
+    {/each}
+  {/if}
   <datalist id="exercises">
     {#each exercises as exercise (exercise._id)}
       <option value={exercise.name} data-exercise={JSON.stringify(exercise)} />
