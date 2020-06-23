@@ -29,6 +29,7 @@
   }
 
   .modal {
+    position: relative;
     max-height: 40rem;
     z-index: 1001;
     overflow: scroll;

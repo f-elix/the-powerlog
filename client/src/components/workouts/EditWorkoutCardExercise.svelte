@@ -91,12 +91,14 @@
     align-items: center;
     font-weight: bold;
     font-size: var(--text-big);
+    cursor: pointer;
   }
 
   .content-ctn .set-ctn {
     display: flex;
     align-items: center;
     margin-top: 1rem;
+    cursor: pointer;
   }
 
   .content-ctn .set {
@@ -179,11 +181,11 @@
   <!-- Content -->
   <div class="content-ctn">
     {#each exercise.movements as movement}
-      <p class="movement-name">
+      <p class="movement-name" on:click={onEditExercise}>
         <span>{movement.exercise.name}</span>
       </p>
       {#each movement.executions as execution, i}
-        <div class="set-ctn">
+        <div class="set-ctn" on:click={onEditExecution(movement, execution)}>
           <p class="set">
             <span>{execution.sets}</span>
             <span>x</span>
@@ -199,11 +201,11 @@
             </span>
           </p>
           <!-- Edit execution btn -->
-          <button class="edit" on:click={onEditExecution(movement, execution)}>
+          <!-- <button class="edit" on:click={onEditExecution(movement, execution)}>
             <i class="material-icons">edit</i>
             <span class="screen-reader-text">Edit</span>
             <Ripple />
-          </button>
+          </button> -->
           <!-- Delete execution btn -->
           <button
             class="delete-execution"
@@ -218,7 +220,7 @@
       <button class="add-set" on:click={onAddExecution(movement)}>
         <span>
           <i class="material-icons">add_circle_outline</i>
-          Add Set
+          Add Sets
         </span>
         <Ripple />
       </button>

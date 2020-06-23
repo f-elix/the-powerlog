@@ -21,18 +21,33 @@
     width: 100%;
     margin-top: 2rem;
   }
+
+  .cancel-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: var(--color-error);
+    line-height: 1;
+    font-size: var(--text-big);
+  }
 </style>
 
 <ModalLayout on:click={onCancel}>
+  <button class="cancel-btn" on:click={onCancel}>
+    <i class="material-icons">close</i>
+  </button>
   <form on:submit|preventDefault novalidate>
     <slot />
     <!-- actions btn -->
     <div class="btn-ctn">
-      <Button variant="filled" color="error" on:click={onCancel}>
-        <i class="material-icons">close</i>
-        Cancel
-      </Button>
-      <Button variant="filled" color="action" type="submit">
+      <Button variant="filled" size="big" color="action" type="submit">
         <i class="material-icons">done</i>
         Done
       </Button>
