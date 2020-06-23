@@ -38,9 +38,8 @@ const queries = {
 				return session.date.getTime() === date.getTime();
 			})
 			.sort((a, b) => {
-				return a.date - b.date;
-			})
-			.reverse();
+				return b.date - a.date;
+			});
 		// Return session
 		return sessions.map(session => {
 			return {
@@ -63,9 +62,8 @@ const queries = {
 				return session.name.toLowerCase().includes(name.toLowerCase());
 			})
 			.sort((a, b) => {
-				return a.date - b.date;
-			})
-			.reverse();
+				return b.date - a.date;
+			});
 		// Return filtered array of sessions
 		return filteredSessions.map(session => {
 			return {
@@ -88,9 +86,8 @@ const queries = {
 				return session.date >= fromDate && session.date <= toDate;
 			})
 			.sort((a, b) => {
-				return a.date - b.date;
-			})
-			.reverse();
+				return b.date - a.date;
+			});
 		// Return filtered array of sessions
 		return filteredSessions.map(session => {
 			return {
@@ -110,9 +107,8 @@ const queries = {
 		// Filter session range
 		const filteredSessions = user.log
 			.sort((a, b) => {
-				return a.date - b.date;
+				return b.date - a.date;
 			})
-			.reverse()
 			.filter((_, i) => {
 				const position = i + 1;
 				return position >= from && position <= to;
