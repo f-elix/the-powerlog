@@ -243,13 +243,14 @@ const actions = {
 		x: (context, event) => event.params.x - context.pointerx,
 		y: (context, event) => event.params.y - context.pointery
 	}),
-	updatePointerPosition: assign({
-		pointery: (_, event) => {
-			const hoveredElTop = event.params.hoveredElTop;
-			const hoveredElHeight = event.params.hoveredElHeight;
-			return hoveredElTop + (hoveredElHeight / 2);
-		}
-	}),
+	// updatePointerPosition: assign({
+
+		// y: (_, event) => {
+		// 	const elTop = event.params.elTop;
+		// 	const elHeight = event.params.elHeight;
+		// 	return event.params.y - (elTop + (elHeight / 2));
+		// }
+	// }),
 	clearDragging: assign({
 		x: 0,
 		y: 0,
@@ -267,6 +268,11 @@ const actions = {
 			updatedWorkout.exercises = reorder(context.workout.exercises, draggedIndex, hoveredIndex);
 			return updatedWorkout;
 		},
+		pointery: (context, event) => {
+			const isDown = event.params.hoveredIndex > context.draggedIndex;
+			return isDown ? context.pointery + event.params.hoveredElHeight : context.pointery - event.params.hoveredElHeight;
+		},
+		y: (_, event) => event.params.y - event.params.hoveredElHeight,
 		draggedIndex: (_, event) => event.params.hoveredIndex
 	}),
 	resetWorkout: assign({
@@ -492,7 +498,7 @@ export const editWorkoutMachine = Machine(
 						}
 					},
 					inside: {
-						entry: ['updatePointerPosition', 'updateExerciseOrder'],
+						entry: ['updateExerciseOrder'],
 						on: {
 							LEAVE: {
 								target: 'outside'

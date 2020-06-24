@@ -66,9 +66,9 @@
       editWorkoutSend({
         type: "ENTER",
         params: {
+          y,
           exerciseId,
           hoveredElHeight: hoveredEl.offsetHeight,
-          hoveredElTop: hoveredEl.getBoundingClientRect().top,
           hoveredIndex: +hoveredEl.dataset.index
         }
       });
