@@ -41,7 +41,7 @@
 
 <ModalLayout on:click={onCancel}>
   <button class="cancel-btn" on:click={onCancel}>
-    <i class="material-icons">close</i>
+    <i class="material-icons">cancel</i>
   </button>
   <form on:submit|preventDefault novalidate>
     <slot />
