@@ -73,13 +73,13 @@
     position: relative;
     display: flex;
     justify-content: space-between;
-    align-items: center;
     min-height: 15rem;
     padding: var(--padding);
   }
 
   .content-ctn {
-    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .content-ctn p {
@@ -126,7 +126,7 @@
   .add-set {
     display: block;
     height: 4rem;
-    margin: 0.5rem 0;
+    margin: auto 0 0.5rem;
     padding: 0.5rem 0.5rem 0.5rem 0;
     border-radius: 0;
   }
@@ -168,6 +168,7 @@
   }
 
   button.handle {
+    align-self: center;
     color: var(--color-primary);
     cursor: inherit;
   }
