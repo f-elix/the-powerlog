@@ -15,6 +15,7 @@ const services = {
                         exercises {
 							_id
                             movements {
+								_id
                                 exercise {
                                     _id
                                     name
@@ -85,6 +86,7 @@ const services = {
                         exercises {
 							_id
                             movements {
+								_id
                                 exercise {
                                     _id
                                     name
