@@ -72,6 +72,34 @@ const services = {
 			throw err;
 		}
 	},
+	saveTemplate: async (context, _) => {
+		const data = {
+			name: context.workoutData.name,
+			instructions: context.workoutData.instructions,
+			exercises: context.workoutData.exercises
+		};
+		const queryName = 'saveTemplate';
+		const query = {
+			query: `
+				mutation saveTemplate($data: TemplateInput!) {
+					saveTemplate(templateData: $data) {
+						_id
+					}
+				}
+			`,
+			variables: {
+				data
+			}
+		};
+		try {
+			const token = getToken();
+			const data = await getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
 	getSession: async (_, event) => {
 		const queryName = 'getSessionById';
 		const query = {
@@ -227,6 +255,21 @@ export const workoutMachine = Machine(
 					},
 					EDIT: {
 						target: 'transitioning'
+					},
+					USE_AS_TEMPLATE: {
+						target: 'creatingTemplate'
+					}
+				}
+			},
+			creatingTemplate: {
+				invoke: {
+					src: 'saveTemplate',
+					onDone: {
+						target: 'displaying',
+						actions: ['routeTemplates']
+					},
+					onError: {
+						target: 'displaying'
 					}
 				}
 			},

@@ -76,7 +76,7 @@
   {/if}
   <!-- Display session -->
   {#if $workoutState.matches('displaying')}
-    <DisplayWorkout on:delete={onDelete} />
+    <DisplayWorkout workoutType="session" on:delete={onDelete} />
   {/if}
   <!-- Edit session -->
   {#if $workoutState.matches('editing')}

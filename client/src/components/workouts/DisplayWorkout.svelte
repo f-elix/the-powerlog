@@ -12,6 +12,8 @@
 
   const { workoutState, workoutSend } = getContext("workout");
 
+  export let workoutType = "session";
+
   $: workout = $workoutState.context.workoutData;
 
   function onDelete() {
@@ -27,7 +29,7 @@
   }
 
   function onUseAsTemplate() {
-    dispatch("useastemplate");
+    workoutSend({ type: "USE_AS_TEMPLATE" });
   }
 </script>
 
@@ -164,11 +166,13 @@
       <i class="material-icons">edit</i>
       Edit
     </Button>
-    <Button color="action" on:click={onUseAsTemplate}>
+  </div>
+  {#if workoutType === 'session'}
+    <Button size="big" color="action" on:click={onUseAsTemplate}>
       <i class="material-icons">insert_drive_file</i>
       Use as template
     </Button>
-  </div>
+  {/if}
   <a href={$route.last.shortPath} class="back-btn-link">
     <Button size="big">
       <span>&larr; Back</span>

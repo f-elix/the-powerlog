@@ -74,7 +74,7 @@
   {/if}
   <!-- Display template -->
   {#if $workoutState.matches('displaying')}
-    <DisplayWorkout on:delete={onDelete} />
+    <DisplayWorkout workoutType="template" on:delete={onDelete} />
   {/if}
   <!-- Edit template -->
   {#if $workoutState.matches('editing')}
