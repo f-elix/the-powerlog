@@ -25,6 +25,9 @@
     }
     const sessionDate = getLocalDate(sessionDateStr);
     const precedingSessionDate = getLocalDate(sessions[i + 1].date);
+    if (sessionDate.getMonth() !== precedingSessionDate.getMonth()) {
+      return true;
+    }
     if (Math.abs(sessionDate.getDate() - precedingSessionDate.getDate()) > 6) {
       return true;
     }
