@@ -11,6 +11,17 @@
   export let workoutType = "session";
   export let workout;
 
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ];
+  const dayName = days[new Date(workout.date).getDay()];
+
   function onView() {
     dispatch("view", workout._id);
   }
@@ -74,7 +85,7 @@
   <div class="workout-info">
     <h3>{workout.name}</h3>
     {#if workoutType === 'session'}
-      <p>{workout.date}</p>
+      <p>{workout.date} | {dayName}</p>
     {/if}
   </div>
   <div>
@@ -83,7 +94,7 @@
       href={`${workoutType === 'session' ? 'log' : 'templates'}/${workout._id}`}>
       <button class="view">
         <i class="material-icons">visibility</i>
-        <span>View Template</span>
+        <span>View {workoutType === 'session' ? 'session' : 'template'}</span>
         <Ripple />
       </button>
     </a>
