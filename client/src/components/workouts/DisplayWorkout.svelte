@@ -1,5 +1,6 @@
 <script>
   // Svelte
+  import { route } from "@sveltech/routify";
   import { createEventDispatcher } from "svelte";
   import { fly } from "svelte/transition";
   import { goto, params } from "@sveltech/routify";
@@ -21,6 +22,19 @@
 </script>
 
 <style>
+  .back-btn-link {
+    display: block;
+    margin-top: 2rem;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .back-btn-link span {
+    display: flex;
+    align-items: center;
+    font-size: var(--text-big);
+  }
+
   h1 {
     color: var(--color-info);
   }
@@ -141,4 +155,9 @@
       Edit
     </Button>
   </div>
+  <a href={$route.last.shortPath} class="back-btn-link">
+    <Button size="big">
+      <span>&larr; Back</span>
+    </Button>
+  </a>
 </div>
