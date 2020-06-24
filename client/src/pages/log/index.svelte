@@ -123,7 +123,7 @@
     <!-- Sessions -->
     {#if $logState.matches('idle.fetch.success')}
       <SessionsList {sessions} on:delete={onDelete} />
-      {#if sessions.length > 10}
+      {#if sessions.length >= 10}
         <div class="load-more-btn">
           <Button color="action" size="big" on:click={onLoadMore}>
             Load more
