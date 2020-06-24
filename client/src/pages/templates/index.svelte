@@ -96,6 +96,7 @@
         <CardWorkout
           workout={template}
           workoutType="template"
+          dayName={null}
           on:delete={onDeleteTemplate} />
       </li>
     {/each}

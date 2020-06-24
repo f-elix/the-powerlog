@@ -26,6 +26,11 @@
     })
   );
 
+  setContext("workout", {
+    workoutState,
+    workoutSend
+  });
+
   $: if ($workoutState.children.editWorkout) {
     const { editWorkoutState, editWorkoutSend } = useService(
       $workoutState.children.editWorkout
@@ -51,14 +56,6 @@
     workoutSend({ type: "DELETE_SESSION" });
   }
 
-  function onEdit() {
-    workoutSend({ type: "EDIT" });
-  }
-
-  function onDisplayOut() {
-    workoutSend({ type: "DISPLAY_OUT" });
-  }
-
   function onEditOut() {
     workoutSend({ type: "EDIT_OUT" });
   }
@@ -79,11 +76,7 @@
   {/if}
   <!-- Display session -->
   {#if $workoutState.matches('displaying')}
-    <DisplayWorkout
-      workout={session}
-      on:delete={onDelete}
-      on:edit={onEdit}
-      on:outroend={onDisplayOut} />
+    <DisplayWorkout on:delete={onDelete} />
   {/if}
   <!-- Edit session -->
   {#if $workoutState.matches('editing')}

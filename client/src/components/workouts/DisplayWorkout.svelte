@@ -1,7 +1,7 @@
 <script>
   // Svelte
   import { route } from "@sveltech/routify";
-  import { createEventDispatcher } from "svelte";
+  import { getContext, createEventDispatcher } from "svelte";
   import { fly } from "svelte/transition";
   import { goto, params } from "@sveltech/routify";
 
@@ -10,14 +10,24 @@
 
   const dispatch = createEventDispatcher();
 
-  export let workout;
+  const { workoutState, workoutSend } = getContext("workout");
+
+  $: workout = $workoutState.context.workoutData;
 
   function onDelete() {
     dispatch("delete");
   }
 
   function onEdit() {
-    dispatch("edit");
+    workoutSend({ type: "EDIT" });
+  }
+
+  function onDisplayOut() {
+    workoutSend({ type: "DISPLAY_OUT" });
+  }
+
+  function onUseAsTemplate() {
+    dispatch("useastemplate");
   }
 </script>
 
@@ -97,7 +107,7 @@
 <div
   in:fly|local={{ x: 30 }}
   out:fly|local={{ x: 30, duration: 200 }}
-  on:outroend>
+  on:outroend={onDisplayOut}>
   <h1>{workout.name}</h1>
   {#if workout.date}
     <h2>{workout.date}</h2>
@@ -153,6 +163,10 @@
     <Button color="action" variant="filled" on:click={onEdit}>
       <i class="material-icons">edit</i>
       Edit
+    </Button>
+    <Button color="action" on:click={onUseAsTemplate}>
+      <i class="material-icons">insert_drive_file</i>
+      Use as template
     </Button>
   </div>
   <a href={$route.last.shortPath} class="back-btn-link">

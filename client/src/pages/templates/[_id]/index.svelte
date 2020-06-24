@@ -26,6 +26,11 @@
     })
   );
 
+  setContext("workout", {
+    workoutState,
+    workoutSend
+  });
+
   $: if ($workoutState.children.editWorkout) {
     const { editWorkoutState, editWorkoutSend } = useService(
       $workoutState.children.editWorkout
@@ -45,18 +50,8 @@
     });
   });
 
-  $: template = $workoutState.context.workoutData;
-
   function onDelete() {
     workoutSend({ type: "DELETE_TEMPLATE" });
-  }
-
-  function onEdit() {
-    workoutSend({ type: "EDIT" });
-  }
-
-  function onDisplayOut() {
-    workoutSend({ type: "DISPLAY_OUT" });
   }
 
   function onEditOut() {
@@ -79,11 +74,7 @@
   {/if}
   <!-- Display template -->
   {#if $workoutState.matches('displaying')}
-    <DisplayWorkout
-      workout={template}
-      on:delete={onDelete}
-      on:edit={onEdit}
-      on:outroend={onDisplayOut} />
+    <DisplayWorkout on:delete={onDelete} />
   {/if}
   <!-- Edit template -->
   {#if $workoutState.matches('editing')}
