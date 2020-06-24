@@ -15,6 +15,29 @@
     );
     return localDate;
   }
+
+  function isFirstOfWeek(sessionDateStr, i) {
+    if (!sessions[i + 1]) {
+      return false;
+    }
+    if (sessionDateStr === sessions[i + 1].date) {
+      return false;
+    }
+    const sessionDate = getLocalDate(sessionDateStr);
+    const precedingSessionDate = getLocalDate(sessions[i + 1].date);
+    if (Math.abs(sessionDate.getDate() - precedingSessionDate.getDate()) > 6) {
+      return true;
+    }
+    const sessionDay = sessionDate.getDay();
+    const precedingSessionDay = precedingSessionDate.getDay();
+    if (precedingSessionDay === 0 || sessionDay === 1) {
+      return true;
+    }
+    if (sessionDay !== 0 && sessionDay < precedingSessionDay) {
+      return true;
+    }
+    return false;
+  }
 </script>
 
 <style>
@@ -22,6 +45,10 @@
     margin: 2rem auto;
     list-style-type: none;
     overflow: hidden;
+  }
+
+  .week-separator {
+    width: 50%;
   }
 </style>
 
@@ -46,6 +73,10 @@
         workoutDate={getLocalDate(session.date)}
         workoutType="session"
         on:delete />
+      <!-- Week separator -->
+      {#if isFirstOfWeek(session.date, i)}
+        <hr class="week-separator" />
+      {/if}
     </li>
   {/each}
 </ul>
