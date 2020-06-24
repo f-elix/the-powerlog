@@ -7,6 +7,14 @@
   import CardWorkout from "@/components/workouts/CardWorkout.svelte";
 
   export let sessions;
+
+  function getLocalDate(dateInput) {
+    const date = new Date(dateInput);
+    const localDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * -60000
+    );
+    return localDate;
+  }
 </script>
 
 <style>
@@ -23,15 +31,21 @@
       animate:flip={{ duration: 200 }}
       out:fly|local={{ duration: 200, x: 30 }}
       in:fade={{ duration: 200 }}>
-      {#if !sessions[i - 1] || new Date(session.date).getMonth() !== new Date(sessions[i - 1].date).getMonth()}
+      {#if !sessions[i - 1] || getLocalDate(session.date).getMonth() !== getLocalDate(sessions[i - 1].date).getMonth()}
         <!-- Date title -->
         <h3>
-          {new Date(session.date).toLocaleString('default', { month: 'long' })}
-          {new Date(session.date).getFullYear()}
+          {getLocalDate(session.date).toLocaleString('default', {
+            month: 'long'
+          })}
+          {getLocalDate(session.date).getFullYear()}
         </h3>
       {/if}
       <!-- Search results -->
-      <CardWorkout workout={session} workoutType="session" on:delete />
+      <CardWorkout
+        workout={session}
+        workoutDate={getLocalDate(session.date)}
+        workoutType="session"
+        on:delete />
     </li>
   {/each}
 </ul>
