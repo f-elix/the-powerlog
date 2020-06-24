@@ -10,19 +10,7 @@
 
   export let workoutType = "session";
   export let workout;
-  export let workoutDate;
-
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-  ];
-
-  const dayName = days[workoutDate.getDay()];
+  export let dayName;
 
   function onView() {
     dispatch("view", workout._id);

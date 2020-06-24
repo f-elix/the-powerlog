@@ -41,6 +41,16 @@
     }
     return false;
   }
+
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ];
 </script>
 
 <style>
@@ -73,8 +83,8 @@
       <!-- Search results -->
       <CardWorkout
         workout={session}
-        workoutDate={getLocalDate(session.date)}
         workoutType="session"
+        dayName={days[getLocalDate(session.date).getDay()]}
         on:delete />
       <!-- Week separator -->
       {#if isFirstOfWeek(session.date, i)}
