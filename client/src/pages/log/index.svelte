@@ -42,10 +42,6 @@
     });
   }
 
-  $: if (sessions.length > 10) {
-    window.scrollTo(0, document.body.scrollHeight);
-  }
-
   function onDateInput(e) {
     logSend({
       type: "DATE_INPUT",
@@ -142,11 +138,11 @@
     {#if $logState.matches('idle.fetch.filtering')}
       <SessionsList {sessions} on:delete={onDelete} />
     {/if}
-    {#if $logState.matches('fetching')}
-      <Spinner />
-    {/if}
     {#if $logState.matches('idle.fetch.error')}
       <h3>{fetchError}</h3>
+    {/if}
+    {#if $logState.matches('fetching')}
+      <Spinner />
     {/if}
   </section>
 </div>
