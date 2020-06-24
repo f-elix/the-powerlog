@@ -121,9 +121,9 @@
       Add new
     </Button>
     <!-- Sessions -->
-    {#if $logState.matches('idle.fetch.success')}
+    {#if $logState.matches('idle.fetch.success') || $logState.matches('fetching.loadmore')}
       <SessionsList {sessions} on:delete={onDelete} />
-      {#if sessions.length >= 10}
+      {#if sessions.length >= $logState.context.range}
         <div class="load-more-btn">
           <Button color="action" size="big" on:click={onLoadMore}>
             Load more

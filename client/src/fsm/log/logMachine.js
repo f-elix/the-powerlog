@@ -189,14 +189,16 @@ const delays = {
 	DEBOUNCE: 500
 };
 
+const range = 10;
+
 export const logMachine = Machine(
 	{
 		id: 'log',
 		context: {
 			sessions: [],
-			range: 10,
+			range,
 			rangeFrom: 1,
-			rangeTo: 10,
+			rangeTo: range,
 			fetchError: '',
 			nameFilter: '',
 			dateFilter: '',
