@@ -42,6 +42,10 @@
     });
   }
 
+  $: if (sessions.length > 10) {
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
   function onDateInput(e) {
     logSend({
       type: "DATE_INPUT",
