@@ -99,8 +99,6 @@
       editWorkoutSend({ type: "CANCEL" });
     }
   }
-
-  $: console.log($editWorkoutState);
 </script>
 
 <style>

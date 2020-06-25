@@ -28,11 +28,11 @@
     });
   }
 
-  function onGetExerciseHistory() {
+  function onGetExerciseHistory(exerciseId) {
     editWorkoutSend({
       type: "GET_EXERCISE_HISTORY",
       params: {
-        exerciseId: exercise._id
+        exerciseId
       }
     });
   }
@@ -95,9 +95,15 @@
     margin: 0;
   }
 
+  .content-ctn .movement-ctn {
+    display: flex;
+    align-items: center;
+  }
+
   .content-ctn .movement-name {
     display: flex;
     align-items: center;
+    flex-basis: 80%;
     font-weight: bold;
     font-size: var(--text-big);
     cursor: pointer;
@@ -191,15 +197,25 @@
   <!-- Content -->
   <div class="content-ctn">
     {#each exercise.movements as movement}
-      <p class="movement-name" on:click={onEditExercise}>
-        <span>{movement.exercise.name}</span>
-      </p>
+      <div class="movement-ctn">
+        <p class="movement-name" on:click={onEditExercise}>
+          <span>{movement.exercise.name}</span>
+        </p>
+        <!-- Get exercise history btn -->
+        <button
+          class="edit"
+          on:click={onGetExerciseHistory(movement.exercise._id)}>
+          <i class="material-icons">bar_chart</i>
+          <span class="screen-reader-text">Last performance</span>
+          <Ripple />
+        </button>
+      </div>
       {#each movement.executions as execution, i}
         <div class="set-ctn" on:click={onEditExecution(movement, execution)}>
           <p class="set">
             <span>{execution.sets}</span>
             <span>x</span>
-            {#if execution.reps !== undefined}
+            {#if execution.reps !== undefined && execution.reps !== null}
               <span>{execution.reps}</span>
             {:else}
               <span>{execution.time.amount}</span>
@@ -246,12 +262,6 @@
     <span class="screen-reader-text">Re-order</span>
   </button>
   <div class="exercise-btn-ctn">
-    <!-- Get exercise history btn -->
-    <button class="edit" on:click={onGetExerciseHistory}>
-      <i class="material-icons">bar_chart</i>
-      <span class="screen-reader-text">Last performance</span>
-      <Ripple />
-    </button>
     <!-- Edit exercise btn -->
     <button class="edit" on:click={onEditExercise}>
       <i class="material-icons">edit</i>

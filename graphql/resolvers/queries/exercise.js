@@ -59,10 +59,15 @@ const queries = {
 			throw error;
 		}
 		// Find last history
-		const lastHistory = exercise.history[exercise.history.length - 1];
+		let index = exercise.history.length - 1;
+		let lastHistory = exercise.history[index];
+		while (new Date(lastHistory.date) >= new Date()) {
+			index--;
+			lastHistory = exercise.history[index];
+		}
 		// Return last history
 		return {
-			data: lastHistory.date,
+			date: lastHistory.date,
 			executions: lastHistory.executions,
 			session: lastHistory.session,
 			name: exercise.name

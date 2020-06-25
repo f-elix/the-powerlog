@@ -9,6 +9,8 @@
 
   $: exercise = $editWorkoutState.context.exerciseHistory;
 
+  $: console.log(exercise);
+
   function onCancel() {
     editWorkoutSend({ type: "DISMISS" });
   }
@@ -30,15 +32,16 @@
   }
 </style>
 
-<EditFormModalLayout on:cancel={onCancel}>
+<EditFormModalLayout on:cancel={onCancel} on:submit={onCancel}>
   {#if $editWorkoutState.matches('exerciseHistory.displaying')}
     <h2>Last {exercise.name} performance</h2>
+    <p>{exercise.date}</p>
     {#each exercise.executions as execution, i}
       <div class="set-ctn">
         <p class="set">
           <span>{execution.sets}</span>
           <span>x</span>
-          {#if execution.reps !== undefined}
+          {#if execution.reps !== undefined && execution.reps !== null}
             <span>{execution.reps}</span>
           {:else}
             <span>{execution.time.amount}</span>
