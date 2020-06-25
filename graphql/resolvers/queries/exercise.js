@@ -26,7 +26,6 @@ const queries = {
 	},
 	getExerciseHistory: async (_, { exerciseId }, { currentUser }) => {
 		// Find exercise
-		console.log(exerciseId);
 		const exercise = await Exercise.findById(exerciseId);
 		if (!exercise) {
 			const error = new Error('Exercise not found.');
@@ -47,7 +46,6 @@ const queries = {
 	},
 	getLastExerciseHistory: async (_, { exerciseId }, { currentUser }) => {
 		// Find exercise
-		console.log(exerciseId);
 		const exercise = await Exercise.findById(exerciseId);
 		if (!exercise) {
 			const error = new Error('Exercise not found.');
