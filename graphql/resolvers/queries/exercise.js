@@ -26,6 +26,7 @@ const queries = {
 	},
 	getExerciseHistory: async (_, { exerciseId }, { currentUser }) => {
 		// Find exercise
+		console.log(exerciseId);
 		const exercise = await Exercise.findById(exerciseId);
 		if (!exercise) {
 			const error = new Error('Exercise not found.');
@@ -42,6 +43,31 @@ const queries = {
 		return {
 			...exercise._doc,
 			_id: exercise._id.toString()
+		};
+	},
+	getLastExerciseHistory: async (_, { exerciseId }, { currentUser }) => {
+		// Find exercise
+		console.log(exerciseId);
+		const exercise = await Exercise.findById(exerciseId);
+		if (!exercise) {
+			const error = new Error('Exercise not found.');
+			error.statusCode = 404;
+			throw error;
+		}
+		// Validate user
+		if (exercise.creator.toString() !== currentUser.userId) {
+			const error = new Error('Not authorized.');
+			error.statusCode = 403;
+			throw error;
+		}
+		// Find last history
+		const lastHistory = exercise.history[exercise.history.length - 1];
+		// Return last history
+		return {
+			data: lastHistory.date,
+			executions: lastHistory.executions,
+			session: lastHistory.session,
+			name: exercise.name
 		};
 	},
 	getExercisesByName: async (_, { name }, { currentUser }) => {

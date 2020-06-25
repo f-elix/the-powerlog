@@ -16,6 +16,7 @@
   import EditExerciseModal from "@/components/workouts/EditExerciseModal.svelte";
   import EditExecutionModal from "@/components/workouts/EditExecutionModal.svelte";
   import SelectTemplateModal from "@/components/workouts/SelectTemplateModal.svelte";
+  import ExerciseHistoryModal from "@/components/workouts/ExerciseHistoryModal.svelte";
 
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
   const { templatesState, templatesSend } = useMachine(templatesMachine);
@@ -98,6 +99,8 @@
       editWorkoutSend({ type: "CANCEL" });
     }
   }
+
+  $: console.log($editWorkoutState);
 </script>
 
 <style>
@@ -140,6 +143,10 @@
       <!-- Edit execution modal -->
       {#if $editWorkoutState.matches('execution')}
         <EditExecutionModal />
+      {/if}
+      <!-- Exercise history modal -->
+      {#if $editWorkoutState.matches('exerciseHistory')}
+        <ExerciseHistoryModal />
       {/if}
       <!-- Workout buttons -->
       <div class="actions">

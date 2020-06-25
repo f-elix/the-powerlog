@@ -28,6 +28,15 @@
     });
   }
 
+  function onGetExerciseHistory() {
+    editWorkoutSend({
+      type: "GET_EXERCISE_HISTORY",
+      params: {
+        exerciseId: exercise._id
+      }
+    });
+  }
+
   function onAddExecution(movement) {
     editWorkoutSend({
       type: "ADD_EXECUTION",
@@ -237,6 +246,12 @@
     <span class="screen-reader-text">Re-order</span>
   </button>
   <div class="exercise-btn-ctn">
+    <!-- Get exercise history btn -->
+    <button class="edit" on:click={onGetExerciseHistory}>
+      <i class="material-icons">bar_chart</i>
+      <span class="screen-reader-text">Last performance</span>
+      <Ripple />
+    </button>
     <!-- Edit exercise btn -->
     <button class="edit" on:click={onEditExercise}>
       <i class="material-icons">edit</i>

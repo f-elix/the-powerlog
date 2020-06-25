@@ -11,6 +11,7 @@ type ExerciseHistory {
 	session: Session!
 	date: Date
 	executions: [Execution]
+	name: String
 }
 
 type ExerciseGroup {
@@ -39,6 +40,7 @@ input ExerciseGroupInput {
 type Query {
 	getExerciseById(exerciseId: ID!): Exercise
 	getExerciseHistory(exerciseId: ID!): Exercise
+	getLastExerciseHistory(exerciseId: ID!): ExerciseHistory
 	getExercisesByName(name: String!): [Exercise]
 	getAllExercises: [Exercise]
 }

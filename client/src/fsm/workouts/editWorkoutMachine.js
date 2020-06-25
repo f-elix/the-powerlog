@@ -131,6 +131,43 @@ const services = {
 			console.log(err);
 			throw err;
 		}
+	},
+	getExerciseHistory: async (_, event) => {
+		const queryName = 'getLastExerciseHistory';
+		const query = {
+			query: `
+				query getExercise($exerciseId: ID!) {
+					getLastExerciseHistory(exerciseId: $exerciseId) {
+						name
+						date
+						executions {
+							_id
+							sets
+							reps
+							time {
+								amount
+								unit
+							}
+							load {
+								amount
+								unit
+							}
+						}
+					}
+				}
+			`,
+			variables: {
+				exerciseId: event.params.exerciseId
+			}
+		};
+		try {
+			const token = getToken();
+			const data = getData(query, queryName, token);
+			return data;
+		} catch (err) {
+			console.log(err);
+			throw err;
+		}
 	}
 };
 
@@ -203,6 +240,12 @@ const actions = {
 	clearEditedExercise: assign({
 		editedExercise: null
 	}),
+	updateExerciseHistory: assign({
+		exerciseHistory: (_, event) => event.data
+	}),
+	clearExerciseHistory: assign({
+		exerciseHistory: null
+	}),
 	deleteExercise: assign({
 		workout: (context, event) => {
 			const { exerciseId } = event.params;
@@ -243,14 +286,6 @@ const actions = {
 		x: (context, event) => event.params.x - context.pointerx,
 		y: (context, event) => event.params.y - context.pointery
 	}),
-	// updatePointerPosition: assign({
-
-		// y: (_, event) => {
-		// 	const elTop = event.params.elTop;
-		// 	const elHeight = event.params.elHeight;
-		// 	return event.params.y - (elTop + (elHeight / 2));
-		// }
-	// }),
 	clearDragging: assign({
 		x: 0,
 		y: 0,
@@ -298,6 +333,7 @@ export const editWorkoutMachine = Machine(
 				...emptyWorkout
 			},
 			editedExercise: null,
+			exerciseHistory: null,
 			nameError: '',
 			draggedIndex: null,
 			draggedId: null,
@@ -351,6 +387,9 @@ export const editWorkoutMachine = Machine(
 					DRAG: {
 						target: 'dragging'
 					},
+					GET_EXERCISE_HISTORY: {
+						target: 'exerciseHistory'
+					},
 					SAVE_SESSION: [
 						{
 							cond: 'isNameEmpty',
@@ -392,6 +431,30 @@ export const editWorkoutMachine = Machine(
 							actions: ['routeTemplates']
 						}
 					]
+				}
+			},
+			exerciseHistory: {
+				initial: 'fetching',
+				states: {
+					fetching: {
+						invoke: {
+							src: 'getExerciseHistory',
+							onDone: {
+								target: 'displaying',
+								actions: ['updateExerciseHistory']
+							},
+							onError: {
+								target: '#editing'
+							}
+						}
+					},
+					displaying: {}
+				},
+				on: {
+					DISMISS: {
+						target: '#editing',
+						actions: ['clearExerciseHistory']
+					}
 				}
 			},
 			selectingtemplate: {
