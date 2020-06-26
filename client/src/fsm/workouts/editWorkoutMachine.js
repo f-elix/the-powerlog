@@ -444,11 +444,12 @@ export const editWorkoutMachine = Machine(
 								actions: ['updateExerciseHistory']
 							},
 							onError: {
-								target: '#editing'
+								target: 'empty'
 							}
 						}
 					},
-					displaying: {}
+					displaying: {},
+					empty: {}
 				},
 				on: {
 					DISMISS: {

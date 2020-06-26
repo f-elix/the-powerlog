@@ -4,6 +4,7 @@
 
   // Components
   import EditFormModalLayout from "./EditFormModalLayout.svelte";
+  import Spinner from "../UI/Spinner.svelte";
 
   const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
 
@@ -54,5 +55,11 @@
         </p>
       </div>
     {/each}
+  {/if}
+  {#if $editWorkoutState.matches('exerciseHistory.empty')}
+    <p>No performance recorded yet</p>
+  {/if}
+  {#if $editWorkoutState.matches('exerciseHistory.fetching')}
+    <Spinner />
   {/if}
 </EditFormModalLayout>

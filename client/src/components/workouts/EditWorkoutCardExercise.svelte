@@ -89,6 +89,7 @@
   .content-ctn {
     display: flex;
     flex-direction: column;
+    flex-basis: 50%;
   }
 
   .content-ctn p {
@@ -97,7 +98,8 @@
 
   .content-ctn .movement-ctn {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
   }
 
   .content-ctn .movement-name {
