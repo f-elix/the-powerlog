@@ -61,9 +61,15 @@ const queries = {
 		// Find last history
 		let index = exercise.history.length - 1;
 		let lastHistory = exercise.history[index];
-		while (new Date(lastHistory.date) >= new Date()) {
+		let lastHistoryDate = lastHistory.date.toISOString().substring(0, 10);
+		const today = new Date().toISOString().substring(0, 10);
+		while (lastHistoryDate >= today) {
 			index--;
 			lastHistory = exercise.history[index];
+			lastHistoryDate = lastHistory.date.toISOString().substring(0, 10);
+		}
+		if (!lastHistory || !lastHistory.executions.length) {
+			throw new Error('No performance recorded yet');
 		}
 		// Return last history
 		return {
@@ -75,20 +81,24 @@ const queries = {
 	},
 	getExercisesByName: async (_, { name }, { currentUser }) => {
 		// Find user by ID and populate user's exercises
-		const user = await await User.findById(currentUser.userId).populate('exercises');
+		const user = await await User.findById(currentUser.userId).populate(
+			'exercises'
+		);
 		if (!user) {
-			const error = new Error('Your session has ended. Please sign in again.');
+			const error = new Error(
+				'Your session has ended. Please sign in again.'
+			);
 			error.statusCode = 401;
 			throw error;
 		}
 		// Find exercises in user exercises collection
 		const filteredExercises = user.exercises
-			.filter(ex => {
+			.filter((ex) => {
 				return ex.name.toLowerCase().includes(name.toLowerCase());
 			})
 			.reverse();
 		// Return filtered array of exercises
-		return filteredExercises.map(exercise => {
+		return filteredExercises.map((exercise) => {
 			return {
 				...exercise._doc,
 				_id: exercise._id.toString()
@@ -97,14 +107,18 @@ const queries = {
 	},
 	getAllExercises: async (_, {}, { currentUser }) => {
 		// Find user by ID and populate user's exercises
-		const user = await User.findById(currentUser.userId).populate('exercises');
+		const user = await User.findById(currentUser.userId).populate(
+			'exercises'
+		);
 		if (!user) {
-			const error = new Error('Your session has ended. Please sign in again.');
+			const error = new Error(
+				'Your session has ended. Please sign in again.'
+			);
 			error.statusCode = 401;
 			throw error;
 		}
 		// Return array of exercises
-		return user.exercises.map(exercise => {
+		return user.exercises.map((exercise) => {
 			return {
 				...exercise._doc,
 				_id: exercise._id.toString()
