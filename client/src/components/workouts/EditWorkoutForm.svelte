@@ -64,9 +64,9 @@
     editWorkoutSend({ type: "USE_TEMPLATE" });
   }
 
-  function onAddExercise() {
-    editWorkoutSend({ type: "ADD_EXERCISE" });
-  }
+  //   function onAddExercise() {
+  //     editWorkoutSend({ type: "ADD_EXERCISE" });
+  //   }
 </script>
 
 <style>
@@ -149,10 +149,10 @@
 {/if}
 <div class="buttons">
   <!-- Add exercise button -->
-  <Button size="big" color="action" on:click={onAddExercise}>
+  <!-- <Button size="big" color="action" on:click={onAddExercise}>
     <i class="material-icons">add_box</i>
     Add Exercise
-  </Button>
+  </Button> -->
   <!-- Use template button -->
   {#if workoutType === types.session}
     <Button size="big" color="action" on:click={onUseTemplate}>

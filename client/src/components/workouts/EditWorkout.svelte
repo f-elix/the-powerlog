@@ -99,16 +99,50 @@
       editWorkoutSend({ type: "CANCEL" });
     }
   }
+
+  function onAddExercise() {
+    editWorkoutSend({ type: "ADD_EXERCISE" });
+  }
 </script>
 
 <style>
   .actions {
+    position: fixed;
+    top: 50%;
+    right: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 80%;
-    margin: 0 auto;
-    padding: 3rem 1rem;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: var(--color-fg-light);
+  }
+
+  .actions button {
+    width: 4rem;
+    height: 4rem;
+    margin: 0.5rem;
+    border: none;
+    color: white;
+    box-shadow: var(--shadow-default);
+  }
+
+  .actions button .inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .actions .cancel {
+    background-color: var(--color-error);
+  }
+
+  .actions .save {
+    background-color: var(--color-action);
+  }
+
+  .actions .add {
+    border: var(--border-thin) var(--color-action);
+    background: none;
   }
 </style>
 
@@ -148,14 +182,24 @@
       {/if}
       <!-- Workout buttons -->
       <div class="actions">
-        <Button color="error" variant="filled" on:click={onCancelEdit}>
-          <i class="material-icons">cancel</i>
-          Cancel
-        </Button>
-        <Button color="action" variant="filled" on:click={onSaveWorkout}>
-          <i class="material-icons">done</i>
-          {isNew ? 'Create' : 'Save'}
-        </Button>
+        <button class="cancel" on:click={onCancelEdit}>
+          <div class="inner">
+            <i class="material-icons">cancel</i>
+          </div>
+          <!-- Cancel -->
+        </button>
+        <button class="save" on:click={onSaveWorkout}>
+          <div class="inner">
+            <i class="material-icons">done</i>
+          </div>
+          <!-- {isNew ? 'Create' : 'Save'} -->
+        </button>
+        <button class="add" on:click={onAddExercise}>
+          <div class="inner">
+            <i class="material-icons">add</i>
+          </div>
+          <!-- {isNew ? 'Create' : 'Save'} -->
+        </button>
       </div>
     </div>
   {/if}
