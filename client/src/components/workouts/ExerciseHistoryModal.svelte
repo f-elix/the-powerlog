@@ -1,19 +1,17 @@
 <script>
   // Svelte
-  import { getContext } from "svelte";
+  import { getContext } from 'svelte';
 
   // Components
-  import EditFormModalLayout from "./EditFormModalLayout.svelte";
-  import Spinner from "../UI/Spinner.svelte";
+  import EditFormModalLayout from './EditFormModalLayout.svelte';
+  import Spinner from '../UI/Spinner.svelte';
 
-  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
+  const { editWorkoutState, editWorkoutSend } = getContext('editWorkout');
 
   $: exercise = $editWorkoutState.context.exerciseHistory;
 
-  $: console.log(exercise);
-
   function onCancel() {
-    editWorkoutSend({ type: "DISMISS" });
+    editWorkoutSend({ type: 'DISMISS' });
   }
 </script>
 
