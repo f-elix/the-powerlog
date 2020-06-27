@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
 
   let ripple;
   let parent;
@@ -29,7 +29,7 @@
     isTransitionEnded = false;
   }
 
-  function onMouseDown(e) {
+  function onPointerDown(e) {
     hideRipple();
     setupRipple(e);
     setTimeout(() => {
@@ -37,7 +37,7 @@
     }, 0);
   }
 
-  function onMouseUp() {
+  function onPointerUp() {
     isMouseDown = false;
     if (!isTransitionEnded) {
       return;
@@ -60,11 +60,11 @@
     const parentStyles = getComputedStyle(parent);
     // Apply necessary styles to ripple according to parent's styles
     color = parentStyles.color;
-    if (parentStyles.position === "static") {
-      parent.style.position = "relative";
+    if (parentStyles.position === 'static') {
+      parent.style.position = 'relative';
     }
-    if (parentStyles.overflow === "visible") {
-      parent.style.overflow = "hidden";
+    if (parentStyles.overflow === 'visible') {
+      parent.style.overflow = 'hidden';
     }
     let rippleWidth;
     let rippleHeight;
@@ -78,7 +78,8 @@
     ripple.style.width = `${rippleWidth}px`;
     ripple.style.height = `${rippleHeight}px`;
     // Add mouseout event listener to parent
-    parent.addEventListener("mouseout", onMouseUp);
+    parent.addEventListener('pointerleave', onPointerUp);
+    parent.addEventListener('touchleave', onPointerUp);
   });
 </script>
 
@@ -118,6 +119,6 @@
   bind:this={ripple}
   class:show-ripple={isVisible}
   class:hide-ripple={!isVisible}
-  on:mousedown={onMouseDown}
-  on:mouseup={onMouseUp}
+  on:pointerdown={onPointerDown}
+  on:pointerup={onPointerUp}
   on:transitionend={onTransitionEnd} />
