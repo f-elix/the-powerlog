@@ -1,17 +1,17 @@
 <script>
   // Svelte
-  import { getContext } from "svelte";
+  import { getContext } from 'svelte';
 
   //FSM
-  import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
-  import { useMachine } from "@/fsm/machineStores.js";
+  import { exercisesMachine } from '@/fsm/exercises/exercisesMachine.js';
+  import { useMachine } from '@/fsm/machineStores.js';
 
   // Components
-  import Input from "@/components/UI/Input.svelte";
-  import Select from "@/components/UI/Select.svelte";
-  import EditFormModalLayout from "./EditFormModalLayout.svelte";
+  import Input from '@/components/UI/Input.svelte';
+  import Select from '@/components/UI/Select.svelte';
+  import EditFormModalLayout from './EditFormModalLayout.svelte';
 
-  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
+  const { editWorkoutState, editWorkoutSend } = getContext('editWorkout');
 
   let exerciseName =
     $editWorkoutState.context.editedExercise.state.context.movement.exercise
@@ -20,34 +20,28 @@
     $editWorkoutState.context.editedExercise.state.context.execution;
   let executionError = $editWorkoutState.context.editedExercise
     ? $editWorkoutState.context.editedExercise.state.context.executionError
-    : "";
+    : '';
 
   const options = {
-    reps: "Reps",
-    time: "Time",
-    sec: "Sec",
-    min: "Min",
-    lbs: "Lbs",
-    kg: "Kg"
+    reps: 'Reps',
+    time: 'Time',
+    sec: 'Sec',
+    min: 'Min',
+    lbs: 'Lbs',
+    kg: 'Kg'
   };
-
-  const repsTimeOptions = [options.reps, options.time];
-  const timeUnitOptions = [options.sec, options.min];
-  const loadUnitOptions = [options.lbs, options.kg];
 
   let selectedRepsTime = options.reps;
   let selectedTimeUnit = options.sec;
   let selectedLoadUnit = options.lbs;
 
-  let sets = "";
-  let load = "";
-  let repsTime = "";
+  let sets = '';
+  let load = '';
+  let repsTime = '';
 
   $: if (editedExecution) {
     selectedRepsTime = editedExecution.reps ? options.reps : options.time;
-    selectedTimeUnit = editedExecution.time.unit
-      ? editedExecution.time.unit
-      : selectedTimeUnit;
+    selectedTimeUnit = editedExecution.time.unit;
     selectedLoadUnit = editedExecution.load.unit;
 
     sets = editedExecution.sets;
@@ -58,7 +52,7 @@
   }
 
   function onCancel() {
-    editWorkoutSend({ type: "CANCEL" });
+    editWorkoutSend({ type: 'CANCEL' });
   }
 
   function onDone() {
@@ -67,7 +61,7 @@
       load: +load,
       selectedLoadUnit
     };
-    if (selectedRepsTime === "Time") {
+    if (selectedRepsTime === 'Time') {
       newExecution.time = +repsTime;
       newExecution.selectedTimeUnit = selectedTimeUnit;
     } else {
@@ -77,7 +71,7 @@
       newExecution._id = editedExecution._id;
     }
     editWorkoutSend({
-      type: "SAVE_EXECUTION",
+      type: 'SAVE_EXECUTION',
       params: {
         executionData: newExecution
       }
@@ -89,31 +83,25 @@
   .input-group {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 6rem 4rem 4rem;
     grid-column-gap: 1rem;
+    grid-auto-flow: column;
     padding-bottom: 2rem;
   }
 
-  .input-group .reps-inputs,
-  .input-group .load-inputs {
-    display: grid;
-    grid-gap: 1rem;
-    align-items: baseline;
+  .radio {
+    display: flex;
+    align-items: center;
+    font-size: var(--text-normal);
   }
 
-  .input-group .sets-input {
-    grid-column: 1 / 2;
+  .radio input {
+    margin: 0;
+    margin-right: 1rem;
   }
 
-  .input-group .reps-inputs {
-    grid-column: 2 / 3;
-    grid-template-rows: 35% 1fr 1fr;
-    grid-row-gap: 2rem;
-  }
-
-  .input-group .load-inputs {
-    grid-column: 3 / 4;
-    grid-template-rows: 35% 1fr;
-    grid-row-gap: 2rem;
+  .radio.disabled {
+    opacity: 0.5;
   }
 </style>
 
@@ -121,47 +109,79 @@
   <h2>{exerciseName}</h2>
   <div class="input-group">
     <!-- Sets input -->
-    <div class="sets-input">
-      <Input
-        type="number"
-        label="Sets"
-        name="sets"
-        autofocus={true}
-        errorMessage={executionError}
-        value={sets}
-        on:input={e => (sets = e.target.value)} />
-    </div>
+    <Input
+      type="number"
+      label="Sets"
+      name="sets"
+      autofocus={true}
+      errorMessage={executionError}
+      value={sets}
+      on:input={e => (sets = e.target.value)} />
+    <!-- Selected reps / time -->
+    <label class="radio">
+      <input
+        type="radio"
+        name={options.reps}
+        value={options.reps}
+        bind:group={selectedRepsTime} />
+      {options.reps}
+    </label>
+    <label class="radio">
+      <input
+        type="radio"
+        name={options.time}
+        value={options.time}
+        bind:group={selectedRepsTime} />
+      {options.time}
+    </label>
     <!-- Reps/time inputs -->
-    <div class="reps-inputs">
-      <Input
-        type="number"
-        label={selectedRepsTime}
-        name="repsTime"
-        value={repsTime}
-        on:input={e => (repsTime = e.target.value)} />
-      <Select
-        name="repsTime"
-        options={repsTimeOptions}
-        bind:selected={selectedRepsTime} />
-      <!-- {#if selectedRepsTime === 'Time'} -->
-      <Select
-        name="timeUnit"
-        disabled={selectedRepsTime !== 'Time'}
-        options={timeUnitOptions}
-        bind:selected={selectedTimeUnit} />
-      <!-- {/if} -->
-    </div>
+    <Input
+      type="number"
+      label={selectedRepsTime}
+      name="repsTime"
+      value={repsTime}
+      on:input={e => (repsTime = e.target.value)} />
+    <!-- Selected time unit -->
+    <label class="radio" class:disabled={selectedRepsTime !== options.time}>
+      <input
+        disabled={selectedRepsTime !== options.time}
+        type="radio"
+        name={options.sec}
+        value={options.sec}
+        bind:group={selectedTimeUnit} />
+      {options.sec}
+    </label>
+    <label class="radio" class:disabled={selectedRepsTime !== options.time}>
+      <input
+        disabled={selectedRepsTime !== options.time}
+        type="radio"
+        name={options.min}
+        value={options.min}
+        bind:group={selectedTimeUnit} />
+      {options.min}
+    </label>
     <!-- Load inputs -->
-    <div class="load-inputs">
-      <Input
-        label="Load"
-        name="load"
-        value={load}
-        on:input={e => (load = e.target.value)} />
-      <Select
-        name="loadUnit"
-        options={loadUnitOptions}
-        bind:selected={selectedLoadUnit} />
-    </div>
+    <Input
+      label="Load"
+      name="load"
+      value={load}
+      on:input={e => (load = e.target.value)} />
+    <!-- Selected load unit -->
+    <label class="radio">
+      <input
+        type="radio"
+        name={options.lbs}
+        value={options.lbs}
+        bind:group={selectedLoadUnit} />
+      {options.lbs}
+    </label>
+    <label class="radio">
+      <input
+        type="radio"
+        name={options.kg}
+        value={options.kg}
+        bind:group={selectedLoadUnit} />
+      {options.kg}
+    </label>
   </div>
 </EditFormModalLayout>
