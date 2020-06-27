@@ -4,7 +4,6 @@
 
   //FSM
   import { exercisesMachine } from '@/fsm/exercises/exercisesMachine.js';
-  import { useMachine } from '@/fsm/machineStores.js';
 
   // Components
   import Input from '@/components/UI/Input.svelte';
