@@ -1,15 +1,15 @@
 <script>
   // Svelte
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
 
   // Components
-  import Button from "../UI/Button.svelte";
+  import Button from '../UI/Button.svelte';
 
   $: deferredPrompt = null;
 
   onMount(() => {
-    window.addEventListener("beforeinstallprompt", e => {
-      console.log("Install prompt event fired");
+    window.addEventListener('beforeinstallprompt', e => {
+      console.log('Install prompt event fired');
       e.preventDefault();
       deferredPrompt = e;
     });
@@ -19,10 +19,10 @@
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(choiceResult => {
-        if (choiceResult.outcome === "accepted") {
-          console.log("The Strength Log has been successfully installed.");
+        if (choiceResult.outcome === 'accepted') {
+          console.log('The Power Log has been successfully installed.');
         } else {
-          console.log("User dismissed installation.");
+          console.log('User dismissed installation.');
         }
       });
       deferredPrompt = null;
