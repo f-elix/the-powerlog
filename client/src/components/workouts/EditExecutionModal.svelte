@@ -2,12 +2,8 @@
   // Svelte
   import { getContext } from 'svelte';
 
-  //FSM
-  import { exercisesMachine } from '@/fsm/exercises/exercisesMachine.js';
-
   // Components
   import Input from '@/components/UI/Input.svelte';
-  import Select from '@/components/UI/Select.svelte';
   import EditFormModalLayout from './EditFormModalLayout.svelte';
 
   const { editWorkoutState, editWorkoutSend } = getContext('editWorkout');
