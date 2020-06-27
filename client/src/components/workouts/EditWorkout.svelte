@@ -1,45 +1,45 @@
 <script>
   // Svelte
-  import { onMount, onDestroy, setContext, getContext } from "svelte";
-  import { fly } from "svelte/transition";
+  import { onMount, onDestroy, setContext, getContext } from 'svelte';
+  import { fly } from 'svelte/transition';
 
   // FSM
-  import { exercisesMachine } from "@/fsm/exercises/exercisesMachine.js";
-  import { templatesMachine } from "@/fsm/templates/templatesMachine.js";
-  import { editWorkoutMachine } from "@/fsm/workouts/editWorkoutMachine.js";
-  import { useMachine } from "@/fsm/machineStores.js";
+  import { exercisesMachine } from '@/fsm/exercises/exercisesMachine.js';
+  import { templatesMachine } from '@/fsm/templates/templatesMachine.js';
+  import { editWorkoutMachine } from '@/fsm/workouts/editWorkoutMachine.js';
+  import { useMachine } from '@/fsm/machineStores.js';
 
   // Components
-  import Button from "@/components/UI/Button.svelte";
-  import Spinner from "@/components/UI/Spinner.svelte";
-  import EditWorkoutForm from "@/components/workouts/EditWorkoutForm.svelte";
-  import EditExerciseModal from "@/components/workouts/EditExerciseModal.svelte";
-  import EditExecutionModal from "@/components/workouts/EditExecutionModal.svelte";
-  import SelectTemplateModal from "@/components/workouts/SelectTemplateModal.svelte";
-  import ExerciseHistoryModal from "@/components/workouts/ExerciseHistoryModal.svelte";
+  import Button from '@/components/UI/Button.svelte';
+  import Spinner from '@/components/UI/Spinner.svelte';
+  import EditWorkoutForm from '@/components/workouts/EditWorkoutForm.svelte';
+  import EditExerciseModal from '@/components/workouts/EditExerciseModal.svelte';
+  import EditExecutionModal from '@/components/workouts/EditExecutionModal.svelte';
+  import SelectTemplateModal from '@/components/workouts/SelectTemplateModal.svelte';
+  import ExerciseHistoryModal from '@/components/workouts/ExerciseHistoryModal.svelte';
 
   const { exercisesState, exercisesSend } = useMachine(exercisesMachine);
   const { templatesState, templatesSend } = useMachine(templatesMachine);
-  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
+  const { editWorkoutState, editWorkoutSend } = getContext('editWorkout');
 
   onMount(() => {
-    exercisesSend({ type: "LOAD" });
-    templatesSend({ type: "LOAD" });
+    exercisesSend({ type: 'LOAD' });
+    templatesSend({ type: 'LOAD' });
   });
 
   export let isNew = true;
-  export let workoutType = "session";
+  export let workoutType = 'session';
 
   $: exercises = $exercisesState.context.exercises;
   $: templates = $templatesState.context.templates;
-  $: if ($editWorkoutState.matches("dragging")) {
-    document.body.dataset.state = "dragging";
+  $: if ($editWorkoutState.matches('dragging')) {
+    document.body.dataset.state = 'dragging';
   } else {
     delete document.body.dataset.state;
   }
 
   function onDrop() {
-    editWorkoutSend({ type: "DROP" });
+    editWorkoutSend({ type: 'DROP' });
   }
 
   function onMove(e) {
@@ -47,7 +47,7 @@
     const x = e.clientX;
     const y = e.clientY;
     editWorkoutSend({
-      type: "MOVE",
+      type: 'MOVE',
       params: {
         x,
         y
@@ -61,11 +61,11 @@
     }
     const hoveredEl = document
       .elementFromPoint(x, y)
-      .closest("[data-exercise-id]");
+      .closest('[data-exercise-id]');
     if (hoveredEl) {
       const exerciseId = hoveredEl.dataset.exerciseId;
       editWorkoutSend({
-        type: "ENTER",
+        type: 'ENTER',
         params: {
           y,
           exerciseId,
@@ -74,7 +74,7 @@
         }
       });
     } else {
-      editWorkoutSend({ type: "LEAVE" });
+      editWorkoutSend({ type: 'LEAVE' });
     }
   }
 
@@ -90,29 +90,36 @@
   function onCancelEdit() {
     if (isNew) {
       editWorkoutSend({
-        type: "DISCARD",
+        type: 'DISCARD',
         params: {
           workoutType
         }
       });
     } else {
-      editWorkoutSend({ type: "CANCEL" });
+      editWorkoutSend({ type: 'CANCEL' });
     }
   }
 
   function onAddExercise() {
-    editWorkoutSend({ type: "ADD_EXERCISE" });
+    editWorkoutSend({ type: 'ADD_EXERCISE' });
   }
 </script>
 
 <style>
+  .ctn {
+    margin-bottom: 4rem;
+  }
+
   .actions {
     position: fixed;
-    top: 50%;
+    z-index: 1000;
+    bottom: 0;
     right: 0;
     display: flex;
     align-items: center;
-    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+    height: 8rem;
     padding: 1rem;
     background-color: var(--color-fg-light);
   }
@@ -141,6 +148,7 @@
   }
 
   .actions .add {
+    width: 8rem;
     border: var(--border-thin) var(--color-action);
     background: none;
   }
@@ -159,7 +167,7 @@
   {#if $editWorkoutState.matches('saving') || $editWorkoutState.matches('done')}
     <Spinner />
   {:else}
-    <div>
+    <div class="ctn">
       <!-- Header -->
       <h1>{isNew ? 'Creating' : 'Editing'} {workoutType}...</h1>
       <!-- Workout form -->

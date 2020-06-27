@@ -1,19 +1,19 @@
 <script>
   // svelte
-  import { getContext } from "svelte";
-  import { flip } from "svelte/animate";
-  import { fly } from "svelte/transition";
+  import { getContext } from 'svelte';
+  import { flip } from 'svelte/animate';
+  import { fly } from 'svelte/transition';
 
   // Components
-  import Input from "@/components/UI/Input.svelte";
-  import Button from "@/components/UI/Button.svelte";
-  import EditWorkoutCardExercise from "./EditWorkoutCardExercise.svelte";
+  import Input from '@/components/UI/Input.svelte';
+  import Button from '@/components/UI/Button.svelte';
+  import EditWorkoutCardExercise from './EditWorkoutCardExercise.svelte';
 
-  const { editWorkoutState, editWorkoutSend } = getContext("editWorkout");
+  const { editWorkoutState, editWorkoutSend } = getContext('editWorkout');
 
   const types = {
-    session: "session",
-    template: "template"
+    session: 'session',
+    template: 'template'
   };
 
   export let workoutType;
@@ -31,7 +31,7 @@
   function move(node, animation, params) {
     const { exerciseId } = params;
     if (
-      $editWorkoutState.matches("dragging") &&
+      $editWorkoutState.matches('dragging') &&
       draggedExerciseId === exerciseId
     ) {
       return {
@@ -42,31 +42,27 @@
   }
 
   function onDateInput(e) {
-    editWorkoutSend({ type: "DATE_INPUT", params: { value: e.target.value } });
+    editWorkoutSend({ type: 'DATE_INPUT', params: { value: e.target.value } });
   }
 
   function onNameInput(e) {
-    editWorkoutSend({ type: "NAME_INPUT", params: { value: e.target.value } });
+    editWorkoutSend({ type: 'NAME_INPUT', params: { value: e.target.value } });
   }
 
   function onNotesInput(e) {
-    editWorkoutSend({ type: "NOTES_INPUT", params: { value: e.target.value } });
+    editWorkoutSend({ type: 'NOTES_INPUT', params: { value: e.target.value } });
   }
 
   function onInstructionsInput(e) {
     editWorkoutSend({
-      type: "INSTRUCTIONS_INPUT",
+      type: 'INSTRUCTIONS_INPUT',
       params: { value: e.detail }
     });
   }
 
   function onUseTemplate() {
-    editWorkoutSend({ type: "USE_TEMPLATE" });
+    editWorkoutSend({ type: 'USE_TEMPLATE' });
   }
-
-  //   function onAddExercise() {
-  //     editWorkoutSend({ type: "ADD_EXERCISE" });
-  //   }
 </script>
 
 <style>
@@ -91,8 +87,7 @@
   }
 
   .buttons {
-    display: grid;
-    grid-row-gap: 2rem;
+    margin-top: 4rem;
   }
 </style>
 
@@ -148,14 +143,8 @@
     on:input={onInstructionsInput} />
 {/if}
 <div class="buttons">
-  <!-- Add exercise button -->
-  <!-- <Button size="big" color="action" on:click={onAddExercise}>
-    <i class="material-icons">add_box</i>
-    Add Exercise
-  </Button> -->
-  <!-- Use template button -->
   {#if workoutType === types.session}
-    <Button size="big" color="action" on:click={onUseTemplate}>
+    <Button size="big" color="action" variant="filled" on:click={onUseTemplate}>
       <i class="material-icons">note_add</i>
       Use Template
     </Button>

@@ -1,35 +1,35 @@
 <script>
   // Svelte
-  import { route } from "@sveltech/routify";
-  import { getContext, createEventDispatcher } from "svelte";
-  import { fly } from "svelte/transition";
-  import { goto, params } from "@sveltech/routify";
+  import { route } from '@sveltech/routify';
+  import { getContext, createEventDispatcher } from 'svelte';
+  import { fly } from 'svelte/transition';
+  import { goto, params } from '@sveltech/routify';
 
   // Components
-  import Button from "@/components/UI/Button.svelte";
+  import Button from '@/components/UI/Button.svelte';
 
   const dispatch = createEventDispatcher();
 
-  const { workoutState, workoutSend } = getContext("workout");
+  const { workoutState, workoutSend } = getContext('workout');
 
-  export let workoutType = "session";
+  export let workoutType = 'session';
 
   $: workout = $workoutState.context.workoutData;
 
   function onDelete() {
-    dispatch("delete");
+    dispatch('delete');
   }
 
   function onEdit() {
-    workoutSend({ type: "EDIT" });
+    workoutSend({ type: 'EDIT' });
   }
 
   function onDisplayOut() {
-    workoutSend({ type: "DISPLAY_OUT" });
+    workoutSend({ type: 'DISPLAY_OUT' });
   }
 
   function onUseAsTemplate() {
-    workoutSend({ type: "USE_AS_TEMPLATE" });
+    workoutSend({ type: 'USE_AS_TEMPLATE' });
   }
 </script>
 
