@@ -176,12 +176,29 @@ const services = {
 const actions = {
 	updateWorkoutData: assign({
 		workoutData: (context, event) => {
-			if (!event.data) {
-				return context.workoutData;
-			}
-			return event.data.workoutData || event.data;
+			return (
+				(event.data && event.data.workoutData) ||
+				event.data ||
+				context.workoutData
+			);
 		}
 	}),
+	storeWorkoutDataInLocalStorage: (context, _) => {
+		localStorage.setItem(
+			'workoutData',
+			JSON.stringify(context.workoutData)
+		);
+	},
+	getWorkoutDataFromLocalStorage: assign({
+		workoutData: () => {
+			const data = JSON.parse(localStorage.getItem('workoutData'));
+			localStorage.removeItem('workoutData');
+			return data;
+		}
+	}),
+	clearWorkoutDataFromLocalStorage: () => {
+		localStorage.removeItem('workoutData');
+	},
 	updateFetchError: assign({
 		fetchError: (_, event) => event.data.message
 	}),
@@ -274,6 +291,7 @@ export const workoutMachine = Machine(
 				}
 			},
 			editing: {
+				entry: ['storeWorkoutDataInLocalStorage'],
 				invoke: {
 					id: 'editWorkout',
 					src: editWorkoutMachine.withConfig({
@@ -284,17 +302,21 @@ export const workoutMachine = Machine(
 					}),
 					data: {
 						workout: (context, _) => {
-							return { ...context.workoutData };
+							return context.workoutData;
 						}
 					},
 					onDone: {
 						target: 'displaying',
-						actions: ['updateWorkoutData']
+						actions: [
+							'updateWorkoutData',
+							'clearWorkoutDataFromLocalStorage'
+						]
 					}
 				},
 				on: {
 					CANCEL: {
-						target: 'transitioning'
+						target: 'transitioning',
+						actions: ['getWorkoutDataFromLocalStorage']
 					}
 				}
 			},
