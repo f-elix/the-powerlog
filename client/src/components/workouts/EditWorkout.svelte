@@ -6,7 +6,6 @@
   // FSM
   import { exercisesMachine } from '@/fsm/exercises/exercisesMachine.js';
   import { templatesMachine } from '@/fsm/templates/templatesMachine.js';
-  import { editWorkoutMachine } from '@/fsm/workouts/editWorkoutMachine.js';
   import { useMachine } from '@/fsm/machineStores.js';
 
   // Components
