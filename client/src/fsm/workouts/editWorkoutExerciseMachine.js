@@ -17,12 +17,18 @@ const actions = {
 					unit: executionData.selectedLoadUnit
 				}
 			};
-			const movementIndex = context.workoutExercise.movements.findIndex(m => m._id === context.movement._id);
+			const movementIndex = context.workoutExercise.movements.findIndex(
+				(m) => m._id === context.movement._id
+			);
 			const updatedExercise = context.workoutExercise;
 			if (executionData._id) {
 				execution._id = executionData._id;
-				const executionIndex = context.movement.executions.findIndex(e => e._id === context.execution._id);
-				updatedExercise.movements[movementIndex].executions[executionIndex] = execution;
+				const executionIndex = context.movement.executions.findIndex(
+					(e) => e._id === context.execution._id
+				);
+				updatedExercise.movements[movementIndex].executions[
+					executionIndex
+				] = execution;
 			} else {
 				execution._id = ObjectID();
 				updatedExercise.movements[movementIndex].executions = [
@@ -36,7 +42,9 @@ const actions = {
 	updateExerciseMovement: assign({
 		workoutExercise: (context, event) => {
 			const { movementId, exercise } = event.params;
-			const movementIndex = context.workoutExercise.movements.findIndex(m => m._id === movementId);
+			const movementIndex = context.workoutExercise.movements.findIndex(
+				(m) => m._id === movementId
+			);
 			const updatedWorkoutExercise = context.workoutExercise;
 			updatedWorkoutExercise.movements[movementIndex].exercise = exercise;
 			return updatedWorkoutExercise;
@@ -59,14 +67,16 @@ const actions = {
 	deleteMovement: assign({
 		workoutExercise: (context, event) => {
 			const updatedExercise = context.workoutExercise;
-			updatedExercise.movements = updatedExercise.movements.filter(m => m._id !== event.params.movementId);
+			updatedExercise.movements = updatedExercise.movements.filter(
+				(m) => m._id !== event.params.movementId
+			);
 			return updatedExercise;
 		}
 	}),
 	generateExerciseIds: assign({
 		workoutExercise: (context, _) => {
 			const updatedExercise = context.workoutExercise;
-			updatedExercise.movements.forEach(m => {
+			updatedExercise.movements.forEach((m) => {
 				if (!m.exercise._id) {
 					m.exercise._id = ObjectID();
 				}
@@ -87,14 +97,21 @@ const actions = {
 };
 
 const guards = {
-	hasEmptyMovement: (context, _) => context.workoutExercise.movements.some(m => m.exercise.name.trim().length === 0),
+	hasEmptyMovement: (context, _) =>
+		context.workoutExercise.movements.some(
+			(m) => m.exercise.name.trim().length === 0
+		),
 	isSetsEmpty: (_, event) => event.params.executionData.sets <= 0
 };
 
-export const editWorkoutExerciseMachine = (workoutExercise, movement, execution) => {
+export const editWorkoutExerciseMachine = (
+	workoutExercise,
+	movement,
+	execution
+) => {
 	if (!workoutExercise) {
 		workoutExercise = {
-			_id: ObjectID(),
+			_id: ObjectID().toString(),
 			movements: [
 				{
 					_id: ObjectID(),
@@ -161,7 +178,7 @@ export const editWorkoutExerciseMachine = (workoutExercise, movement, execution)
 					}
 				},
 				done: {
-					entry: sendParent(context => ({
+					entry: sendParent((context) => ({
 						type: 'DONE',
 						exercise: context.workoutExercise
 					})),
