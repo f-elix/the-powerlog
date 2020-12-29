@@ -23,7 +23,7 @@
 		<h2 class="text-50">{ui.tagline}</h2>
 	</div>
 	<div class="flex flex-col space-y-50 w-full px-50">
-		<Button on:click={onLogin}>{ui.login}</Button>
-		<Button variant="outlined" on:click={onSignUp}>{ui.signup}</Button>
+		<Button theme="info" on:click={onLogin}>{ui.login}</Button>
+		<Button theme="info" variant="outlined" on:click={onSignUp}>{ui.signup}</Button>
 	</div>
 </section>

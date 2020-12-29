@@ -1,11 +1,15 @@
 <script lang="ts">
 	export let variant = 'filled'; // Filled, outlined
-	export let theme = 'info'; // Info, success, danger
+	export let theme = 'primary'; // Primary, info, success, danger
 </script>
 
 <style>
 	button.filled {
 		background-color: var(--theme);
+	}
+
+	button.primary {
+		@apply border-primary bg-primary;
 	}
 
 	button.info {
