@@ -1,0 +1,55 @@
+html {
+	--unit-root: 1;
+	--fluid-breakpoint-root: 1560;
+	--unit-in-vw: calc(var(--unit-root) * 100 / var(--fluid-breakpoint-root) * 1vw);
+	--unit-in-px: calc(var(--unit-root) * 1px);
+
+	font-size: calc(var(--unit-in-vw) * 3);
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+
+body {
+	@apply min-w-min;
+	@apply font-base text-40;
+	@apply bg-main text-main;
+}
+
+@screen ip {
+	html {
+		font-size: calc(var(--unit-in-vw) * 2.5);
+	}
+}
+
+@screen ph {
+	html {
+		font-size: calc(var(--unit-in-vw) * 2);
+	}
+}
+
+@screen xs {
+	html {
+		font-size: calc(var(--unit-in-vw) * 1.5);
+	}
+}
+
+@screen sm {
+	html {
+		font-size: calc(var(--unit-in-vw) * 1.25);
+	}
+}
+
+@screen md {
+	html {
+		font-size: var(--unit-in-vw);
+	}
+}
+
+@screen xl {
+	html {
+		font-size: var(--unit-in-px);
+	}
+}
+
+button:focus {
+	outline: none;
+}
