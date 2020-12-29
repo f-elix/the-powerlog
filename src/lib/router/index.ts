@@ -124,8 +124,6 @@ export const createRouter: (
 	);
 
 	const onTransition = (state: any, event: RouterEvent) => {
-		console.log(event);
-		console.log(state.value);
 		if (event.type.includes('xstate')) {
 			return;
 		}
