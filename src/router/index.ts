@@ -1,8 +1,7 @@
-import { createRouter, view } from '@/lib/router/index';
-// View Components
 import Auth from '@/views/Auth.svelte';
 import Dashboard from '@/views/Dashboard.svelte';
 import Session from '@/views/Session.svelte';
+import { createRouter, view } from '../lib/router/index';
 
 export const router = createRouter({
 	initial: 'auth',
