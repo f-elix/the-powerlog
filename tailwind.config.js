@@ -95,7 +95,8 @@ module.exports = {
 		},
 		borderRadius: {
 			0: 0,
-			10: '6px'
+			10: '6px',
+			full: '100%'
 		},
 		borderWidth: {
 			10: '1px',

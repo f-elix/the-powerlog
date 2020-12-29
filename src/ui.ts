@@ -42,5 +42,7 @@ export const ui: Ui = {
 		sessionDate: 'Session date',
 		from: 'From',
 		to: 'To'
-	}
+	},
+	loadMore: 'Load More',
+	newSession: 'New session'
 };
