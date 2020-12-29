@@ -53,3 +53,8 @@ body {
 button:focus {
 	outline: none;
 }
+
+svg,
+img {
+	display: block;
+}

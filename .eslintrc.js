@@ -6,7 +6,7 @@ module.exports = {
 		'plugin:@typescript-eslint/recommended'
 	],
 	parser: '@typescript-eslint/parser',
-	plugins: ['svelte3', 'prettier', '@typescript-eslint'],
+	plugins: ['@typescript-eslint', 'svelte3', 'prettier'],
 	rules: {
 		'prettier/prettier': 'off',
 		'no-console': ['warn', { allow: ['warn', 'error'] }],

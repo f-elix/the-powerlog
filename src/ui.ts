@@ -1,4 +1,11 @@
-export const ui: Record<string, string | Record<string, string>> = {
+export interface Filter {
+	name: string;
+	component: string;
+}
+
+export type Ui = Record<string, string | Filter[] | Record<string, string>>;
+
+export const ui: Ui = {
 	appName: 'Powerlog',
 	tagline: 'Log your training, get the results.',
 	login: 'Login',
@@ -6,11 +13,34 @@ export const ui: Record<string, string | Record<string, string>> = {
 	logout: 'Logout',
 	dashboardTitle: 'Log History',
 	filterBy: 'Filter by',
-	filters: {
-		name: 'Name',
-		date: 'Date',
-		period: 'Period',
-		daysAgo: 'Days ago',
-		weeksAgo: 'Weeks ago'
+	filters: [
+		{
+			name: 'Name',
+			component: 'Name'
+		},
+		{
+			name: 'Days ago',
+			component: 'DaysAgo'
+		},
+		{
+			name: 'Weeks ago',
+			component: 'WeeksAgo'
+		},
+		{
+			name: 'Date',
+			component: 'Date'
+		},
+		{
+			name: 'Period',
+			component: 'Period'
+		}
+	],
+	labels: {
+		sessionName: 'Session name',
+		daysAgo: 'days ago',
+		weeksAgo: 'weeks ago',
+		sessionDate: 'Session date',
+		from: 'From',
+		to: 'To'
 	}
 };

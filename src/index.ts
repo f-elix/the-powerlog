@@ -2,6 +2,7 @@ import App from './App.svelte';
 import './styles/Tailwind.css';
 import './styles/fonts.css';
 import './styles/app.css';
+import './styles/filters.css';
 
 const app = new App({
 	target: document.body
