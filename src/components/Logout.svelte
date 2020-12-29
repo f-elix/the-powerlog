@@ -9,7 +9,10 @@
 	};
 </script>
 
-<button class={extClass} on:click={onLogout} aria-label={ui.logout}>
+<button
+	class="{extClass} p-20 rounded-10 ring-2 ring-opacity-0 ring-highlight focus:ring-opacity-100"
+	on:click={onLogout}
+	aria-label={ui.logout}>
 	<svg
 		class="w-90 h-90"
 		width="29"

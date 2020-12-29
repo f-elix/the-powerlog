@@ -36,7 +36,7 @@
 </style>
 
 <button
-	class="{variant} {theme} py-50 font-bold rounded-10 shadow-lg transition-colors ring-2 ring-transparent focus-visible:ring-highlight"
+	class="{variant} {theme} py-50 font-bold rounded-10 shadow-lg transition-colors ring-2 ring-opacity-0 ring-highlight focus-visible:ring-opacity-100"
 	on:click>
 	<slot />
 </button>
