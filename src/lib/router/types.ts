@@ -8,7 +8,8 @@ import type {
 	StateSchema,
 	Action,
 	ActionFunction,
-	ActionObject
+	ActionObject,
+	StateNodeConfig
 } from 'xstate';
 import type ComponentTree from 'xstate-component-tree';
 
@@ -17,14 +18,6 @@ export type Query = Record<string, string>;
 export type Params = Record<string, string>;
 
 export type Routes = Record<string, string>;
-
-export interface RouterStateNode {
-	initial?: string;
-	states?: {
-		[key: string]: string | Record<string, unknown>;
-	};
-	meta?: Record<string, unknown>;
-}
 
 export interface RouterSchema {
 	initial: string | Record<string, unknown>;
@@ -35,7 +28,7 @@ export interface RouterSchema {
 }
 
 export interface RouterContext {
-	$page: {
+	$page?: {
 		query: Query;
 		params: Params;
 	};
@@ -46,6 +39,7 @@ export interface RouterEvent extends EventObject {
 	query?: Record<string, string>;
 	params?: Params;
 	external?: boolean;
+	[key: string]: any;
 }
 
 export type RouterConfig = MachineConfig<RouterContext, RouterSchema, RouterEvent>;
@@ -77,5 +71,9 @@ export type ActionType =
 	| ActionFunction<RouterContext, RouterEvent>
 	| Action<RouterContext, RouterEvent>[]
 	| undefined;
+
+export interface RouterStateNode extends StateNodeConfig<RouterContext, RouterSchema, RouterEvent> {
+	meta?: Record<string, unknown>;
+}
 
 export type { MachineOptions, State, StateSchema };

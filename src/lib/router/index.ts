@@ -19,7 +19,8 @@ import type {
 	MachineOptions,
 	View,
 	Routes,
-	ActionType
+	ActionType,
+	StateSchema
 } from './types';
 
 enum RouterEvents {
@@ -97,7 +98,7 @@ export const createRouter: (
 					params: {}
 				}
 			},
-			entry: ['updatePage', 'updateUrl', ...getUserEntryActions(machineConfig.entry)],
+			entry: ['updatePage', ...getUserEntryActions(machineConfig.entry)],
 			on: {
 				...machineConfig.on,
 				...$events
@@ -114,23 +115,6 @@ export const createRouter: (
 						return { query, params };
 					}
 				}),
-				updateUrl: (context, event, { state }) => {
-					if (event.external || event.type.includes('xstate')) {
-						return;
-					}
-					const stateStr = state.toStrings();
-					const statePath = stateStr[stateStr.length - 1];
-					const path = $routes[statePath];
-					const { params } = context.$page;
-					const paramsString = toParamsString(params);
-					const { query } = context.$page;
-					const queryString = toQueryString(query);
-					window.history.pushState(
-						{},
-						document.title,
-						`#${path}${paramsString}${queryString}`
-					);
-				},
 				redirectToFallback: () => {
 					const path = $routes[fallbackState];
 					window.history.pushState({}, document.title, `#${path}`);
@@ -139,9 +123,27 @@ export const createRouter: (
 		}
 	);
 
-	const service = interpret(routerMachine, interpreterOptions);
+	const onTransition = (state: any, event: RouterEvent) => {
+		console.log(event);
+		console.log(state.value);
+		if (event.type.includes('xstate')) {
+			return;
+		}
+		const { context } = state;
+		const stateStr = state.toStrings();
+		const statePath = stateStr[stateStr.length - 1];
+		const path = $routes[statePath];
+		const params = context.$page?.params;
+		const paramsString = toParamsString(params);
+		const query = context.$page?.query;
+		const queryString = toQueryString(query);
+		const url = `#${path}${paramsString}${queryString}`;
+		if (url !== window.location.hash) {
+			window.history.pushState({}, document.title, url);
+		}
+	};
 
-	const getViews = (cb: (list: View[]) => void) => new ComponentTree(service, cb);
+	const service = interpret(routerMachine, interpreterOptions).onTransition(onTransition);
 
 	const currentUrl = window.location.hash;
 
@@ -159,6 +161,10 @@ export const createRouter: (
 			service.send({ type: RouterEvents.fallback, external: true });
 		}
 	};
+
+	service.start();
+
+	sendRoutingEvent(currentUrl);
 
 	const onUrlChange = () => {
 		sendRoutingEvent(window.location.hash);
@@ -178,13 +184,13 @@ export const createRouter: (
 			});
 	};
 
+	const getViews = (cb: (list: View[]) => void) => new ComponentTree(service, cb);
+
 	const update = () => {
 		getLinks();
 	};
 
 	const init = () => {
-		service.start();
-		sendRoutingEvent(currentUrl);
 		getLinks();
 		window.addEventListener('popstate', onUrlChange);
 	};

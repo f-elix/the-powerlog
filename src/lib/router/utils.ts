@@ -19,7 +19,7 @@ export const toQueryString: (query?: string | Record<string, string>) => string 
 	return `?${qs}`;
 };
 
-export const toParamsString: (params: Params) => string = (params) =>
+export const toParamsString: (params?: Params) => string = (params = {}) =>
 	Object.values(params)
 		.map((param) => `/${param}`)
 		.join('');

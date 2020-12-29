@@ -7,6 +7,7 @@
 		"ts-check": "svelte-check"
 	},
 	"dependencies": {
+		"netlify-identity-widget": "^1.9.1",
 		"svelte": "^3.31.0",
 		"xstate": "^4.15.2",
 		"xstate-component-tree": "^3.3.1"
@@ -17,6 +18,7 @@
 		"@snowpack/plugin-svelte": "^3.4.1",
 		"@snowpack/plugin-typescript": "^1.1.1",
 		"@tsconfig/svelte": "^1.0.10",
+		"@types/netlify-identity-widget": "^1.9.1",
 		"@types/snowpack-env": "^2.3.3",
 		"@typescript-eslint/eslint-plugin": "^4.11.0",
 		"@typescript-eslint/parser": "^4.11.0",
