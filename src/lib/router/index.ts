@@ -20,7 +20,7 @@ import type {
 	View,
 	Routes,
 	ActionType,
-	StateSchema
+	State
 } from './types';
 
 enum RouterEvents {
@@ -123,7 +123,8 @@ export const createRouter: (
 		}
 	);
 
-	const onTransition = (state: any, event: RouterEvent) => {
+	const onTransition = (state: State<RouterContext>, event: RouterEvent) => {
+		console.log({ state });
 		if (event.type.includes('xstate')) {
 			return;
 		}
