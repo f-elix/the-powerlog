@@ -8,26 +8,32 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 
 	if (!user) {
 		return {
-			statusCode: 404
+			statusCode: 403
 		};
 	}
 
-	const res = await faunaFetch({
-		query: `
-		  mutation ($id: ID!) {
-			createUser(data: { netlifyId: $id }) {
-				_id
-				netlifyId
+	try {
+		const res = await faunaFetch({
+			query: `
+			  mutation ($id: ID!) {
+				createUser(data: { netlifyId: $id }) {
+					_id
+					netlifyId
+				}
+			  }
+			`,
+			variables: {
+				id: user.id
 			}
-		  }
-		`,
-		variables: {
-			id: user.id
-		}
-	});
-
-	/* eslint-disable-next-line no-console */
-	console.log(res);
+		});
+		/* eslint-disable-next-line no-console */
+		console.log(res);
+	} catch (error) {
+		console.error(error);
+		return {
+			statusCode: 400
+		};
+	}
 
 	return {
 		statusCode: 200
