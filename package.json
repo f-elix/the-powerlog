@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"scripts": {
 		"build:lambda": "netlify-lambda build src/functions",
-		"start": "npm run build:lambda && snowpack dev",
-		"build": "npm run build:lambda && snowpack build",
+		"start": "snowpack dev",
+		"build": "snowpack build",
 		"ts-check": "svelte-check"
 	},
 	"dependencies": {
