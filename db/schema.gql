@@ -1,0 +1,8 @@
+type User {
+	netlifyId: ID!
+	name: String!
+}
+
+type Query {
+	getUserById(netlifyId: ID!): User
+}
