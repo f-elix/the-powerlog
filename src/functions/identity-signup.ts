@@ -12,26 +12,21 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 		};
 	}
 
-	const name = user.user_metadata?.full_name;
-
-	const res = await faunaFetch({
+	await faunaFetch({
 		query: `
-		  mutation ($id: ID!, $name: String!) {
-			createUser(data: { netlifyId: $id, name: $name }) {
+		  mutation ($id: ID!) {
+			createUser(data: { netlifyId: $id }) {
 				_id
 				netlifyId
-				name
 			}
 		  }
 		`,
 		variables: {
-			id: user.id,
-			name: name || 'Anonymous'
+			id: user.id
 		}
 	});
 
 	return {
-		statusCode: 200,
-		body: JSON.stringify(res)
+		statusCode: 200
 	};
 };
