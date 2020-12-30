@@ -1,6 +1,54 @@
+type Duration {
+	amount: Float
+	unit: String
+}
+
+type Load {
+	amount: Float
+	unit: String
+}
+
+type Execution {
+	sets: Float
+	reps: Float
+	time: Duration
+	load: Load
+	movement: Movement
+}
+
+type Movement {
+	sessionExercise: SessionExercise
+	exercise: Exercise!
+	executions: [Execution] @relation
+}
+
+type SessionExercise {
+	movements: [Movement] @relation
+	session: Session
+}
+
+type Bodyweight {
+	amount: Float
+	unit: String
+}
+
+type Session {
+	name: String!
+	date: Date!
+	exercises: [SessionExercise] @relation
+	bodyweigth: Bodyweight
+	creator: User!
+}
+
+type Exercise {
+	name: String
+	user: User
+}
+
 type User {
 	netlifyId: ID!
-	name: String!
+	sessions: [Session] @relation
+	exercises: [Exercise] @relation
 }
 
 type Query {
