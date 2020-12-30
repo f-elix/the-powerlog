@@ -14,7 +14,7 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 
 	const name = user.user_metadata?.full_name;
 
-	await faunaFetch({
+	const res = await faunaFetch({
 		query: `
 		  mutation ($id: ID!, $name: String!) {
 			createUser(data: { netlifyId: $id, name: $name }) {
@@ -31,6 +31,7 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 	});
 
 	return {
-		statusCode: 200
+		statusCode: 200,
+		body: JSON.stringify(res)
 	};
 };
