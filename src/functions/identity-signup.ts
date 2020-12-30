@@ -5,13 +5,14 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 	event
 ) => {
 	const { user } = JSON.parse(event.body || '{}');
-	console.log(user);
 
 	if (!user) {
 		return {
 			statusCode: 404
 		};
 	}
+
+	const name = user.user_metadata?.full_name;
 
 	await faunaFetch({
 		query: `
@@ -25,7 +26,7 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 		`,
 		variables: {
 			id: user.id,
-			name: user.name
+			name: name || 'Anonymous'
 		}
 	});
 
