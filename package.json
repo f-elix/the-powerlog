@@ -8,6 +8,7 @@
 		"ts-check": "svelte-check"
 	},
 	"dependencies": {
+		"encoding": "^0.1.13",
 		"netlify-identity-widget": "^1.9.1",
 		"netlify-lambda": "^2.0.2",
 		"node-fetch": "^2.6.1",
