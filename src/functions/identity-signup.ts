@@ -12,7 +12,7 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 		};
 	}
 
-	await faunaFetch({
+	const res = await faunaFetch({
 		query: `
 		  mutation ($id: ID!) {
 			createUser(data: { netlifyId: $id }) {
@@ -25,6 +25,8 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 			id: user.id
 		}
 	});
+	
+	console.log(res);
 
 	return {
 		statusCode: 200
