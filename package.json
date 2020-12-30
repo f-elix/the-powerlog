@@ -2,8 +2,8 @@
 	"name": "the-powerlog",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "snowpack dev",
 		"build:lambda": "netlify-lambda build src/functions",
+		"start": "npm run build:lambda && snowpack dev",
 		"build": "npm run build:lambda && snowpack build",
 		"ts-check": "svelte-check"
 	},
