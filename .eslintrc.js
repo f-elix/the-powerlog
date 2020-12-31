@@ -18,7 +18,9 @@ module.exports = {
 		'import/first': 0,
 		'import/no-extraneous-dependencies': 0,
 		'no-shadow': 'off',
-		'@typescript-eslint/no-shadow': 'error'
+		'@typescript-eslint/no-shadow': 'error',
+		'no-use-before-define': 'off',
+		'@typescript-eslint/no-use-before-define': ['error']
 	},
 	overrides: [
 		{
