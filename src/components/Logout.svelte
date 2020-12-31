@@ -1,11 +1,11 @@
 <script lang="ts">
-	import netlifyIdentity from 'netlify-identity-widget';
-	import { ui } from '../ui';
+	import { router } from '@/router/index';
+	import { ui } from '@/ui';
 
 	export let extClass = '';
 
 	const onLogout = () => {
-		netlifyIdentity.logout();
+		router.send('LOGOUT');
 	};
 </script>
 

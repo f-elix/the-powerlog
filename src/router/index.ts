@@ -32,7 +32,10 @@ export const router = createRouter(
 					target: 'auth'
 				},
 				on: {
-					AUTH: 'auth',
+					LOGOUT: {
+						target: 'auth',
+						actions: ['logout']
+					},
 					SESSION_NEW: 'session.new',
 					SESSION: 'session.id'
 				}
@@ -50,12 +53,6 @@ export const router = createRouter(
 			})
 		},
 		entry: ['initNetlifyIdentity'],
-		on: {
-			LOGOUT: {
-				target: 'auth',
-				actions: ['clearUser']
-			}
-		},
 		meta: {
 			routes: {
 				'session.id': '/session/:id'
@@ -73,24 +70,23 @@ export const router = createRouter(
 			storeUser: assign({
 				user: (context, event) => event.user || netlifyIdentity.currentUser()
 			}),
-			clearUser: assign({
-				user: (context, event) => null
+			logout: assign({
+				user: (context, event) => {
+					netlifyIdentity.logout();
+					return null;
+				}
 			}),
 			closeWidget: () => {
 				netlifyIdentity.close();
 			}
 		},
 		guards: {
-			isLoggedIn: (context, event) => !!netlifyIdentity.currentUser(),
-			isLoggedOut: (context, event) => !netlifyIdentity.currentUser()
+			isLoggedIn: (context, event) => !!context.user,
+			isLoggedOut: (context, event) => !context.user
 		}
 	}
 );
 
 netlifyIdentity.on('login', (user) => {
 	router.send('LOGIN', { user });
-});
-
-netlifyIdentity.on('logout', () => {
-	router.send('LOGOUT');
 });
