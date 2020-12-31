@@ -1,54 +1,50 @@
-type Duration {
-	amount: Float
-	unit: String
+type User {
+	netlifyId: ID!
+	exercises: [UserExercise] @relation(name: "user_exercises")
+	sessions: [Session] @relation(name: "user_sessions")
 }
 
-type Load {
-	amount: Float
-	unit: String
-}
-
-type Execution {
-	sets: Float
-	reps: Float
-	time: Duration
-	load: Load
-	movement: Movement
-}
-
-type Movement {
-	sessionExercise: SessionExercise
-	exercise: Exercise!
-	executions: [Execution] @relation
-}
-
-type SessionExercise {
-	movements: [Movement] @relation
-	session: Session
-}
-
-type Bodyweight {
-	amount: Float
-	unit: String
+type UserExercise {
+	creator: User! @relation(name: "user_exercises")
+	name: String!
+	history: [Exercise] @relation(name: "exercise_history")
 }
 
 type Session {
+	creator: User! @relation(name: "user_sessions")
 	name: String!
 	date: Date!
-	exercises: [SessionExercise] @relation
-	bodyweigth: Bodyweight
-	creator: User!
+	performances: [Performance] @relation(name: "session_performance")
+	bodyweigth: Weight
+}
+
+type Performance {
+	session: Session @relation(name: "session_performance")
+	exercise: [Exercise] @relation(name: "performance_exercise")
 }
 
 type Exercise {
-	name: String
-	user: User
+	performance: Performance @relation(name: "performance_exercise")
+	movement: UserExercise! @relation(name: "exercise_history")
+	date: Date!
+	executions: [Execution]
 }
 
-type User {
-	netlifyId: ID!
-	sessions: [Session] @relation
-	exercises: [Exercise] @relation
+type Execution @embedded {
+	sets: Int
+	reps: Int
+	duration: Duration
+	load: Weight
+}
+
+type Weight @embedded {
+	amount: Float
+	unit: String
+}
+
+type Duration @embedded {
+	amount: Float
+	unit: String
 }
 
 type Query {
