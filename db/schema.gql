@@ -15,7 +15,7 @@ type Session {
 	name: String!
 	date: Date!
 	performances: [Performance] @relation(name: "session_performance")
-	bodyweigth: Weight
+	bodyweight: Weight
 }
 
 type Performance {
