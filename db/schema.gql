@@ -26,8 +26,8 @@ type Performance {
 type Exercise {
 	performance: Performance @relation(name: "performance_exercise")
 	movement: UserExercise! @relation(name: "exercise_history")
-	date: Date!
 	executions: [Execution]
+	date: Date!
 }
 
 type Execution @embedded {
