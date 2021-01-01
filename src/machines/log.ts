@@ -47,9 +47,9 @@ type LogState =
 	  };
 
 type LogEvent =
+	| { type: 'LOAD'; data: { token?: string } }
 	| { type: 'done.invoke.fetchUser'; data: UserResponse }
-	| { type: 'error.platform.fetchUser'; data: string }
-	| { type: 'LOAD'; data: { token: string } };
+	| { type: 'error.platform.fetchUser'; data: string };
 
 export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 	{
