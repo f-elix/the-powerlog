@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { ui } from '@/ui';
-	import Name from '@/components/filters/Name.svelte';
-	import DaysAgo from '@/components/filters/DaysAgo.svelte';
-	import WeeksAgo from '@/components/filters/WeeksAgo.svelte';
-	import Date from '@/components/filters/Date.svelte';
-	import Period from '@/components/filters/Period.svelte';
+	import { ui } from 'src/ui';
+	import Name from 'coms/filters/Name.svelte';
+	import DaysAgo from 'coms/filters/DaysAgo.svelte';
+	import WeeksAgo from 'coms/filters/WeeksAgo.svelte';
+	import Date from 'coms/filters/Date.svelte';
+	import Period from 'coms/filters/Period.svelte';
 
-	import type { Filter } from '@/ui';
+	import type { Filter } from 'src/ui';
 	import type { SvelteComponentDev } from 'svelte/internal';
 
 	const filters: Filter[] = ui.filters;

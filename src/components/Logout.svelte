@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { router } from '@/router/index';
-	import { ui } from '@/ui';
+	import { router } from 'src/router/index';
+	import { ui } from 'src/ui';
 
 	export let extClass = '';
 

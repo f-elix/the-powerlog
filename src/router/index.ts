@@ -1,6 +1,6 @@
-import Auth from '@/views/Auth.svelte';
-import Dashboard from '@/views/Dashboard.svelte';
-import Session from '@/views/Session.svelte';
+import Auth from 'src/views/Auth.svelte';
+import Dashboard from 'src/views/Dashboard.svelte';
+import Session from 'src/views/Session.svelte';
 import { assign } from 'xstate';
 import netlifyIdentity from 'netlify-identity-widget';
 import { createRouter, view } from '../lib/router/index';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ui } from '@/ui';
+	import { ui } from 'src/ui';
 </script>
 
 <label class="_filter flex flex-col">

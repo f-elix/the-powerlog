@@ -2,7 +2,7 @@
 	// Types
 	import type { Session } from 'types';
 	// Components
-	import Button from '@/components/Button.svelte';
+	import Button from 'coms/Button.svelte';
 
 	export let session: Session;
 </script>

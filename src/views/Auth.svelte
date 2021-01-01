@@ -1,9 +1,9 @@
 <script lang="ts">
 	import netlifyIdentity from 'netlify-identity-widget';
 	import type { View } from '../lib/router/types';
-	import Button from '@/components/Button.svelte';
-	import Icon from '@/components/Icon.svelte';
-	import { ui } from '@/ui';
+	import Button from 'coms/Button.svelte';
+	import Icon from 'coms/Icon.svelte';
+	import { ui } from 'src/ui';
 
 	export let props: Record<string, unknown>;
 	export let children: View[];

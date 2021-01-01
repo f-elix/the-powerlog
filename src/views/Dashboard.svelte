@@ -3,15 +3,15 @@
 	import type { View, ViewProps } from '../lib/router/types';
 	import type { User } from 'netlify-identity-widget';
 	// Machines
-	import { log } from '@/stores/log';
+	import { log } from 'src/stores/log';
 	// ui
-	import { ui } from '@/ui';
+	import { ui } from 'src/ui';
 	// Components
-	import Button from '@/components/Button.svelte';
-	import Logout from '@/components/Logout.svelte';
-	import Filters from '@/components/Filters.svelte';
-	import SessionsList from '@/components/SessionsList.svelte';
-	import Fab from '@/components/Fab.svelte';
+	import Button from 'coms/Button.svelte';
+	import Logout from 'coms/Logout.svelte';
+	import Filters from 'coms/Filters.svelte';
+	import SessionsList from 'coms/SessionsList.svelte';
+	import Fab from 'coms/Fab.svelte';
 
 	export let props: ViewProps;
 	export let children: View[];

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ui } from '@/ui';
+	import { ui } from 'src/ui';
 </script>
 
 <div class="grid grid-cols-2 gap-50">
