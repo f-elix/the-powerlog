@@ -1,6 +1,4 @@
 <script lang="ts">
-	// Types
-	import type { Session } from 'types';
 	// Machines
 	import { log } from 'src/stores/log';
 	// Components
