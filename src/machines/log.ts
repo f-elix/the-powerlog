@@ -128,7 +128,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 		services: {
 			fetchUser: async (context, event) => {
 				assertEventType(event, 'LOAD');
-				return new Promise((resolve) => resolve(''));
+				return new Promise((resolve) => resolve('temp'));
 				// try {
 				// 	const { token } = event.data;
 				// 	const cursor = context.user?.sessions?.after || null;
