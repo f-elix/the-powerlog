@@ -26,6 +26,7 @@ export type UserResponse = {
 	};
 	sessions: {
 		data: Array<Maybe<Session>>;
+		after: string | null;
 	};
 };
 

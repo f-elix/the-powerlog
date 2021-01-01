@@ -88,7 +88,13 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					}
 				}
 			},
-			loaded: {}
+			loaded: {
+				on: {
+					LOAD: {
+						target: 'fetchingUser'
+					}
+				}
+			}
 		}
 	},
 	{
@@ -96,7 +102,17 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			updateUser: assign({
 				user: (context, event) => {
 					assertEventType(event, 'done.invoke.fetchUser');
-					return event.data;
+					const currentSessions = context.user?.sessions.data || [];
+					const loadedSessions = event.data.sessions.data;
+					const cursor = event.data.sessions.after;
+					const user = {
+						...event.data,
+						sessions: {
+							data: [...currentSessions, ...loadedSessions],
+							after: cursor
+						}
+					};
+					return user;
 				}
 			}),
 			updateError: assign({
@@ -114,10 +130,13 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 				assertEventType(event, 'LOAD');
 				try {
 					const { token } = event.data;
+					const cursor = context.user?.sessions?.after || null;
 					const res = await fetch('/.netlify/functions/get-user', {
+						method: 'POST',
 						headers: {
 							Authorization: `Bearer ${token}`
-						}
+						},
+						body: JSON.stringify({ cursor })
 					});
 					const data = await res.json();
 					return data;

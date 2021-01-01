@@ -7,10 +7,13 @@ interface TResponseData {
 }
 
 export const handler: (event: APIGatewayEvent, context: any) => Promise<TResponseData> = async (
-	_,
+	event,
 	context
 ) => {
+	const body = JSON.parse(event.body || '{}');
 	const user = context.clientContext?.user;
+	const cursor = body.cursor ? `"${body.cursor}"` : null;
+	const size = 2;
 
 	if (!user) {
 		return {
@@ -23,12 +26,13 @@ export const handler: (event: APIGatewayEvent, context: any) => Promise<TRespons
 		query($id: ID!) {
 			getUserById(netlifyId: $id) {
 			  _id
-			  sessions {
+			  sessions(_size: ${size}, _cursor: ${cursor}) {
 				data {
 				  _id
 				  name
 				  date
 				}
+				after
 			  }
 			  exercises {
 				data {

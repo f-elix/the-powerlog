@@ -12,13 +12,21 @@
 	import Filters from 'coms/Filters.svelte';
 	import SessionsList from 'coms/SessionsList.svelte';
 	import Fab from 'coms/Fab.svelte';
+	import Spinner from 'coms/Spinner.svelte';
 
 	export let props: ViewProps;
 	export let children: View[];
 
+	const { state } = log;
 	const user = props.context.user as User;
 
-	log.send({ type: 'LOAD', data: { token: user.token?.access_token } });
+	const onLoad = () => {
+		log.send({ type: 'LOAD', data: { token: user.token?.access_token } });
+	};
+
+	onLoad();
+
+	$: cursor = $state.context.user?.sessions.after;
 </script>
 
 <section class="space-y-70 px-50 h-full overflow-y-auto">
@@ -29,7 +37,12 @@
 	<div class="flex flex-col space-y-110">
 		<Filters />
 		<SessionsList />
-		<Button theme="success" variant="outlined">{ui.loadMore}</Button>
+		{#if $state.matches('fetchingUser')}
+			<Spinner />
+		{/if}
+		{#if cursor}
+			<Button theme="success" variant="outlined" on:click={onLoad}>{ui.loadMore}</Button>
+		{/if}
 	</div>
 	<Fab label={ui.newSession} />
 </section>
