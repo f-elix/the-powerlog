@@ -96,13 +96,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			updateUser: assign({
 				user: (context, event) => {
 					assertEventType(event, 'done.invoke.fetchUser');
-					const { data } = event;
-					const user = {
-						_id: data._id,
-						sessions: data.sessions?.data,
-						exercises: data.exercises?.data
-					};
-					return user as UserResponse;
+					return event.data;
 				}
 			}),
 			updateError: assign({

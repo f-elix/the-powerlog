@@ -21,11 +21,11 @@ export type User = {
 
 export type UserResponse = {
 	_id?: Scalars['ID'];
-	exercises?: {
-		data: Maybe<Array<Maybe<UserExercise>>>;
+	exercises: {
+		data: Array<Maybe<UserExercise>>;
 	};
-	sessions?: {
-		data: Maybe<Array<Maybe<Session>>>;
+	sessions: {
+		data: Array<Maybe<Session>>;
 	};
 };
 
@@ -42,7 +42,7 @@ export type Session = {
 	creator: User;
 	name: Scalars['String'];
 	date: Scalars['String'];
-	performances?: Maybe<Array<Maybe<Performance>>>;
+	performances?: Array<Maybe<Performance>>;
 	bodyweight?: Maybe<Weight>;
 };
 
