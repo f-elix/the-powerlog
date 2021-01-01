@@ -102,3 +102,49 @@ export type QueryGetUserByIdResponse = {
 		after: string | null;
 	};
 };
+
+interface user {
+	id: string;
+	name: string;
+	email: string;
+	sessions: session[]; // array relationship
+	exercises: exercise[]; // array relationship
+}
+
+interface exercise {
+	id: number;
+	userId: string; // object relationship
+	name: string;
+	history: exerciseInstance[]; // Array relationship
+}
+
+interface exerciseInstance {
+	id: number;
+	session: session; // Object relationship
+	exercise: exercise; // Object relationship
+	executions?: {
+		sets?: number;
+		reps?: number;
+		load?: {
+			amount?: number;
+			unit?: string;
+		};
+		duration?: {
+			amount?: number;
+			unit?: string;
+		};
+	}[];
+	superset: string | null;
+}
+
+interface session {
+	id: number;
+	userId: string; // object relationship
+	title: string;
+	date: string;
+	bodyweight: {
+		amount: number;
+		unit: string;
+	};
+	exercises: exerciseInstance[]; // Array relationship
+}

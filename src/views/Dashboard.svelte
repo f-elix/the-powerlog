@@ -25,8 +25,6 @@
 	};
 
 	onLoad();
-
-	$: cursor = $state.context.user?.sessions.after;
 </script>
 
 <section class="space-y-70 px-50 h-full overflow-y-auto">
@@ -37,12 +35,13 @@
 	<div class="flex flex-col space-y-110">
 		<Filters />
 		<SessionsList />
-		{#if $state.matches('fetchingUser')}
+		{#if $state.matches('fetchingSessions')}
 			<Spinner />
 		{/if}
-		{#if cursor}
+		<!-- @TODO implement pagination -->
+		<!-- {#if cursor}
 			<Button theme="success" variant="outlined" on:click={onLoad}>{ui.loadMore}</Button>
-		{/if}
+		{/if} -->
 	</div>
 	<Fab label={ui.newSession} />
 </section>

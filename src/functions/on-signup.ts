@@ -29,14 +29,13 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 		});
 		/* eslint-disable-next-line no-console */
 		console.log(res);
+		return {
+			statusCode: 200
+		};
 	} catch (error) {
 		console.error(error);
 		return {
 			statusCode: 400
 		};
 	}
-
-	return {
-		statusCode: 200
-	};
 };

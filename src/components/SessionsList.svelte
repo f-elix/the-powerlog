@@ -6,7 +6,7 @@
 
 	const { state } = log;
 
-	$: sessions = $state.context.user?.sessions?.data;
+	$: sessions = $state.context.sessions;
 </script>
 
 <div>

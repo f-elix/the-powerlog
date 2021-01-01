@@ -21,8 +21,10 @@ export const gqlQuery: (query: TQuery) => Promise<any> = async ({ query, variabl
 		const { errors, data } = await res.json();
 
 		if (errors) {
+			console.error(errors);
 			return {
-				statusCode: 500
+				statusCode: 500,
+				body: JSON.stringify(errors)
 			};
 		}
 
@@ -31,7 +33,7 @@ export const gqlQuery: (query: TQuery) => Promise<any> = async ({ query, variabl
 			body: JSON.stringify(data)
 		};
 	} catch (err) {
-		console.warn(err);
+		console.error(err);
 		throw err;
 	}
 };

@@ -1,6 +1,6 @@
 import { createMachine, assign } from 'xstate';
 import type { EventObject } from 'xstate';
-import type { UserResponse } from 'types';
+import type { Session } from 'types';
 
 function assertEventType<TE extends EventObject, TType extends TE['type']>(
 	event: TE,
@@ -12,7 +12,7 @@ function assertEventType<TE extends EventObject, TType extends TE['type']>(
 }
 
 interface LogContext {
-	user?: UserResponse;
+	sessions?: Session[];
 	error?: string;
 }
 
@@ -20,42 +20,42 @@ type LogState =
 	| {
 			value: 'idle.normal';
 			context: LogContext & {
-				user: undefined;
+				session: undefined;
 				error: undefined;
 			};
 	  }
 	| {
 			value: 'idle.error';
 			context: LogContext & {
-				user: undefined;
+				session: undefined;
 				error: string;
 			};
 	  }
 	| {
-			value: 'fetchingUser';
+			value: 'fetchingSessions';
 			context: LogContext & {
-				user: undefined;
+				session: undefined;
 				error: undefined;
 			};
 	  }
 	| {
 			value: 'loaded';
 			context: LogContext & {
-				user: UserResponse;
+				session: Session[];
 				error: undefined;
 			};
 	  };
 
 type LogEvent =
 	| { type: 'LOAD'; data: { token?: string } }
-	| { type: 'done.invoke.fetchUser'; data: UserResponse }
-	| { type: 'error.platform.fetchUser'; data: string };
+	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
+	| { type: 'error.platform.fetchUserSessions'; data: string };
 
 export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 	{
 		id: 'log',
 		context: {
-			user: undefined,
+			sessions: undefined,
 			error: undefined
 		},
 		initial: 'idle',
@@ -70,14 +70,14 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 				},
 				on: {
 					LOAD: {
-						target: 'fetchingUser'
+						target: 'fetchingSessions'
 					}
 				}
 			},
-			fetchingUser: {
-				id: 'fetchUser',
+			fetchingSessions: {
+				id: 'fetchUserSessions',
 				invoke: {
-					src: 'fetchUser',
+					src: 'fetchUserSessions',
 					onDone: {
 						target: 'loaded',
 						actions: ['updateUser']
@@ -91,7 +91,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			loaded: {
 				on: {
 					LOAD: {
-						target: 'fetchingUser'
+						target: 'fetchingSessions'
 					}
 				}
 			}
@@ -100,24 +100,16 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 	{
 		actions: {
 			updateUser: assign({
-				user: (context, event) => {
-					assertEventType(event, 'done.invoke.fetchUser');
-					// const currentSessions = context.user?.sessions.data || [];
-					// const loadedSessions = event.data.sessions.data;
-					// const cursor = event.data.sessions.after;
-					// const user = {
-					// 	...event.data,
-					// 	sessions: {
-					// 		data: [...currentSessions, ...loadedSessions],
-					// 		after: cursor
-					// 	}
-					// };
-					return context.user;
+				sessions: (context, event) => {
+					assertEventType(event, 'done.invoke.fetchUserSessions');
+					const currentSessions = context.sessions || [];
+					const loadedSessions = event.data.sessions || [];
+					return [...currentSessions, ...loadedSessions];
 				}
 			}),
 			updateError: assign({
 				error: (context, event) => {
-					assertEventType(event, 'error.platform.fetchUser');
+					assertEventType(event, 'error.platform.fetchUserSessions');
 					return event.data;
 				}
 			}),
@@ -126,25 +118,21 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			})
 		},
 		services: {
-			fetchUser: async (context, event) => {
+			fetchUserSessions: async (context, event) => {
 				assertEventType(event, 'LOAD');
-				return new Promise((resolve) => resolve('temp'));
-				// try {
-				// 	const { token } = event.data;
-				// 	const cursor = context.user?.sessions?.after || null;
-				// 	const res = await fetch('/.netlify/functions/get-user', {
-				// 		method: 'POST',
-				// 		headers: {
-				// 			Authorization: `Bearer ${token}`
-				// 		},
-				// 		body: JSON.stringify({ cursor })
-				// 	});
-				// 	const data = await res.json();
-				// 	return data;
-				// } catch (error) {
-				// 	console.warn(error);
-				// 	throw new Error('No user found');
-				// }
+				try {
+					const { token } = event.data;
+					const res = await fetch('/.netlify/functions/get-sessions', {
+						headers: {
+							Authorization: `Bearer ${token}`
+						}
+					});
+					const sessions = await res.json();
+					return sessions;
+				} catch (error) {
+					console.warn(error);
+					throw new Error('No user found');
+				}
 			}
 		}
 	}
