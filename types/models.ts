@@ -15,8 +15,8 @@ export type User = {
 	__typename?: 'User';
 	_id?: Scalars['ID'];
 	netlifyId?: Scalars['ID'];
-	exercises?: Maybe<Array<Maybe<UserExercise>>>;
-	sessions?: Maybe<Array<Maybe<Session>>>;
+	exercises?: Maybe<Array<UserExercise>>;
+	sessions?: Maybe<Array<Session>>;
 };
 
 export type UserResponse = {
@@ -90,4 +90,15 @@ export type QueryGetUserByIdArgs = {
 	_id: Scalars['ID'];
 	exercises?: Maybe<Array<Maybe<UserExercise>>>;
 	sessions?: Maybe<Array<Maybe<Session>>>;
+};
+
+export type QueryGetUserByIdResponse = {
+	_id: Scalars['ID'];
+	exercises?: {
+		data: Maybe<Array<UserExercise>>;
+	};
+	sessions?: {
+		data: Maybe<Array<Session>>;
+		after: string | null;
+	};
 };

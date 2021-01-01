@@ -1,7 +1,7 @@
 type User {
 	netlifyId: ID!
-	exercises: [UserExercise] @relation(name: "user_exercises")
-	sessions: [Session] @relation(name: "user_sessions")
+	exercises: [UserExercise!] @relation(name: "user_exercises")
+	sessions: [Session!] @relation(name: "user_sessions")
 }
 
 type UserExercise {
@@ -49,4 +49,5 @@ type Duration @embedded {
 
 type Query {
 	getUserById(netlifyId: ID!): User
+	getSessionsByName(name: String!): [Session]
 }

@@ -102,17 +102,17 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			updateUser: assign({
 				user: (context, event) => {
 					assertEventType(event, 'done.invoke.fetchUser');
-					const currentSessions = context.user?.sessions.data || [];
-					const loadedSessions = event.data.sessions.data;
-					const cursor = event.data.sessions.after;
-					const user = {
-						...event.data,
-						sessions: {
-							data: [...currentSessions, ...loadedSessions],
-							after: cursor
-						}
-					};
-					return user;
+					// const currentSessions = context.user?.sessions.data || [];
+					// const loadedSessions = event.data.sessions.data;
+					// const cursor = event.data.sessions.after;
+					// const user = {
+					// 	...event.data,
+					// 	sessions: {
+					// 		data: [...currentSessions, ...loadedSessions],
+					// 		after: cursor
+					// 	}
+					// };
+					return context.user;
 				}
 			}),
 			updateError: assign({
@@ -128,22 +128,23 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 		services: {
 			fetchUser: async (context, event) => {
 				assertEventType(event, 'LOAD');
-				try {
-					const { token } = event.data;
-					const cursor = context.user?.sessions?.after || null;
-					const res = await fetch('/.netlify/functions/get-user', {
-						method: 'POST',
-						headers: {
-							Authorization: `Bearer ${token}`
-						},
-						body: JSON.stringify({ cursor })
-					});
-					const data = await res.json();
-					return data;
-				} catch (error) {
-					console.warn(error);
-					throw new Error('No user found');
-				}
+				return new Promise((resolve) => resolve(''));
+				// try {
+				// 	const { token } = event.data;
+				// 	const cursor = context.user?.sessions?.after || null;
+				// 	const res = await fetch('/.netlify/functions/get-user', {
+				// 		method: 'POST',
+				// 		headers: {
+				// 			Authorization: `Bearer ${token}`
+				// 		},
+				// 		body: JSON.stringify({ cursor })
+				// 	});
+				// 	const data = await res.json();
+				// 	return data;
+				// } catch (error) {
+				// 	console.warn(error);
+				// 	throw new Error('No user found');
+				// }
 			}
 		}
 	}

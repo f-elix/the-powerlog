@@ -1,5 +1,5 @@
 import type { APIGatewayEvent } from 'aws-lambda';
-import { faunaFetch } from './utils/fauna';
+import { gqlQuery } from './utils/gql-query';
 
 export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }> = async (
 	event
@@ -13,17 +13,18 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 	}
 
 	try {
-		const res = await faunaFetch({
+		const res = await gqlQuery({
 			query: `
-			  mutation ($id: ID!) {
-				createUser(data: { netlifyId: $id }) {
-					_id
-					netlifyId
+				mutation ($id: String!, $name: String!, $email: String!) {
+					insert_users(objects: {id: $id, name: $name, email: $email}) {
+					affected_rows
+					}
 				}
-			  }
 			`,
 			variables: {
-				id: user.id
+				id: user.id,
+				email: user.email,
+				name: user.user_metadata.full_name
 			}
 		});
 		/* eslint-disable-next-line no-console */
