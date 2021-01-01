@@ -1,6 +1,5 @@
 /* Use this file to declare any custom file extensions for importing */
 /* Use this folder to also add/extend a package d.ts file, if needed. */
-/// <reference types="netlify-identity-widget" />
 
 /* CSS MODULES */
 declare module '*.module.css' {
@@ -55,12 +54,4 @@ declare module '*.jpeg' {
 declare module '*.png' {
 	const ref: string;
 	export default ref;
-}
-
-/* CUSTOM: ADD YOUR OWN HERE */
-declare module 'xstate-component-tree' {
-	class ComponentTree {
-		constructor(service, cb);
-	}
-	export default ComponentTree;
 }
