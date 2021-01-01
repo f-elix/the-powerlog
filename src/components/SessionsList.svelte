@@ -1,12 +1,25 @@
 <script lang="ts">
-	import CardSession from '@/components/CardSession.svelte';
+	// Types
+	import type { Session } from 'types';
+	// Machines
+	import { log } from 'src/stores/log';
+	// Components
+	import CardSession from 'coms/CardSession.svelte';
+
+	const { state } = log;
+
+	$: sessions = $state.context.user?.sessions?.data;
 </script>
 
 <div>
 	<h2 class="mb-70 text-60 font-bold text-highlight">December 2020</h2>
 	<ul class="flex flex-col space-y-50">
-		<li class="flex flex-col">
-			<CardSession />
-		</li>
+		{#if sessions}
+			{#each sessions as session (session?._id)}
+				<li class="flex flex-col">
+					<CardSession {session} />
+				</li>
+			{/each}
+		{/if}
 	</ul>
 </div>

@@ -1,11 +1,19 @@
 import fetch from 'node-fetch';
+import type { QueryGetUserByIdArgs } from 'types';
 
 interface TQuery {
 	query: string;
 	variables: Record<string, string>;
 }
 
-export const faunaFetch: (query: TQuery) => Promise<unknown> = async ({ query, variables }) => {
+interface TResponseData {
+	getUserById?: QueryGetUserByIdArgs;
+}
+
+export const faunaFetch: (query: TQuery) => Promise<{ data: TResponseData }> = async ({
+	query,
+	variables
+}) => {
 	try {
 		const res = await fetch('https://graphql.fauna.com/graphql', {
 			method: 'POST',

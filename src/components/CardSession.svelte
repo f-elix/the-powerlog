@@ -1,10 +1,15 @@
 <script lang="ts">
+	// Types
+	import type { Session } from 'types';
+	// Components
 	import Button from '@/components/Button.svelte';
+
+	export let session: Session;
 </script>
 
 <Button>
 	<div class="flex flex-col space-y-30 px-50 text-left">
-		<span class="text-50">Squat / legs / shoulders</span>
-		<span class="font-normal">Thursday 2020-12-22</span>
+		<span class="text-50">{session.name}</span>
+		<span class="font-normal">{session.date}</span>
 	</div>
 </Button>

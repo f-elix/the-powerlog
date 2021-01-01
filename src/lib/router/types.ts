@@ -11,6 +11,7 @@ import type {
 	ActionObject,
 	StateNodeConfig
 } from 'xstate';
+
 import type ComponentTree from 'xstate-component-tree';
 
 export type Query = Record<string, string>;
@@ -46,7 +47,7 @@ export type RouterConfig = MachineConfig<RouterContext, RouterSchema, RouterEven
 
 export interface View {
 	component?: unknown;
-	props?: Record<string, unknown>;
+	props?: ViewProps;
 	children?: View[];
 }
 
@@ -74,6 +75,12 @@ export type ActionType =
 
 export interface RouterStateNode extends StateNodeConfig<RouterContext, RouterSchema, RouterEvent> {
 	meta?: Record<string, unknown>;
+}
+
+export interface ViewProps {
+	context: RouterContext;
+	event: RouterEvent;
+	[key: string]: unknown;
 }
 
 export type { MachineOptions, State, StateSchema };

@@ -10,6 +10,7 @@ module.exports = {
 	rules: {
 		'prettier/prettier': 'off',
 		'no-console': ['warn', { allow: ['warn', 'error'] }],
+		'no-underscore-dangle': 0,
 		'func-names': 'off',
 		'import/no-unresolved': 0,
 		'import/extensions': 0,

@@ -1,14 +1,24 @@
 <script lang="ts">
-	import type { View } from '../lib/router/types';
+	// Types
+	import type { View, ViewProps } from '../lib/router/types';
+	import type { User } from 'netlify-identity-widget';
+	// Machines
+	import { log } from '@/stores/log';
+	// ui
+	import { ui } from '@/ui';
+	// Components
 	import Button from '@/components/Button.svelte';
 	import Logout from '@/components/Logout.svelte';
 	import Filters from '@/components/Filters.svelte';
 	import SessionsList from '@/components/SessionsList.svelte';
 	import Fab from '@/components/Fab.svelte';
-	import { ui } from '@/ui';
 
-	export let props: Record<string, unknown>;
+	export let props: ViewProps;
 	export let children: View[];
+
+	const user = props.context.user as User;
+
+	log.send({ type: 'LOAD', data: { token: user.token?.access_token } });
 </script>
 
 <section class="space-y-70 px-50 h-full overflow-y-auto">
