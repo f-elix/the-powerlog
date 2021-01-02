@@ -1,150 +1,42 @@
-export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-/** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
-	ID: string;
-	String: string;
-	Boolean: boolean;
-	Int: number;
-	Float: number;
-};
-
-export type User = {
-	__typename?: 'User';
-	_id?: Scalars['ID'];
-	netlifyId?: Scalars['ID'];
-	exercises?: Maybe<Array<UserExercise>>;
-	sessions?: Maybe<Array<Session>>;
-};
-
-export type UserResponse = {
-	_id?: Scalars['ID'];
-	exercises: {
-		data: Array<Maybe<UserExercise>>;
-	};
-	sessions: {
-		data: Array<Maybe<Session>>;
-		after: string | null;
-	};
-};
-
-export type UserExercise = {
-	__typename?: 'UserExercise';
-	creator: User;
-	name: Scalars['String'];
-	history?: Maybe<Array<Maybe<Exercise>>>;
-};
-
-export type Session = {
-	__typename?: 'Session';
-	_id: Scalars['ID'];
-	creator: User;
-	name: Scalars['String'];
-	date: Scalars['String'];
-	performances?: Array<Maybe<Performance>>;
-	bodyweight?: Maybe<Weight>;
-};
-
-export type Performance = {
-	__typename?: 'Performance';
-	session?: Maybe<Session>;
-	exercise?: Maybe<Array<Maybe<Exercise>>>;
-};
-
-export type Exercise = {
-	__typename?: 'Exercise';
-	performance?: Maybe<Performance>;
-	movement: UserExercise;
-	executions?: Maybe<Array<Maybe<Execution>>>;
-	date: Scalars['String'];
-};
-
-export type Execution = {
-	__typename?: 'Execution';
-	sets?: Maybe<Scalars['Int']>;
-	reps?: Maybe<Scalars['Int']>;
-	duration?: Maybe<Duration>;
-	load?: Maybe<Weight>;
-};
-
-export type Weight = {
-	__typename?: 'Weight';
-	amount?: Maybe<Scalars['Float']>;
-	unit?: Maybe<Scalars['String']>;
-};
-
-export type Duration = {
-	__typename?: 'Duration';
-	amount?: Maybe<Scalars['Float']>;
-	unit?: Maybe<Scalars['String']>;
-};
-
-export type Query = {
-	__typename?: 'Query';
-	getUserById?: Maybe<User>;
-};
-
-export type QueryGetUserByIdArgs = {
-	_id: Scalars['ID'];
-	exercises?: Maybe<Array<Maybe<UserExercise>>>;
-	sessions?: Maybe<Array<Maybe<Session>>>;
-};
-
-export type QueryGetUserByIdResponse = {
-	_id: Scalars['ID'];
-	exercises?: {
-		data: Maybe<Array<UserExercise>>;
-	};
-	sessions?: {
-		data: Maybe<Array<Session>>;
-		after: string | null;
-	};
-};
-
-interface user {
+export interface User {
 	id: string;
-	name: string;
-	email: string;
-	sessions: session[]; // array relationship
-	exercises: exercise[]; // array relationship
+	name?: string;
+	email?: string;
 }
 
-interface exercise {
+export interface Session {
 	id: number;
-	userId: string; // object relationship
-	name: string;
-	history: exerciseInstance[]; // Array relationship
+	userId: string;
+	title: string;
+	date: string;
+	bodyweight?: {
+		amount?: number;
+		unit?: string;
+	};
 }
 
-interface exerciseInstance {
+export interface Exercise {
 	id: number;
-	session: session; // Object relationship
-	exercise: exercise; // Object relationship
+	userId: string;
+	name: string;
+}
+
+export interface ExerciseInstance {
+	id: number;
+	sessionId: number;
+	exerciseId: number;
+	superset: string | null;
 	executions?: {
 		sets?: number;
 		reps?: number;
 		load?: {
 			amount?: number;
 			unit?: string;
+			bodyweight?: boolean;
 		};
 		duration?: {
 			amount?: number;
 			unit?: string;
 		};
 	}[];
-	superset: string | null;
-}
-
-interface session {
-	id: number;
-	userId: string; // object relationship
-	title: string;
-	date: string;
-	bodyweight: {
-		amount: number;
-		unit: string;
-	};
-	exercises: exerciseInstance[]; // Array relationship
 }

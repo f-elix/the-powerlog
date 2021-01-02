@@ -35,7 +35,7 @@
 	<div class="flex flex-col space-y-110">
 		<Filters />
 		<SessionsList />
-		{#if $state.matches('fetchingSessions')}
+		{#if $state.matches('fetching')}
 			<Spinner />
 		{/if}
 		<!-- @TODO implement pagination -->

@@ -62,16 +62,16 @@ export const router = createRouter(
 	{
 		actions: {
 			initNetlifyIdentity: assign({
-				user: (context, event) => {
+				user: (_, __) => {
 					netlifyIdentity.init();
 					return netlifyIdentity.currentUser();
 				}
 			}),
 			storeUser: assign({
-				user: (context, event) => event.user || netlifyIdentity.currentUser()
+				user: (_, event) => event.user || netlifyIdentity.currentUser()
 			}),
 			logout: assign({
-				user: (context, event) => {
+				user: (_, __) => {
 					netlifyIdentity.logout();
 					return null;
 				}
@@ -81,8 +81,8 @@ export const router = createRouter(
 			}
 		},
 		guards: {
-			isLoggedIn: (context, event) => !!context.user,
-			isLoggedOut: (context, event) => !context.user
+			isLoggedIn: (context, _) => !!context.user,
+			isLoggedOut: (context, _) => !context.user
 		}
 	}
 );

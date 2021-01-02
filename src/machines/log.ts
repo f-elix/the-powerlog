@@ -32,9 +32,9 @@ type LogState =
 			};
 	  }
 	| {
-			value: 'fetchingSessions';
+			value: 'fetching';
 			context: LogContext & {
-				session: undefined;
+				session: Session[] | undefined;
 				error: undefined;
 			};
 	  }
@@ -63,35 +63,54 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			idle: {
 				initial: 'normal',
 				states: {
-					normal: {},
-					error: {
-						exit: ['clearError']
-					}
+					normal: {}
 				},
 				on: {
 					LOAD: {
-						target: 'fetchingSessions'
+						target: 'fetching'
 					}
 				}
 			},
-			fetchingSessions: {
-				id: 'fetchUserSessions',
-				invoke: {
-					src: 'fetchUserSessions',
-					onDone: {
-						target: 'loaded',
-						actions: ['updateUser']
-					},
-					onError: {
-						target: 'idle.error',
-						actions: ['updateError']
+			fetching: {
+				initial: 'sessions',
+				states: {
+					sessions: {
+						id: 'fetchUserSessions',
+						invoke: {
+							src: 'fetchUserSessions',
+							onDone: {
+								target: 'loaded',
+								actions: ['updateUser']
+							},
+							onError: {
+								target: 'loaded.error',
+								actions: ['updateError']
+							}
+						}
 					}
 				}
 			},
 			loaded: {
+				initial: 'transient',
+				states: {
+					transient: {
+						always: [
+							{
+								cond: 'hasSessions',
+								target: 'normal'
+							},
+							{
+								target: 'empty'
+							}
+						]
+					},
+					empty: {},
+					normal: {},
+					error: {}
+				},
 				on: {
 					LOAD: {
-						target: 'fetchingSessions'
+						target: 'fetching'
 					}
 				}
 			}
@@ -108,17 +127,17 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 				}
 			}),
 			updateError: assign({
-				error: (context, event) => {
+				error: (_, event) => {
 					assertEventType(event, 'error.platform.fetchUserSessions');
 					return event.data;
 				}
 			}),
 			clearError: assign({
-				error: (context, event) => undefined
+				error: (_, __) => undefined
 			})
 		},
 		services: {
-			fetchUserSessions: async (context, event) => {
+			fetchUserSessions: async (_, event) => {
 				assertEventType(event, 'LOAD');
 				try {
 					const { token } = event.data;
@@ -134,6 +153,9 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					throw new Error('No user found');
 				}
 			}
+		},
+		guards: {
+			hasData: (context) => !!context.sessions
 		}
 	}
 );
