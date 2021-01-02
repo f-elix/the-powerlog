@@ -1,6 +1,18 @@
 <script lang="ts">
-	export let variant = 'filled'; // Filled, outlined
-	export let theme = 'primary'; // Primary, info, success, danger
+	enum Variant {
+		filled = 'filled',
+		outlined = 'outlined'
+	}
+
+	enum Theme {
+		primary = 'primary',
+		info = 'info',
+		success = 'success',
+		danger = 'danger'
+	}
+
+	export let variant: Variant = Variant.filled;
+	export let theme: Theme = Theme.primary;
 </script>
 
 <style>
