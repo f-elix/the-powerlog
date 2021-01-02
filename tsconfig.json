@@ -11,7 +11,8 @@
 		"paths": {
 			"xstate-component-tree": ["./types/xstate-component-tree"],
 			"src": ["./src"],
-			"coms": ["./src/components"]
+			"coms": ["./src/components"],
+			"types": ["./types"]
 		},
 		/* noEmit - Snowpack builds (emits) files, not tsc. */
 		"noEmit": true,

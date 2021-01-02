@@ -1,5 +1,7 @@
 <script lang="ts">
+	// Ui
 	import { ui } from 'src/ui';
+	// Components
 	import Name from 'coms/filters/Name.svelte';
 	import DaysAgo from 'coms/filters/DaysAgo.svelte';
 	import WeeksAgo from 'coms/filters/WeeksAgo.svelte';
@@ -19,8 +21,6 @@
 	};
 
 	let selectedFilter = filters[0].component;
-
-	const onFilterInput = (e: InputEvent) => {};
 </script>
 
 <div class="flex flex-col space-y-70">
@@ -35,5 +35,5 @@
 			{/each}
 		</select>
 	</label>
-	<svelte:component this={filterComponents[selectedFilter]} on:input={onFilterInput} />
+	<svelte:component this={filterComponents[selectedFilter]} on:input />
 </div>

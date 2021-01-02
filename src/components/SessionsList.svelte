@@ -9,11 +9,13 @@
 	const { state } = log;
 
 	$: sessions = $state.context.sessions || [];
+	$: filteredSessions = $state.context.filteredSessions || [];
+	$: displayedSessions = $state.matches('loaded.filtered') ? filteredSessions : sessions;
 </script>
 
 <div>
 	<ul class="flex flex-col space-y-50">
-		{#each sessions as session, i (session?.id)}
+		{#each displayedSessions as session, i (session?.id)}
 			{#if !sessions[i - 1] || getLocalDate(session.date).getMonth() !== getLocalDate(sessions[i - 1].date).getMonth()}
 				<h2 class="mb-70 text-60 font-bold text-highlight">
 					{getLocalDate(session.date).toLocaleString('default', { month: 'long' })}

@@ -1,3 +1,4 @@
+import type { EventObject } from 'xstate';
 import type { Session } from 'types';
 
 export const getLocalDate: (dateInput: string) => Date = (dateInput: string) => {
@@ -34,3 +35,12 @@ export const isFirstOfWeek: (sessions: Session[], sessionDate: string, index: nu
 };
 
 export const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export function assertEventType<TE extends EventObject, TType extends TE['type']>(
+	event: TE,
+	eventType: TType
+): asserts event is TE & { type: TType } {
+	if (event.type !== eventType) {
+		throw new Error(`Invalid event: expected "${eventType}", got "${event.type}"`);
+	}
+}

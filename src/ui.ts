@@ -3,7 +3,7 @@ export interface Filter {
 	component: string;
 }
 
-export type Ui = Record<string, string | Filter[] | Record<string, string>>;
+export type Ui = Record<string, any>;
 
 export const ui: Ui = {
 	appName: 'Powerlog',

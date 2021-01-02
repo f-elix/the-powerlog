@@ -1,8 +1,8 @@
 import fetch, { RequestInfo } from 'node-fetch';
 
-interface TQuery {
+export interface TQuery {
 	query: string;
-	variables: Record<string, string>;
+	variables: Record<string, string | number>;
 }
 
 export const gqlQuery: (query: TQuery) => Promise<any> = async ({ query, variables }) => {

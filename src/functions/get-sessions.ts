@@ -7,13 +7,14 @@ export const handler: (
 	context: any
 ) => Promise<{ statusCode: number; sessions: Session[] | [] }> = async (event, context) => {
 	const { user } = context.clientContext;
-	const { cursor, limit } = JSON.parse(event.body || '{}');
 
 	if (!user) {
 		return {
 			statusCode: 403
 		};
 	}
+
+	const { cursor, limit } = JSON.parse(event.body || '{}');
 
 	return gqlQuery({
 		query: `

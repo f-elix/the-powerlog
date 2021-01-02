@@ -1,29 +1,35 @@
 import { createMachine, assign } from 'xstate';
-import type { EventObject } from 'xstate';
+import { assertEventType } from 'src/utils';
 import type { Session } from 'types';
-
-function assertEventType<TE extends EventObject, TType extends TE['type']>(
-	event: TE,
-	eventType: TType
-): asserts event is TE & { type: TType } {
-	if (event.type !== eventType) {
-		throw new Error(`Invalid event: expected "${eventType}", got "${event.type}"`);
-	}
-}
 
 interface LogContext {
 	sessions?: Session[];
+	filteredSessions?: Session[];
 	cursor?: string;
 	limit: number;
 	hasNextPage: boolean;
 	error?: string;
 }
+type LogEvent =
+	| {
+			type: 'FILTER';
+			data: {
+				token?: string;
+				filterType?: string;
+				value?: Record<string, string | number>;
+			};
+	  }
+	| { type: 'LOAD'; data: { token?: string } }
+	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
+	| { type: 'error.platform.fetchUserSessions'; data: string }
+	| { type: 'done.invoke.filter'; data: { sessions: Session[] } };
 
 type LogState =
 	| {
 			value: 'idle';
 			context: LogContext & {
 				session: undefined;
+				filteredSessions: undefined;
 				cursor: undefined;
 				limit: number;
 				hasNextPage: true;
@@ -34,6 +40,7 @@ type LogState =
 			value: 'fetching';
 			context: LogContext & {
 				session?: Session[];
+				filteredSessions?: Session[];
 				cursor?: string;
 				limit: number;
 				hasNextPage: true | false;
@@ -48,6 +55,7 @@ type LogState =
 			value: 'loaded.empty';
 			context: LogContext & {
 				session: [];
+				filteredSessions: undefined;
 				cursor: undefined;
 				limit: number;
 				hasNextPage: false;
@@ -58,6 +66,18 @@ type LogState =
 			value: 'loaded.normal';
 			context: LogContext & {
 				session: Session[];
+				filteredSessions?: Session[];
+				cursor: string;
+				limit: number;
+				hasNextPage: true;
+				error: undefined;
+			};
+	  }
+	| {
+			value: 'loaded.filtered';
+			context: LogContext & {
+				session: Session[];
+				filteredSessions: Session[];
 				cursor: string;
 				limit: number;
 				hasNextPage: true;
@@ -68,6 +88,7 @@ type LogState =
 			value: 'loaded.end';
 			context: LogContext & {
 				session: Session[];
+				filteredSessions?: Session[];
 				cursor: string;
 				limit: number;
 				hasNextPage: false;
@@ -78,6 +99,7 @@ type LogState =
 			value: 'loaded.error';
 			context: LogContext & {
 				session: undefined;
+				filteredSessions: undefined;
 				cursor: undefined;
 				limit: number;
 				hasNextPage: true | false;
@@ -85,16 +107,12 @@ type LogState =
 			};
 	  };
 
-type LogEvent =
-	| { type: 'LOAD'; data: { token?: string } }
-	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
-	| { type: 'error.platform.fetchUserSessions'; data: string };
-
 export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 	{
 		id: 'log',
 		context: {
 			sessions: undefined,
+			filteredSessions: undefined,
 			cursor: undefined,
 			limit: 10,
 			error: undefined,
@@ -113,8 +131,8 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 				initial: 'sessions',
 				states: {
 					sessions: {
-						id: 'fetchUserSessions',
 						invoke: {
+							id: 'fetchUserSessions',
 							src: 'fetchUserSessions',
 							onDone: {
 								target: '#log.loaded',
@@ -123,6 +141,19 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 							onError: {
 								target: '#log.loaded.error',
 								actions: ['updateError']
+							}
+						}
+					},
+					filter: {
+						invoke: {
+							id: 'filter',
+							src: 'filter',
+							onDone: {
+								target: '#log.loaded.filtered',
+								actions: ['updateFilteredSessions']
+							},
+							onError: {
+								target: '#log.loaded.last'
 							}
 						}
 					}
@@ -155,7 +186,16 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 						}
 					},
 					end: {},
-					error: {}
+					filtered: {},
+					error: {},
+					last: {
+						type: 'history'
+					}
+				},
+				on: {
+					FILTER: {
+						target: 'fetching.filter'
+					}
 				}
 			}
 		}
@@ -174,6 +214,12 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					cursor,
 					hasNextPage
 				};
+			}),
+			updateFilteredSessions: assign({
+				filteredSessions: (_, event) => {
+					assertEventType(event, 'done.invoke.filter');
+					return event.data.sessions;
+				}
 			}),
 			updateError: assign({
 				error: (_, event) => {
@@ -197,6 +243,24 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 							Authorization: `Bearer ${token}`
 						},
 						body: JSON.stringify({ cursor, limit: limit + 1 })
+					});
+					const data = await res.json();
+					return data;
+				} catch (error) {
+					console.warn(error);
+					throw new Error('No sessions found');
+				}
+			},
+			filter: async (_, event) => {
+				assertEventType(event, 'FILTER');
+				try {
+					const { token, filterType, value } = event.data;
+					const res = await fetch('/.netlify/functions/filter-sessions', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${token}`
+						},
+						body: JSON.stringify({ filterType, value })
 					});
 					const data = await res.json();
 					return data;
