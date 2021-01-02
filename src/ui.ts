@@ -44,5 +44,6 @@ export const ui: Ui = {
 		to: 'To'
 	},
 	loadMore: 'Load More',
+	noSessions: 'No sessions entered yet.',
 	newSession: 'New session'
 };

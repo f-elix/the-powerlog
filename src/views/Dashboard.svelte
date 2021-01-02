@@ -32,16 +32,20 @@
 		<Logout extClass="absolute left-0" />
 		<h1 class="text-70 font-bold">{ui.dashboardTitle}</h1>
 	</div>
-	<div class="flex flex-col space-y-110">
+	<div class="flex flex-col space-y-110 pb-110">
 		<Filters />
-		<SessionsList />
+		{#if $state.matches('loaded.empty')}
+			<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
+		{/if}
+		{#if $state.matches('loaded') || $state.matches('fetching')}
+			<SessionsList />
+		{/if}
 		{#if $state.matches('fetching')}
 			<Spinner />
 		{/if}
-		<!-- @TODO implement pagination -->
-		<!-- {#if cursor}
+		{#if $state.matches('loaded.normal')}
 			<Button theme="success" variant="outlined" on:click={onLoad}>{ui.loadMore}</Button>
-		{/if} -->
+		{/if}
 	</div>
 	<Fab label={ui.newSession} />
 </section>

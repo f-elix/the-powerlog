@@ -7,6 +7,7 @@ export const handler: (
 	context: any
 ) => Promise<{ statusCode: number; sessions: Session[] | [] }> = async (event, context) => {
 	const { user } = context.clientContext;
+	const { cursor, limit } = JSON.parse(event.body || '{}');
 
 	if (!user) {
 		return {
@@ -16,8 +17,8 @@ export const handler: (
 
 	return gqlQuery({
 		query: `
-				query getSessions($id: String!)	{
-					sessions(where: {user_id: {_eq: $id}}, order_by: {date: desc}) {
+				query getSessions($id: String!, $dateCursor: timestamp, $limit: Int!)	{
+					sessions(where: {user_id: {_eq: $id}, date: {_lt: $dateCursor}}, order_by: {date: desc}, limit: $limit) {
 						id
 						date
 						title
@@ -25,7 +26,9 @@ export const handler: (
 				}
 			`,
 		variables: {
-			id: user.sub
+			id: user.sub,
+			dateCursor: cursor,
+			limit
 		}
 	});
 };
