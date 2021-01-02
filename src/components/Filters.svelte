@@ -9,7 +9,7 @@
 	import type { Filter } from 'src/ui';
 	import type { SvelteComponentDev } from 'svelte/internal';
 
-	const filters: Filter[] = ui.filters;
+	const filters: Filter[] = ui.filters as Filter[];
 	const filterComponents: Record<string, typeof SvelteComponentDev> = {
 		Name,
 		DaysAgo,
@@ -18,7 +18,7 @@
 		Period
 	};
 
-	let selectedFilter = filters[4].component;
+	let selectedFilter = filters[0].component;
 
 	const onFilterInput = (e: InputEvent) => {};
 </script>
