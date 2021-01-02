@@ -121,7 +121,8 @@ module.exports = {
 				},
 				highlight: {
 					DEFAULT: colors.amber[700],
-					light: colors.amber[600]
+					light: colors.amber[600],
+					lighter: colors.amber[300]
 				}
 			},
 			textColor: {
