@@ -18,8 +18,9 @@ export const handler: (
 		query: `
 				query getSessions($id: String!)	{
 					sessions(where: {user_id: {_eq: $id}}) {
-					date
-					title
+						id
+						date
+						title
 					}
 				}
 			`,
