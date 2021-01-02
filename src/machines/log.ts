@@ -79,11 +79,11 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 						invoke: {
 							src: 'fetchUserSessions',
 							onDone: {
-								target: 'loaded',
+								target: '#log.loaded',
 								actions: ['updateUser']
 							},
 							onError: {
-								target: 'loaded.error',
+								target: '#log.loaded.error',
 								actions: ['updateError']
 							}
 						}
@@ -155,7 +155,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			}
 		},
 		guards: {
-			hasData: (context) => !!context.sessions
+			hasSessions: (context) => !!context.sessions
 		}
 	}
 );
