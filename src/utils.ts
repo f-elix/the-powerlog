@@ -6,34 +6,30 @@ export const getLocalDate: (dateInput: string) => Date = (dateInput: string) => 
 	return localDate;
 };
 
-export const isFirstOfWeek: (sessions: Session[], dateStr: string, index: number) => boolean = (
+export const getNumberOfWeek: (dateInput: string) => number = (dateInput) => {
+	const date = new Date(dateInput);
+	const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+	const pastDaysOfYear = (date.valueOf() - firstDayOfYear.valueOf()) / 86400000;
+	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay()) / 7);
+};
+
+export const isFirstOfWeek: (sessions: Session[], sessionDate: string, index: number) => boolean = (
 	sessions,
-	sessionDateStr,
+	sessionDate,
 	i
 ) => {
-	if (!sessions[i + 1]) {
+	// Next session in the array is the preceding one in time because sessions are ordered by desc. date
+	const precedingSession = sessions[i + 1];
+	if (!precedingSession) {
+		return true;
+	}
+	const sessionWeek = getNumberOfWeek(sessionDate);
+	const precedingSessionWeek = getNumberOfWeek(precedingSession.date);
+	// If both sessions are in the same week
+	if (sessionWeek === precedingSessionWeek) {
 		return false;
 	}
-	if (sessionDateStr === sessions[i + 1].date) {
-		return false;
-	}
-	const sessionDate = getLocalDate(sessionDateStr);
-	const precedingSessionDate = getLocalDate(sessions[i + 1].date);
-	if (sessionDate.getMonth() !== precedingSessionDate.getMonth()) {
-		return true;
-	}
-	if (Math.abs(sessionDate.getDate() - precedingSessionDate.getDate()) > 6) {
-		return true;
-	}
-	const sessionDay = sessionDate.getDay();
-	const precedingSessionDay = precedingSessionDate.getDay();
-	if (precedingSessionDay === 0 || sessionDay === 1) {
-		return true;
-	}
-	if (sessionDay !== 0 && sessionDay < precedingSessionDay) {
-		return true;
-	}
-	return false;
+	return true;
 };
 
 export const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
