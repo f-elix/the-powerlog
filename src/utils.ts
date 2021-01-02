@@ -10,6 +10,7 @@ export const getNumberOfWeek: (dateInput: string) => number = (dateInput) => {
 	const date = new Date(dateInput);
 	const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
 	const pastDaysOfYear = (date.valueOf() - firstDayOfYear.valueOf()) / 86400000;
+	// Modified to start the week on Monday
 	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay()) / 7);
 };
 
