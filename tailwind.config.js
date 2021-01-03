@@ -56,6 +56,8 @@ module.exports = {
 			170: '240rem',
 			180: '300rem',
 			'100vh': '100vh',
+			'1/2': '50%',
+			'9/10': '90%',
 			...except(screenExceptions, theme('screens'))
 		}),
 		maxWidth: (theme) => ({
@@ -149,7 +151,8 @@ module.exports = {
 				},
 				highlight: {
 					DEFAULT: colors.amber[700],
-					light: colors.amber[600]
+					light: colors.amber[600],
+					lighter: colors.amber[300]
 				}
 			},
 			ringColor: {

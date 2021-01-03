@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Plus from 'coms/svg/Plus.svelte';
+
 	enum Variant {
 		filled = 'filled',
 		outlined = 'outlined'
@@ -34,16 +36,6 @@
 	aria-label={label}
 	on:click>
 	<div class="flex items-center justify-center">
-		<svg
-			class="w-80 h-80"
-			width="28"
-			height="28"
-			viewBox="0 0 28 28"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg">
-			<path
-				d="M26 11H17V2C17 0.895625 16.1044 0 15 0H13C11.8956 0 11 0.895625 11 2V11H2C0.895625 11 0 11.8956 0 13V15C0 16.1044 0.895625 17 2 17H11V26C11 27.1044 11.8956 28 13 28H15C16.1044 28 17 27.1044 17 26V17H26C27.1044 17 28 16.1044 28 15V13C28 11.8956 27.1044 11 26 11Z"
-				fill="white" />
-		</svg>
+		<Plus extClass="w-80 h-80" />
 	</div>
 </button>

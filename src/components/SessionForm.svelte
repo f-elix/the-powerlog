@@ -4,6 +4,7 @@
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
+	import ExerciseFields from 'coms/ExerciseFields.svelte';
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
 
@@ -29,6 +30,7 @@
 				<input type="date" name="date" value={today} />
 			</label>
 		</div>
+		<ExerciseFields />
 		<div class="flex flex-col space-y-70 px-50">
 			<Button type="submit" theme="success">Save</Button>
 			<Button theme="danger" on:click={onCancel}>Cancel</Button>
