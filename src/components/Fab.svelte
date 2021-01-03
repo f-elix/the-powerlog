@@ -3,11 +3,12 @@
 </script>
 
 <button
-	class="fixed bottom-110 right-80 w-120 h-120 bg-action rounded-full shadow-md"
+	class="fixed bottom-110 right-80 w-120 h-120 bg-action rounded-full shadow-md active:bg-danger-light"
 	aria-label={label}
 	on:click>
 	<div class="flex items-center justify-center">
 		<svg
+			class="w-80 h-80"
 			width="28"
 			height="28"
 			viewBox="0 0 28 28"

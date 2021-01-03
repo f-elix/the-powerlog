@@ -6,7 +6,13 @@ module.exports = {
 		src: '/dist'
 	},
 	plugins: [
-		['@snowpack/plugin-build-script', { cmd: 'postcss', input: ['.css'], output: ['.css'] }],
+		[
+			'@snowpack/plugin-run-script',
+			{
+				cmd: 'postcss src/styles/main.css -o public/styles/main.css --no-map',
+				watch: 'postcss src/styles/main.css -o public/styles/main.css --no-map -w --verbose'
+			}
+		],
 		'@snowpack/plugin-svelte',
 		'@snowpack/plugin-dotenv',
 		'@snowpack/plugin-typescript'

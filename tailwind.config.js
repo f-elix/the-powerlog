@@ -14,7 +14,10 @@ const except = (exceptions, object) => {
 };
 
 module.exports = {
-	purge: ['./src/**.*.svelte'],
+	purge: {
+		mode: 'all',
+		content: ['./src/**/*.svelte']
+	},
 	darkMode: false,
 	theme: {
 		screens: {
@@ -156,7 +159,8 @@ module.exports = {
 	},
 	variants: {
 		extend: {
-			ringColor: ['focus-visible']
+			ringColor: ['focus-visible'],
+			backgroundColor: ['active']
 		}
 	},
 	plugins: []
