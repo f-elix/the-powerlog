@@ -1,21 +1,17 @@
 <script lang="ts">
-	// Machines
-	import { log } from 'src/stores/log';
+	// Types
+	import type { Session } from 'types';
 	// Utils
 	import { getLocalDate, isFirstOfWeek } from 'src/utils';
 	// Components
 	import CardSession from 'coms/CardSession.svelte';
 
-	const { state } = log;
-
-	$: sessions = $state.context.sessions || [];
-	$: filteredSessions = $state.context.filteredSessions || [];
-	$: displayedSessions = $state.matches('filtered') ? filteredSessions : sessions;
+	export let sessions: Session[];
 </script>
 
 <div>
 	<ul class="flex flex-col space-y-50">
-		{#each displayedSessions as session, i (session?.id)}
+		{#each sessions as session, i (session?.id)}
 			{#if !sessions[i - 1] || getLocalDate(session.date).getMonth() !== getLocalDate(sessions[i - 1].date).getMonth()}
 				<h2 class="mb-70 text-60 font-bold text-highlight">
 					{getLocalDate(session.date).toLocaleString('default', { month: 'long' })}

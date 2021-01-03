@@ -1,8 +1,3 @@
-export interface Filter {
-	name: string;
-	component: string;
-}
-
 export type Ui = Record<string, any>;
 
 export const ui: Ui = {
@@ -13,28 +8,6 @@ export const ui: Ui = {
 	logout: 'Logout',
 	dashboardTitle: 'Log History',
 	filterBy: 'Filter by',
-	filters: [
-		{
-			name: 'Name',
-			component: 'Name'
-		},
-		{
-			name: 'Days ago',
-			component: 'DaysAgo'
-		},
-		{
-			name: 'Weeks ago',
-			component: 'WeeksAgo'
-		},
-		{
-			name: 'Date',
-			component: 'Date'
-		},
-		{
-			name: 'Period',
-			component: 'Period'
-		}
-	],
 	labels: {
 		sessionName: 'Session name',
 		daysAgo: 'days ago',

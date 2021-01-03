@@ -4,6 +4,7 @@
 	import type { User } from 'netlify-identity-widget';
 	// Machines
 	import { log } from 'src/stores/log';
+	import { filters } from 'src/stores/filters';
 	// ui
 	import { ui } from 'src/ui';
 	// Components
@@ -17,7 +18,8 @@
 	export let props: ViewProps;
 	export let children: View[];
 
-	const { state } = log;
+	const { state: logState } = log;
+	const { state: filtersState } = filters;
 	const user = props.context.user as User;
 	const token = user.token?.access_token;
 
@@ -26,6 +28,9 @@
 	};
 
 	onLoad();
+
+	$: sessions = $logState.context.sessions || [];
+	$: filteredSessions = $filtersState.context.sessions || [];
 </script>
 
 <section class="space-y-70 px-50 h-full overflow-y-auto">
@@ -35,17 +40,24 @@
 	</div>
 	<div class="flex flex-col space-y-110 pb-110">
 		<Filters {token} />
-		{#if $state.matches('loaded.empty')}
-			<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
-		{/if}
-		{#if $state.matches('loaded') || $state.matches('fetching')}
-			<SessionsList />
-		{/if}
-		{#if $state.matches('fetching')}
-			<Spinner />
-		{/if}
-		{#if $state.matches('loaded.normal')}
-			<Button theme="success" variant="outlined" on:click={onLoad}>{ui.loadMore}</Button>
+		{#if $filtersState.matches('idle.clear')}
+			{#if $logState.matches('loaded.empty')}
+				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
+			{/if}
+			{#if $logState.matches('loaded') || $logState.matches('fetching')}
+				<SessionsList {sessions} />
+			{/if}
+			{#if $logState.matches('fetching')}
+				<Spinner />
+			{/if}
+			{#if $logState.matches('loaded.normal')}
+				<Button theme="success" variant="outlined" on:click={onLoad}>{ui.loadMore}</Button>
+			{/if}
+		{:else}
+			<SessionsList sessions={filteredSessions} />
+			{#if $filtersState.matches('idle.error')}
+				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
+			{/if}
 		{/if}
 	</div>
 	<Fab label={ui.newSession} />

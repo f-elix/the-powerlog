@@ -44,3 +44,5 @@ export function assertEventType<TE extends EventObject, TType extends TE['type']
 		throw new Error(`Invalid event: expected "${eventType}", got "${event.type}"`);
 	}
 }
+
+export const isTouchDevice: () => boolean = () => window.matchMedia('(pointer: coarse)').matches;
