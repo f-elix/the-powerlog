@@ -12,7 +12,7 @@
 
 <style>
 	.outlined {
-		@apply bg-opacity-0;
+		@apply bg-main;
 	}
 
 	button {
@@ -21,12 +21,12 @@
 
 	button:active {
 		@apply transform translate-y-20;
-		@apply bg-opacity-50 border-opacity-0;
+		@apply border-opacity-0;
 	}
 
 	@screen pointer {
 		button:hover {
-			@apply bg-opacity-50 border-opacity-0;
+			@apply border-opacity-0;
 		}
 	}
 </style>
