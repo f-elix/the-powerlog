@@ -5,6 +5,7 @@
 	// Machines
 	import { log } from 'src/stores/log';
 	import { filters } from 'src/stores/filters';
+	import { router } from 'src/router/index';
 	// ui
 	import { ui } from 'src/ui';
 	// Components
@@ -27,13 +28,18 @@
 		log.send({ type: 'LOAD', data: { token } });
 	};
 
-	onLoad();
+	const onNewSession = () => {
+		router.send({ type: 'SESSION_NEW' });
+	};
 
 	$: sessions = $logState.context.sessions || [];
 	$: filteredSessions = $filtersState.context.sessions || [];
+
+	onLoad();
 </script>
 
 <section class="space-y-70 px-50 h-full overflow-y-auto">
+	<Fab label={ui.newSession} on:click={onNewSession} />
 	<div class="flex items-center justify-center relative py-50">
 		<Logout extClass="absolute left-0" />
 		<h1 class="text-70 font-bold">{ui.dashboardTitle}</h1>
@@ -60,5 +66,4 @@
 			{/if}
 		{/if}
 	</div>
-	<Fab label={ui.newSession} />
 </section>

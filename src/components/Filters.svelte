@@ -76,7 +76,7 @@
 	{#if !$state.matches('idle.clear')}
 		<button
 			on:click={onClearFilters}
-			class="absolute top-60 right-0 px-30 border-solid border-danger-light border-20 rounded-10 transition-colors focus:bg-danger-light hover:bg-danger-light active:bg-danger-light">{ui.clearFilters}</button>
+			class="absolute top-60 right-0 px-30 border-solid border-danger-light border-20 rounded-10 transition-colors focus:bg-danger-light pointer:hover:bg-danger-light active:bg-danger-light">{ui.clearFilters}</button>
 	{/if}
 	<label class="w-full flex flex-col space-y-70">
 		<span>{ui.filterBy}</span>

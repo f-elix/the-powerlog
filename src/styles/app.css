@@ -58,3 +58,7 @@ svg,
 img {
 	display: block;
 }
+
+._focus-default {
+	@apply ring-2 ring-highlight ring-opacity-0 focus-visible:ring-opacity-100;
+}

@@ -52,7 +52,7 @@
 </style>
 
 <button
-	class="{variant} {theme} py-50 font-bold rounded-10 shadow-lg transition-colors ring-2 ring-opacity-0 ring-highlight focus-visible:ring-opacity-100"
+	class="{variant} {theme} py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default"
 	on:click>
 	<slot />
 </button>

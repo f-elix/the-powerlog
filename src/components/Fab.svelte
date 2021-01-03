@@ -3,7 +3,7 @@
 </script>
 
 <button
-	class="fixed bottom-110 right-80 w-120 h-120 bg-action rounded-full shadow-md active:bg-danger-light"
+	class="fixed bottom-110 right-80 w-120 h-120 bg-action rounded-full shadow-md transition-colors pointer:hover:bg-highlight-light active:bg-highlight-light _focus-default"
 	aria-label={label}
 	on:click>
 	<div class="flex items-center justify-center">

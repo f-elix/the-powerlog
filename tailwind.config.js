@@ -159,7 +159,7 @@ module.exports = {
 	},
 	variants: {
 		extend: {
-			ringColor: ['focus-visible'],
+			ringOpacity: ['focus-visible'],
 			backgroundColor: ['active']
 		}
 	},
