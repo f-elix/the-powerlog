@@ -27,11 +27,11 @@
 </script>
 
 <div class="grid grid-cols-2 gap-50">
-	<label class="_filter flex flex-col">
+	<label class="_input flex flex-col">
 		<span>{ui.labels.to}</span>
 		<input type="date" name="from" on:input={onPeriodInput} />
 	</label>
-	<label class="_filter flex flex-col">
+	<label class="_input flex flex-col">
 		<span>{ui.labels.from}</span>
 		<input type="date" name="to" on:input={onPeriodInput} />
 	</label>

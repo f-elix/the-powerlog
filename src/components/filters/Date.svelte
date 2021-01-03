@@ -2,7 +2,7 @@
 	import { ui } from 'src/ui';
 </script>
 
-<label class="_filter flex flex-col">
+<label class="_input flex flex-col">
 	<span>{ui.labels.sessionDate}</span>
 	<input type="date" name="date" on:input />
 </label>

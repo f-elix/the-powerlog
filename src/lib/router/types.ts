@@ -1,15 +1,14 @@
-import type {
+import {
 	MachineConfig,
 	EventObject,
-	EventData,
-	SCXML,
 	MachineOptions,
 	State,
 	StateSchema,
 	Action,
 	ActionFunction,
 	ActionObject,
-	StateNodeConfig
+	StateNodeConfig,
+	Interpreter
 } from 'xstate';
 
 import type ComponentTree from 'xstate-component-tree';
@@ -19,14 +18,6 @@ export type Query = Record<string, string>;
 export type Params = Record<string, string>;
 
 export type Routes = Record<string, string>;
-
-export interface RouterSchema {
-	initial: string | Record<string, unknown>;
-	states: {
-		[key: string]: StateSchema<unknown>;
-	};
-	meta?: Record<string, unknown>;
-}
 
 export interface RouterContext {
 	$page?: {
@@ -43,7 +34,7 @@ export interface RouterEvent extends EventObject {
 	[key: string]: any;
 }
 
-export type RouterConfig = MachineConfig<RouterContext, RouterSchema, RouterEvent>;
+export type RouterConfig = MachineConfig<RouterContext, any, RouterEvent>;
 
 export interface View {
 	component?: unknown;
@@ -58,10 +49,7 @@ export interface RouterTypestate {
 
 export interface Router {
 	init: () => void;
-	send: (
-		event: string | EventObject | EventObject[] | SCXML.Event<RouterEvent>,
-		payload?: EventData | undefined
-	) => State<RouterContext, RouterEvent, RouterSchema>;
+	send: Interpreter<RouterContext, any, RouterEvent, RouterTypestate>['send'];
 	update: () => void;
 	getViews: (cb: (list: View[]) => void) => ComponentTree;
 }
@@ -73,8 +61,9 @@ export type ActionType =
 	| Action<RouterContext, RouterEvent>[]
 	| undefined;
 
-export interface RouterStateNode extends StateNodeConfig<RouterContext, RouterSchema, RouterEvent> {
+export interface RouterStateNode extends StateNodeConfig<RouterContext, any, RouterEvent> {
 	meta?: Record<string, unknown>;
+	initial?: string;
 }
 
 export interface ViewProps {

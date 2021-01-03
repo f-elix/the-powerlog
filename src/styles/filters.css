@@ -1,12 +1,12 @@
-._filter {
+._input {
 	@apply transition-colors focus-within:bg-fg group focus-within:text-highlight;
 }
 
-._filter input {
+._input input {
 	@apply appearance-none p-30 border-solid border-b-20 border-main bg-transparent text-50 focus:outline-none text-main;
 }
 
-._filter input::-webkit-calendar-picker-indicator {
+._input input::-webkit-calendar-picker-indicator {
 	filter: invert(1);
 	opacity: 0.5;
 }

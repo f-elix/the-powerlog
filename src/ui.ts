@@ -19,5 +19,7 @@ export const ui: Ui = {
 	loadMore: 'Load More',
 	noSessions: 'No sessions entered yet.',
 	newSession: 'New session',
-	clearFilters: 'Clear'
+	clearFilters: 'Clear',
+	creatingSession: 'Creating session...',
+	newExercise: 'New exercise'
 };

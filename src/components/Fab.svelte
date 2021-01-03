@@ -1,9 +1,36 @@
 <script lang="ts">
+	enum Variant {
+		filled = 'filled',
+		outlined = 'outlined'
+	}
+
 	export let label: string;
+	export let variant: Variant = Variant.filled;
 </script>
 
+<style>
+	.outlined {
+		@apply bg-opacity-0;
+	}
+
+	button {
+		@apply transition-all;
+	}
+
+	button:active {
+		@apply transform translate-y-20;
+		@apply bg-opacity-50 border-opacity-0;
+	}
+
+	@screen pointer {
+		button:hover {
+			@apply bg-opacity-50 border-opacity-0;
+		}
+	}
+</style>
+
 <button
-	class="fixed bottom-110 right-80 w-120 h-120 bg-action rounded-full shadow-md transition-colors pointer:hover:bg-highlight-light active:bg-highlight-light _focus-default"
+	class="fixed bottom-110 right-80 w-120 h-120 rounded-full border-action border-solid border-20 bg-action shadow-md transition-colors  _focus-default {variant}"
 	aria-label={label}
 	on:click>
 	<div class="flex items-center justify-center">

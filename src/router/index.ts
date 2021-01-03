@@ -1,6 +1,8 @@
 import Auth from 'src/views/Auth.svelte';
 import Dashboard from 'src/views/Dashboard.svelte';
-import Session from 'src/views/Session.svelte';
+import SessionCreating from 'src/views/SessionCreating.svelte';
+import SessionViewing from 'src/views/SessionViewing.svelte';
+import SessionEditing from 'src/views/SessionEditing.svelte';
 import { assign } from 'xstate';
 import netlifyIdentity from 'netlify-identity-widget';
 import { createRouter, view } from '../lib/router/index';
@@ -40,21 +42,33 @@ export const router = createRouter(
 					SESSION: 'session.id'
 				}
 			}),
-			session: view(Session, {
-				initial: 'new',
+			session: {
 				always: {
 					cond: 'isLoggedOut',
 					target: 'auth'
 				},
+				initial: 'new',
 				states: {
-					new: {},
-					id: {}
+					new: view(SessionCreating),
+					id: {
+						initial: 'viewing',
+						states: {
+							viewing: view(SessionViewing),
+							editing: view(SessionEditing)
+						}
+					}
+				},
+				on: {
+					DASHBOARD: {
+						target: 'dashboard'
+					}
 				}
-			})
+			}
 		},
 		entry: ['initNetlifyIdentity'],
 		meta: {
 			routes: {
+				'session.new': '/session/new',
 				'session.id': '/session/:id'
 			}
 		}

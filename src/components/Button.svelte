@@ -11,8 +11,14 @@
 		danger = 'danger'
 	}
 
+	enum Type {
+		button = 'button',
+		submit = 'submit'
+	}
+
 	export let variant: Variant = Variant.filled;
 	export let theme: Theme = Theme.primary;
+	export let type: Type = Type.button;
 </script>
 
 <style>
@@ -45,13 +51,19 @@
 		@apply bg-opacity-0;
 	}
 
-	button:active,
-	button:hover {
+	button:active {
 		@apply bg-opacity-50 border-opacity-0;
+	}
+
+	@screen pointer {
+		button:hover {
+			@apply bg-opacity-50 border-opacity-0;
+		}
 	}
 </style>
 
 <button
+	{type}
 	class="{variant} {theme} py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default"
 	on:click>
 	<slot />
