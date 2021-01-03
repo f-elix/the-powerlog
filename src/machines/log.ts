@@ -19,6 +19,7 @@ type LogEvent =
 				value?: Record<string, string | number>;
 			};
 	  }
+	| { type: 'CLEAR' }
 	| { type: 'LOAD'; data: { token?: string } }
 	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
 	| { type: 'error.platform.fetchUserSessions'; data: string }
@@ -74,17 +75,6 @@ type LogState =
 			};
 	  }
 	| {
-			value: 'loaded.filtered';
-			context: LogContext & {
-				session: Session[];
-				filteredSessions: Session[];
-				cursor: string;
-				limit: number;
-				hasNextPage: true;
-				error: undefined;
-			};
-	  }
-	| {
 			value: 'loaded.end';
 			context: LogContext & {
 				session: Session[];
@@ -104,6 +94,17 @@ type LogState =
 				limit: number;
 				hasNextPage: true | false;
 				error: string;
+			};
+	  }
+	| {
+			value: 'filtered';
+			context: LogContext & {
+				session?: Session[];
+				filteredSessions: Session[];
+				cursor: string;
+				limit: number;
+				hasNextPage: true;
+				error: undefined;
 			};
 	  };
 
@@ -149,7 +150,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 							id: 'filter',
 							src: 'filter',
 							onDone: {
-								target: '#log.loaded.filtered',
+								target: '#log.filtered',
 								actions: ['updateFilteredSessions']
 							},
 							onError: {
@@ -186,7 +187,6 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 						}
 					},
 					end: {},
-					filtered: {},
 					error: {},
 					last: {
 						type: 'history'
@@ -195,6 +195,14 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 				on: {
 					FILTER: {
 						target: 'fetching.filter'
+					}
+				}
+			},
+			filtered: {
+				on: {
+					CLEAR: {
+						target: 'loaded.last',
+						actions: ['clearFilteredSessions', 'clearFilters']
 					}
 				}
 			}
@@ -221,6 +229,19 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					return event.data.sessions;
 				}
 			}),
+			clearFilteredSessions: assign({
+				filteredSessions: (_, __) => undefined
+			}),
+			clearFilters: () => {
+				const filterCtn = <HTMLDivElement>document.querySelector('#filters');
+				if (!filterCtn) {
+					return;
+				}
+				filterCtn.querySelectorAll('input').forEach((i) => {
+					const input = i;
+					input.value = '';
+				});
+			},
 			updateError: assign({
 				error: (_, event) => {
 					assertEventType(event, 'error.platform.fetchUserSessions');

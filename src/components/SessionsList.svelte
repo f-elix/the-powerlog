@@ -10,7 +10,7 @@
 
 	$: sessions = $state.context.sessions || [];
 	$: filteredSessions = $state.context.filteredSessions || [];
-	$: displayedSessions = $state.matches('loaded.filtered') ? filteredSessions : sessions;
+	$: displayedSessions = $state.matches('filtered') ? filteredSessions : sessions;
 </script>
 
 <div>

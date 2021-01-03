@@ -25,17 +25,6 @@
 		log.send({ type: 'LOAD', data: { token } });
 	};
 
-	const onFilterInput = (e: InputEvent | CustomEvent) => {
-		const target = e.target as HTMLInputElement;
-		const detail = e.detail;
-		if (!target && !detail) {
-			return;
-		}
-		const filterType = target?.name || detail?.filterType;
-		const value = { [target?.name]: target?.value } || detail?.value;
-		log.send({ type: 'FILTER', data: { token, filterType, value } });
-	};
-
 	onLoad();
 </script>
 
@@ -45,7 +34,7 @@
 		<h1 class="text-70 font-bold">{ui.dashboardTitle}</h1>
 	</div>
 	<div class="flex flex-col space-y-110 pb-110">
-		<Filters on:input={onFilterInput} />
+		<Filters {token} />
 		{#if $state.matches('loaded.empty')}
 			<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
 		{/if}

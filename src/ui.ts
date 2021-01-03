@@ -45,5 +45,6 @@ export const ui: Ui = {
 	},
 	loadMore: 'Load More',
 	noSessions: 'No sessions entered yet.',
-	newSession: 'New session'
+	newSession: 'New session',
+	clearFilters: 'Clear'
 };
