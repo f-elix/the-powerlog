@@ -24,9 +24,17 @@
 		@apply border-opacity-0;
 	}
 
+	button.filled:active {
+		@apply bg-action;
+	}
+
 	@screen pointer {
-		button:hover {
+		button.filled:hover {
 			@apply border-opacity-0;
+		}
+
+		button.outlined:hover {
+			@apply bg-action;
 		}
 	}
 </style>
