@@ -1,7 +1,16 @@
 <script lang="ts">
+	// Types
+	import type { Interpreter } from 'xstate';
+	// xstate-svelte
+	import { useService } from 'xstate-svelte';
+	// Components
 	import RadioGroup from 'coms/RadioGroup.svelte';
 	import Checkbox from 'coms/Checkbox.svelte';
 	import Plus from 'coms/svg/Plus.svelte';
+
+	export let service: Interpreter<any>;
+
+	const { state, send } = useService(service);
 
 	const repsOrTimeOptions = [
 		{
@@ -38,14 +47,22 @@
 			value: 'kg'
 		}
 	];
+
+	const onExerciseInput = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const list = target.list as HTMLDataListElement;
+		const option = Array.from(list.options).find(
+			(option: HTMLOptionElement) => option.value === target.value
+		);
+		const id = option?.dataset.id;
+	};
 </script>
 
 <fieldset>
 	<div class="space-y-80 p-50 bg-fg">
 		<label class="_input flex flex-col">
 			<span>Exercise</span>
-			<!-- @TODO use exercise id as name -->
-			<input type="text" name="exercise" />
+			<input type="text" name="exercise" list="exercises" on:input={onExerciseInput} />
 		</label>
 		<div class="flex items-center justify-between space-x-30">
 			<div class="space-y-50 p-30 border-solid border-main border-20 rounded-10 shadow-lg">

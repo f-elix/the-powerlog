@@ -1,22 +1,27 @@
-import type { Session } from 'types';
-import type { ExerciseEvent } from 'src/machines/exercise';
-import { createMachine, assign, spawn, SpawnedActorRef } from 'xstate';
+import type { Session, ExerciseInstance, Exercise } from 'types';
+import { createMachine, assign } from 'xstate';
 import { assertEventType } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { router } from 'src/router';
 
 interface EditContext {
 	session?: Session;
-	exerciseActors?: SpawnedActorRef<ExerciseEvent>[];
+	exercises: Exercise[];
 }
 
 type EditEvent =
 	| { type: 'CREATE'; data: { token?: string } }
-	| { type: 'done.invoke.createSession'; data: { insert_sessions_one: Session } }
+	| {
+			type: 'done.invoke.createSession';
+			data: { insert_sessions_one: Session; exercises: Exercise[] };
+	  }
 	| { type: 'TITLE_INPUT'; data: { value: string } }
 	| { type: 'DATE_INPUT'; data: { value: string } }
 	| { type: 'DELETE'; data: { token?: string } }
-	| { type: 'done.invoke.deleteSession' };
+	| { type: 'done.invoke.deleteSession' }
+	| { type: 'EDIT_EXERCISE'; data?: { exerciseId: number } }
+	| { type: 'CANCEL_EXERCISE' }
+	| { type: 'SAVE_EXERCISE'; data: { exercise: ExerciseInstance } };
 
 type EditState =
 	| {
@@ -53,7 +58,8 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 		id: 'edit',
 		initial: 'idle',
 		context: {
-			session: undefined
+			session: undefined,
+			exercises: []
 		},
 		states: {
 			idle: {
@@ -72,7 +78,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							src: 'createSession',
 							onDone: {
 								target: '#edit.editing',
-								actions: ['updateSession']
+								actions: ['updateContext']
 							},
 							onError: {
 								target: '#edit.error'
@@ -95,15 +101,72 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 				}
 			},
 			editing: {
-				on: {
-					TITLE_INPUT: {
-						actions: ['updateTitle']
+				initial: 'session',
+				states: {
+					session: {
+						on: {
+							TITLE_INPUT: {
+								actions: ['updateTitle']
+							},
+							DATE_INPUT: {
+								actions: ['updateDate']
+							},
+							DELETE: {
+								target: '#edit.fetching.deleting'
+							},
+							EDIT_EXERCISE: {
+								target: 'exercise'
+							}
+						}
 					},
-					DATE_INPUT: {
-						actions: ['updateDate']
-					},
-					DELETE: {
-						target: 'fetching.deleting'
+					exercise: {
+						invoke: {
+							id: 'exercise',
+							src: 'exercise',
+							data: {
+								sessionId: (context: EditContext, event: EditEvent) => {
+									assertEventType(event, 'EDIT_EXERCISE');
+									const { session } = context;
+									if (!session) {
+										return {
+											instance: {}
+										};
+									}
+									const exerciseId = event.data?.exerciseId;
+									if (!exerciseId) {
+										return {
+											instance: {
+												sessionId: session.id,
+												userId: session.userId
+											}
+										};
+									}
+									const exercises = session.exercises || [];
+									const exercise = exercises.find(
+										(instance) => instance.exercise?.id === exerciseId
+									);
+									if (!exercise) {
+										return {
+											instance: {}
+										};
+									}
+									return {
+										instance: {
+											...exercise
+										}
+									};
+								}
+							}
+						},
+						on: {
+							CANCEL_EXERCISE: {
+								target: 'session'
+							},
+							SAVE_EXERCISE: {
+								target: 'session',
+								actions: ['updateExercises']
+							}
+						}
 					}
 				}
 			},
@@ -112,7 +175,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 	},
 	{
 		actions: {
-			updateSession: assign({
+			updateContext: assign({
 				session: (_, event) => {
 					assertEventType(event, 'done.invoke.createSession');
 					const session = event.data.insert_sessions_one;
@@ -120,6 +183,11 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 						...session,
 						date: new Date(session.date).toLocaleDateString('en-CA')
 					};
+				},
+				exercises: (_, event) => {
+					assertEventType(event, 'done.invoke.createSession');
+					const session = event.data.insert_sessions_one;
+					return session.user?.exercises || [];
 				}
 			}),
 			clearSession: assign({
@@ -151,6 +219,21 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 					return {
 						...session,
 						date: event.data.value
+					};
+				}
+			}),
+			updateExercises: assign({
+				session: (context, event) => {
+					assertEventType(event, 'SAVE_EXERCISE');
+					const { session } = context;
+					if (!session) {
+						return undefined;
+					}
+					const exercises = session?.exercises || [];
+					const updatedExercises = [...exercises, event.data.exercise];
+					return {
+						...session,
+						exercises: updatedExercises
 					};
 				}
 			}),
@@ -195,7 +278,8 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 					console.warn(error);
 					throw new Error('Problem deleting session');
 				}
-			}
+			},
+			exercise: exerciseMachine
 		}
 	}
 );

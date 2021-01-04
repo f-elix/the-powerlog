@@ -2,6 +2,7 @@ export interface User {
 	id: string;
 	name?: string;
 	email?: string;
+	exercises?: Exercise[];
 }
 
 export interface Session {
@@ -14,19 +15,19 @@ export interface Session {
 		amount?: number;
 		unit?: string;
 	};
+	user?: User;
 }
 
 export interface Exercise {
-	id: number;
+	id?: number;
 	userId: string;
 	name: string;
 }
 
 export interface ExerciseInstance {
 	id?: number;
-	sessionId?: number;
-	exerciseId?: number;
-	exercise: Exercise;
+	sessionId: number;
+	exercise?: Exercise;
 	superset?: string;
 	executions?: Execution[];
 }

@@ -1,10 +1,10 @@
 <script lang="ts">
-	// Machines
+	// Stores
 	import { edit } from 'src/stores/edit';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
-	import ExerciseFields from 'coms/ExerciseFields.svelte';
+	import SessionExercises from 'coms/SessionExercises.svelte';
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
 
@@ -32,16 +32,26 @@
 		edit.send({ type: 'DELETE', data: { token } });
 	};
 
+	const onNewExercise = () => {
+		edit.send({ type: 'EDIT_EXERCISE' });
+	};
+
 	const focusInput: () => void = (node: HTMLInputElement) => {
 		node.focus();
 	};
 
 	$: session = $state.context.session;
+	$: exercises = $state.context.exercises;
 </script>
 
 {#if $state.matches('editing') && session}
 	<form bind:this={form} on:submit|preventDefault={onSave} novalidate>
-		<Fab variant="outlined" label={ui.newExercise} />
+		<datalist id="exercises">
+			{#each exercises as exercise (exercise.id)}
+				<option value={exercise.name} data-id={exercise.id} />
+			{/each}
+		</datalist>
+		<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
 		<div class="flex flex-col space-y-110">
 			<div class="flex flex-col space-y-70 px-50">
 				<label class="_input flex flex-col">
@@ -58,7 +68,7 @@
 					<input type="date" name="date" value={session.date} on:input={onDateInput} />
 				</label>
 			</div>
-			<ExerciseFields />
+			<SessionExercises exercises={session.exercises} />
 			<div class="flex flex-col space-y-70 px-50">
 				<Button type="submit" theme="success">Save</Button>
 				<Button theme="danger" on:click={onCancel}>Cancel</Button>
