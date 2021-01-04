@@ -19,13 +19,15 @@
 	export let props: ViewProps;
 	export let children: View[];
 
+	log.start();
+
 	const { state: logState } = log;
 	const { state: filtersState } = filters;
 	const user = props.context.user as User;
 	const token = user.token?.access_token;
 
-	const onLoad = () => {
-		log.send({ type: 'LOAD', data: { token } });
+	const onLoadMore = () => {
+		log.send({ type: 'LOAD_MORE', data: { token } });
 	};
 
 	const onNewSession = () => {
@@ -35,7 +37,7 @@
 	$: sessions = $logState.context.sessions || [];
 	$: filteredSessions = $filtersState.context.sessions || [];
 
-	onLoad();
+	log.send({ type: 'LOAD', data: { token } });
 </script>
 
 <section class="space-y-70 px-50 h-full overflow-y-auto">
@@ -57,7 +59,9 @@
 				<Spinner />
 			{/if}
 			{#if $logState.matches('loaded.normal')}
-				<Button theme="success" variant="outlined" on:click={onLoad}>{ui.loadMore}</Button>
+				<Button theme="success" variant="outlined" on:click={onLoadMore}>
+					{ui.loadMore}
+				</Button>
 			{/if}
 		{:else}
 			<SessionsList sessions={filteredSessions} />

@@ -1,5 +1,29 @@
-import type { EventObject } from 'xstate';
+import type { EventObject, State, StateMachine } from 'xstate';
 import type { Session } from 'types';
+import { useMachine } from 'xstate-svelte';
+
+export const usePersistedMachine: (machine: StateMachine<any, any, any>, options?: any) => any = (
+	machine,
+	options
+) => {
+	const store = useMachine(machine, options);
+	const storageKey = `powerlog-${store.service.id}-state`;
+	const { service } = store;
+	service.onStop(() => {
+		sessionStorage.setItem(storageKey, JSON.stringify(service.state));
+	});
+	const start = () => {
+		if (service.status === 1) {
+			return;
+		}
+		const state: State<any> = JSON.parse(sessionStorage.getItem(storageKey) || '');
+		service.start(state);
+	};
+	return {
+		...store,
+		start
+	};
+};
 
 export const getLocalDate: (dateInput: string) => Date = (dateInput: string) => {
 	const date = new Date(dateInput);

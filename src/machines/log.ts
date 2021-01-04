@@ -9,8 +9,15 @@ interface LogContext {
 	hasNextPage: boolean;
 	error?: string;
 }
+
+enum LoadEvents {
+	LOAD = 'LOAD',
+	LOADMORE = 'LOAD_MORE'
+}
+
 type LogEvent =
-	| { type: 'LOAD'; data: { token?: string } }
+	| { type: LoadEvents.LOAD; data: { token?: string } }
+	| { type: LoadEvents.LOADMORE; data: { token?: string } }
 	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
 	| { type: 'error.platform.fetchUserSessions'; data: string };
 
@@ -149,7 +156,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					empty: {},
 					normal: {
 						on: {
-							LOAD: {
+							LOAD_MORE: {
 								target: '#log.fetching'
 							}
 						}
@@ -187,7 +194,11 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 		},
 		services: {
 			fetchUserSessions: async (context, event) => {
-				assertEventType(event, 'LOAD');
+				if (event.type !== LoadEvents.LOAD && event.type !== LoadEvents.LOADMORE) {
+					throw new Error(
+						`Invalid event: expected "${LoadEvents.LOAD} or ${LoadEvents.LOADMORE}", got "${event.type}"`
+					);
+				}
 				try {
 					const { cursor, limit } = context;
 					const { token } = event.data;

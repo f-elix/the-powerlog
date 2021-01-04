@@ -1,4 +1,4 @@
-import { useMachine } from 'xstate-svelte';
+import { usePersistedMachine } from 'src/utils';
 import { logMachine } from '../machines/log';
 
-export const log = useMachine(logMachine);
+export const log = usePersistedMachine(logMachine);
