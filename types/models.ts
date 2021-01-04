@@ -5,10 +5,11 @@ export interface User {
 }
 
 export interface Session {
-	id: number;
-	userId: string;
+	id?: number;
+	userId?: string;
 	title: string;
 	date: string;
+	exercises?: ExerciseInstance[];
 	bodyweight?: {
 		amount?: number;
 		unit?: string;
@@ -22,21 +23,24 @@ export interface Exercise {
 }
 
 export interface ExerciseInstance {
-	id: number;
-	sessionId: number;
-	exerciseId: number;
-	superset: string | null;
-	executions?: {
-		sets?: number;
-		reps?: number;
-		load?: {
-			amount?: number;
-			unit?: string;
-			bodyweight?: boolean;
-		};
-		duration?: {
-			amount?: number;
-			unit?: string;
-		};
-	}[];
+	id?: number;
+	sessionId?: number;
+	exerciseId?: number;
+	exercise: Exercise;
+	superset?: string;
+	executions?: Execution[];
+}
+
+export interface Execution {
+	sets?: number;
+	reps?: number;
+	load?: {
+		amount?: number;
+		unit?: string;
+		bodyweight?: boolean;
+	};
+	duration?: {
+		amount?: number;
+		unit?: string;
+	};
 }
