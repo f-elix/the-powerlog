@@ -48,7 +48,7 @@
 			<input type="text" name="exercise" />
 		</label>
 		<div class="flex items-center justify-between space-x-30">
-			<div class="space-y-50 p-30 border-solid border-main border-20 rounded-10">
+			<div class="space-y-50 p-30 border-solid border-main border-20 rounded-10 shadow-lg">
 				<div class="flex items-center space-x-50">
 					<label class="_input flex flex-col w-120">
 						<span>Sets</span>
@@ -74,21 +74,14 @@
 				</div>
 			</div>
 			<button
-				class="p-30 border-20 border-action border-solid rounded-10"
+				class="p-30 border-20 border-action border-solid rounded-10 shadow-md"
 				aria-label="Add sets">
 				<Plus extClass="w-60 h-60" />
 			</button>
 		</div>
 		<div class="flex flex-col items-end">
-			<div class="flex items-center justify-between flex-wrap space-y-40 w-140">
-				<button
-					class="w-full p-30 border-20 border-action border-solid rounded-10"
-					aria-label="Add movement">
-					<div class="flex items-center justify-center">
-						<Plus extClass="w-80 h-80" />
-					</div>
-				</button>
-				<button class="p-40 rounded-10 bg-danger" aria-label="Cancel">
+			<div class="flex items-center space-x-50">
+				<button class="p-40 rounded-10 bg-danger shadow-md" aria-label="Cancel">
 					<svg
 						width="22"
 						height="19"
@@ -100,7 +93,7 @@
 							fill="#F9FAFB" />
 					</svg>
 				</button>
-				<button class="p-40 rounded-10 bg-action" aria-label="Confirm">
+				<button class="p-40 rounded-10 bg-action shadow-md" aria-label="Confirm">
 					<svg
 						width="22"
 						height="17"
