@@ -16,14 +16,21 @@ export const handler: (
 
 	return gqlQuery({
 		query: `
-			mutation createSession($title: String!, $userId: String!) {
-				insert_sessions_one(object:{title: $title, user_id: $userId}) {
-					id
-					user_id
-					title
-					date
+		mutation createSession($userId: String!, $title: String!) {
+			insert_sessions_one(object: {title: $title, userId: $userId}) {
+			  id
+			  userId
+			  title
+			  date
+			  user {
+				exercises {
+				  id
+				  name
+				  userId
 				}
+			  }
 			}
+		  }
 		`,
 		variables: {
 			userId: user.sub,

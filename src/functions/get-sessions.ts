@@ -19,7 +19,7 @@ export const handler: (
 	return gqlQuery({
 		query: `
 				query getSessions($id: String!, $dateCursor: timestamptz, $limit: Int!)	{
-					sessions(where: {user_id: {_eq: $id}, date: {_lt: $dateCursor}}, order_by: {date: desc}, limit: $limit) {
+					sessions(where: {userId: {_eq: $id}, date: {_lt: $dateCursor}}, order_by: {date: desc}, limit: $limit) {
 						id
 						date
 						title
