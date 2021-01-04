@@ -11,7 +11,7 @@
 	export let name: string = '';
 </script>
 
-<div class="flex flex-col justify-around self-stretch">
+<div class="flex flex-col justify-between self-stretch">
 	{#each options as { label, value, checked }}
 		<Radio {label} {value} {checked} {name} />
 	{/each}
