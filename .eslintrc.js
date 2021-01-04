@@ -22,7 +22,13 @@ module.exports = {
 		'@typescript-eslint/no-shadow': 'error',
 		'no-use-before-define': 'off',
 		'@typescript-eslint/no-use-before-define': ['error'],
-		'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+		'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+		camelcase: [
+			'error',
+			{
+				properties: 'never'
+			}
+		]
 	},
 	overrides: [
 		{

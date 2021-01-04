@@ -21,7 +21,10 @@ module.exports = {
 		/* ... */
 	],
 	installOptions: {
-		installTypes: true
+		installTypes: true,
+		env: {
+			'NODE_ENV': true
+		}
 		/* ... */
 	},
 	devOptions: {

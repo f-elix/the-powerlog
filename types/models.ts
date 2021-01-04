@@ -5,8 +5,8 @@ export interface User {
 }
 
 export interface Session {
-	id?: number;
-	userId?: string;
+	id: number;
+	userId: string;
 	title: string;
 	date: string;
 	exercises?: ExerciseInstance[];
