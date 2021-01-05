@@ -96,3 +96,24 @@ export const createExecution: (id: number) => Execution = (id) => ({
 		unit: LoadUnit.lbs
 	}
 });
+
+export const updateObjectKey = <TObj extends Record<string, any>>(
+	obj: TObj,
+	key: string | string[],
+	value: any
+): TObj => {
+	const updatedObj = obj;
+	if (typeof key === 'string') {
+		return updateObjectKey(updatedObj, key.split('.'), value);
+	}
+	if (key.length === 1 && value !== undefined) {
+		return {
+			...updatedObj,
+			[key[0]]: value
+		};
+	}
+	return {
+		...updatedObj,
+		[key[0]]: updateObjectKey(updatedObj[key[0]], key.slice(1), value)
+	};
+};

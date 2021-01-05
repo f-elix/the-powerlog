@@ -29,6 +29,30 @@
 		send({ type: 'NEW_EXECUTION' });
 	};
 
+	const execInput = (path: string, value: any, id: number) => {
+		send({ type: 'EXECUTION_INPUT', data: { path, value, executionId: id } });
+	};
+
+	const onSetInput = (e: Event, id: number) => {
+		const target = e.target as HTMLInputElement;
+		execInput('sets', target.value, id);
+	};
+
+	const onRepInput = (e: Event, id: number) => {
+		const target = e.target as HTMLInputElement;
+		execInput('reps', target.value, id);
+	};
+
+	const onTimeAmountInput = (e: Event, id: number) => {
+		const target = e.target as HTMLInputElement;
+		execInput('duration.amount', target.value, id);
+	};
+
+	const onLoadAmountInput = (e: Event, id: number) => {
+		const target = e.target as HTMLInputElement;
+		execInput('load.amount', target.value, id);
+	};
+
 	$: executions = $state.context.instance.executions;
 	$: console.log($state);
 </script>
@@ -46,7 +70,11 @@
 					<div class="grid grid-cols-4 gap-x-50">
 						<label class="_input flex flex-col">
 							<span>Sets</span>
-							<input type="number" name="sets" value={execution.sets} />
+							<input
+								type="number"
+								name="sets"
+								value={execution.sets}
+								on:input={(e) => onSetInput(e, execution.id)} />
 						</label>
 						{#if execution.duration}
 							<label class="_input flex flex-col">
@@ -54,17 +82,26 @@
 								<input
 									type="number"
 									name="reps"
-									value={execution.duration.amount} />
+									value={execution.duration.amount}
+									on:input={(e) => onTimeAmountInput(e, execution.id)} />
 							</label>
 						{:else}
 							<label class="_input flex flex-col">
 								<span>Reps</span>
-								<input type="number" name="reps" value={execution.reps} />
+								<input
+									type="number"
+									name="reps"
+									value={execution.reps}
+									on:input={(e) => onRepInput(e, execution.id)} />
 							</label>
 						{/if}
-						<RadioGroup name="setType" options={SetType} selected={execution.setType} />
 						<RadioGroup
-							name="timeUnit"
+							name="setType-{execution.id}"
+							options={SetType}
+							selected={execution.setType}
+							on:change={(e) => console.log('change', e)} />
+						<RadioGroup
+							name="timeUnit-{execution.id}"
 							options={TimeUnit}
 							selected={execution.duration.unit}
 							disabled={execution.setType === SetType.reps} />
@@ -72,10 +109,14 @@
 					<div class="grid grid-cols-4 gap-x-50">
 						<label class="_input flex flex-col col-span-1">
 							<span>Weight</span>
-							<input type="number" name="load" value={execution.load?.amount} />
+							<input
+								type="number"
+								name="load"
+								value={execution.load?.amount}
+								on:input={(e) => onLoadAmountInput(e, execution.id)} />
 						</label>
 						<RadioGroup
-							name="loadUnit"
+							name="loadUnit-{execution.id}"
 							options={LoadUnit}
 							selected={execution.load.unit} />
 						<Checkbox

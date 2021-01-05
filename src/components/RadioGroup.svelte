@@ -11,6 +11,6 @@
 
 <div class="flex flex-col justify-between self-stretch">
 	{#each optionsArray as option}
-		<Radio value={option} {name} checked={selected === option} {disabled} />
+		<Radio value={option} {name} checked={selected === option} {disabled} on:change />
 	{/each}
 </div>
