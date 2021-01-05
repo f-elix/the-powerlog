@@ -20,7 +20,7 @@ export const handler: (
 		query: `
 			mutation deleteSession($id: Int!) {
 				delete_sessions_by_pk(id: $id) {
-					user_id
+					userId
 				}
 			}
 		`,
