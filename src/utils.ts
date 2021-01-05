@@ -1,5 +1,5 @@
 import type { EventObject, State, StateMachine } from 'xstate';
-import type { Session } from 'types';
+import type { Session, Execution } from 'types';
 import { useMachine } from 'xstate-svelte';
 
 export const usePersistedMachine: (machine: StateMachine<any, any, any>, options?: any) => any = (
@@ -70,3 +70,29 @@ export function assertEventType<TE extends EventObject, TType extends TE['type']
 }
 
 export const isTouchDevice: () => boolean = () => window.matchMedia('(pointer: coarse)').matches;
+
+export enum SetType {
+	reps = 'reps',
+	time = 'time'
+}
+
+export enum TimeUnit {
+	sec = 'sec',
+	min = 'min'
+}
+
+export enum LoadUnit {
+	lbs = 'lbs',
+	kg = 'kg'
+}
+
+export const createExecution: (id: number) => Execution = (id) => ({
+	id,
+	setType: SetType.reps,
+	duration: {
+		unit: TimeUnit.sec
+	},
+	load: {
+		unit: LoadUnit.lbs
+	}
+});

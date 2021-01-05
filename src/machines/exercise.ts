@@ -1,18 +1,19 @@
-import { assertEventType } from 'src/utils';
+import { assertEventType, createExecution } from 'src/utils';
 import type { ExerciseInstance } from 'types';
 import { createMachine, assign } from 'xstate';
 
-interface ExerciseContext {
+export interface ExerciseContext {
 	instance: ExerciseInstance;
 	userId: string;
 }
 
-type ExerciseEvent =
+export type ExerciseEvent =
+	| { type: 'EXERCISE_INPUT'; data: { exercise: { name: string; id?: number } } }
+	| { type: 'NEW_EXECUTION' }
 	| { type: 'CANCEL' }
-	| { type: 'SAVE' }
-	| { type: 'EXERCISE_INPUT'; data: { exercise: { name: string; id?: number } } };
+	| { type: 'SAVE' };
 
-type ExerciseState =
+export type ExerciseState =
 	| {
 			value: 'editing';
 			context: ExerciseContext;
@@ -35,6 +36,9 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 				on: {
 					EXERCISE_INPUT: {
 						actions: ['updateExercise']
+					},
+					NEW_EXECUTION: {
+						actions: ['addExecution']
 					},
 					CANCEL: {
 						target: 'cancelled'
@@ -64,6 +68,20 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 							...event.data.exercise,
 							userId: context.userId
 						}
+					};
+				}
+			}),
+			addExecution: assign({
+				instance: (context, event) => {
+					assertEventType(event, 'NEW_EXECUTION');
+					const currentExecutions = context.instance.executions;
+					const updatedExecutions = [
+						...currentExecutions,
+						createExecution(currentExecutions.length + 1)
+					];
+					return {
+						...context.instance,
+						executions: updatedExecutions
 					};
 				}
 			})

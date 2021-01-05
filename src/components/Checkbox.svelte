@@ -2,6 +2,7 @@
 	export let checked: boolean = false;
 	export let label: string = '';
 	export let name: string = '';
+	export let extClass: string = '';
 </script>
 
 <style>
@@ -18,7 +19,7 @@
 	}
 </style>
 
-<label class="flex items-center space-x-30 cursor-pointer self-end">
+<label class="flex items-center space-x-30 cursor-pointer {extClass}">
 	<input
 		class="_checkbox-input absolute w-0 h-0 opacity-0"
 		type="checkbox"

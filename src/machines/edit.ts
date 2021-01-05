@@ -1,6 +1,6 @@
 import type { Session, ExerciseInstance, Exercise } from 'types';
 import { createMachine, assign } from 'xstate';
-import { assertEventType } from 'src/utils';
+import { assertEventType, createExecution } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { router } from 'src/router';
 
@@ -124,38 +124,31 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							id: 'exercise',
 							src: 'exercise',
 							data: {
-								sessionId: (context: EditContext, event: EditEvent) => {
+								instance: (context: EditContext, event: EditEvent) => {
 									assertEventType(event, 'EDIT_EXERCISE');
 									const { session } = context;
 									if (!session) {
-										return {
-											instance: {}
-										};
+										return {};
 									}
 									const exerciseId = event.data?.exerciseId;
 									if (!exerciseId) {
 										return {
-											instance: {
-												sessionId: session.id,
-												userId: session.userId
-											}
+											sessionId: session.id,
+											executions: [createExecution(1)]
 										};
 									}
 									const exercises = session.exercises || [];
-									const exercise = exercises.find(
+									const exerciseInstance = exercises.find(
 										(instance) => instance.exercise?.id === exerciseId
 									);
-									if (!exercise) {
-										return {
-											instance: {}
-										};
+									if (!exerciseInstance) {
+										return {};
 									}
 									return {
-										instance: {
-											...exercise
-										}
+										...exerciseInstance
 									};
-								}
+								},
+								userId: (context: EditContext) => context.session?.userId
 							}
 						},
 						on: {

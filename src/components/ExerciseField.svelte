@@ -1,6 +1,8 @@
 <script lang="ts">
 	// Types
 	import type { Interpreter } from 'xstate';
+	import { SetType, TimeUnit, LoadUnit } from 'src/utils';
+	import type { ExerciseContext, ExerciseEvent, ExerciseState } from 'src/machines/exercise';
 	// xstate-svelte
 	import { useService } from 'xstate-svelte';
 	// Components
@@ -8,54 +10,27 @@
 	import Checkbox from 'coms/Checkbox.svelte';
 	import Plus from 'coms/svg/Plus.svelte';
 
-	export let service: Interpreter<any>;
+	export let service: Interpreter<ExerciseContext, any, ExerciseEvent, ExerciseState>;
 
 	const { state, send } = useService(service);
 
-	const repsOrTimeOptions = [
-		{
-			label: 'Reps',
-			value: 'reps',
-			checked: true
-		},
-		{
-			label: 'Time',
-			value: 'time'
-		}
-	];
-
-	const timeUnitOptions = [
-		{
-			label: 'Sec',
-			value: 'sec',
-			checked: true
-		},
-		{
-			label: 'Min',
-			value: 'min'
-		}
-	];
-
-	const loadUnitOptions = [
-		{
-			label: 'lbs',
-			value: 'lbs',
-			checked: true
-		},
-		{
-			label: 'kg',
-			value: 'kg'
-		}
-	];
-
 	const onExerciseInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
+		const name = target.value;
 		const list = target.list as HTMLDataListElement;
 		const option = Array.from(list.options).find(
 			(option: HTMLOptionElement) => option.value === target.value
 		);
-		const id = option?.dataset.id;
+		const id = parseInt(option?.dataset.id || '', 10);
+		send({ type: 'EXERCISE_INPUT', data: { exercise: { name, id } } });
 	};
+
+	const onNewExecution = () => {
+		send({ type: 'NEW_EXECUTION' });
+	};
+
+	$: executions = $state.context.instance.executions;
+	$: console.log($state);
 </script>
 
 <fieldset>
@@ -64,38 +39,60 @@
 			<span>Exercise</span>
 			<input type="text" name="exercise" list="exercises" on:input={onExerciseInput} />
 		</label>
-		<div class="flex items-center justify-between space-x-30">
-			<div class="space-y-50 p-30 border-solid border-main border-20 rounded-10 shadow-lg">
-				<div class="flex items-center space-x-50">
-					<label class="_input flex flex-col w-120">
-						<span>Sets</span>
-						<!-- @TODO use execution id -->
-						<input type="number" name="sets" />
-					</label>
-					<!-- <span>X</span> -->
-					<label class="_input flex flex-col w-120">
-						<span>Reps</span>
-						<!-- @TODO use execution id -->
-						<input type="number" name="reps" />
-					</label>
-					<RadioGroup name="repsOrTime" options={repsOrTimeOptions} />
-					<RadioGroup name="timeUnit" options={timeUnitOptions} />
+		{#each executions as execution, i (execution.id)}
+			<div class="flex items-center justify-between space-x-50">
+				<div
+					class="flex-grow space-y-50 p-30 border-solid border-main border-20 rounded-10 shadow-lg">
+					<div class="grid grid-cols-4 gap-x-50">
+						<label class="_input flex flex-col">
+							<span>Sets</span>
+							<input type="number" name="sets" value={execution.sets} />
+						</label>
+						{#if execution.duration}
+							<label class="_input flex flex-col">
+								<span>Time</span>
+								<input
+									type="number"
+									name="reps"
+									value={execution.duration.amount} />
+							</label>
+						{:else}
+							<label class="_input flex flex-col">
+								<span>Reps</span>
+								<input type="number" name="reps" value={execution.reps} />
+							</label>
+						{/if}
+						<RadioGroup name="setType" options={SetType} selected={execution.setType} />
+						<RadioGroup
+							name="timeUnit"
+							options={TimeUnit}
+							selected={execution.duration.unit}
+							disabled={execution.setType === SetType.reps} />
+					</div>
+					<div class="grid grid-cols-4 gap-x-50">
+						<label class="_input flex flex-col col-span-1">
+							<span>Weight</span>
+							<input type="number" name="load" value={execution.load?.amount} />
+						</label>
+						<RadioGroup
+							name="loadUnit"
+							options={LoadUnit}
+							selected={execution.load.unit} />
+						<Checkbox
+							extClass="col-span-2"
+							label="Add Bodyweight"
+							name="bodyweight"
+							checked={execution.load?.bodyweight} />
+					</div>
 				</div>
-				<div class="flex items-center space-x-50">
-					<label class="_input flex flex-col w-140">
-						<span>Weight</span>
-						<input type="number" name="load" />
-					</label>
-					<RadioGroup name="loadUnit" options={loadUnitOptions} />
-					<Checkbox label="Add Bodyweight" name="bodyweight" />
-				</div>
+				<button
+					class="p-30 border-20 border-action border-solid rounded-10 shadow-md transition-colors pointer:hover:bg-action active:bg-action _focus-default"
+					aria-label="Add sets"
+					on:click={onNewExecution}>
+					<Plus extClass="w-60 h-60" />
+				</button>
 			</div>
-			<button
-				class="p-30 border-20 border-action border-solid rounded-10 shadow-md"
-				aria-label="Add sets">
-				<Plus extClass="w-60 h-60" />
-			</button>
-		</div>
+		{/each}
 		<div class="flex flex-col items-end">
 			<div class="flex items-center space-x-50">
 				<button class="p-40 rounded-10 bg-danger shadow-md" aria-label="Cancel">

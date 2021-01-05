@@ -1,3 +1,5 @@
+import type { SetType, TimeUnit, LoadUnit } from 'src/utils';
+
 export interface User {
 	id: string;
 	name?: string;
@@ -29,19 +31,21 @@ export interface ExerciseInstance {
 	sessionId: number;
 	exercise?: Exercise;
 	superset?: string;
-	executions?: Execution[];
+	executions: Execution[];
 }
 
 export interface Execution {
+	id: number;
 	sets?: number;
 	reps?: number;
-	load?: {
+	setType: SetType;
+	load: {
 		amount?: number;
-		unit?: string;
+		unit: LoadUnit;
 		bodyweight?: boolean;
 	};
-	duration?: {
+	duration: {
 		amount?: number;
-		unit?: string;
+		unit: TimeUnit;
 	};
 }
