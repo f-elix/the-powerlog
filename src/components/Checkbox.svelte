@@ -3,6 +3,7 @@
 	export let label: string = '';
 	export let name: string = '';
 	export let extClass: string = '';
+	export let key: string = '';
 </script>
 
 <style>
@@ -23,6 +24,7 @@
 	<input
 		class="_checkbox-input absolute w-0 h-0 opacity-0"
 		type="checkbox"
+		data-key={key}
 		{name}
 		bind:checked
 		on:change />

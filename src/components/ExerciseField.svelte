@@ -29,28 +29,13 @@
 		send({ type: 'NEW_EXECUTION' });
 	};
 
-	const execInput = (path: string, value: any, id: number) => {
+	const onExecInput = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const path = target.dataset.key || '';
+		const value = target.value;
+		const parent = target.closest('[data-id]') as HTMLDivElement;
+		const id = parseInt(parent.dataset.id || '0', 10);
 		send({ type: 'EXECUTION_INPUT', data: { path, value, executionId: id } });
-	};
-
-	const onSetInput = (e: Event, id: number) => {
-		const target = e.target as HTMLInputElement;
-		execInput('sets', target.value, id);
-	};
-
-	const onRepInput = (e: Event, id: number) => {
-		const target = e.target as HTMLInputElement;
-		execInput('reps', target.value, id);
-	};
-
-	const onTimeAmountInput = (e: Event, id: number) => {
-		const target = e.target as HTMLInputElement;
-		execInput('duration.amount', target.value, id);
-	};
-
-	const onLoadAmountInput = (e: Event, id: number) => {
-		const target = e.target as HTMLInputElement;
-		execInput('load.amount', target.value, id);
 	};
 
 	$: executions = $state.context.instance.executions;
@@ -64,7 +49,7 @@
 			<input type="text" name="exercise" list="exercises" on:input={onExerciseInput} />
 		</label>
 		{#each executions as execution, i (execution.id)}
-			<div class="flex items-center justify-between space-x-50">
+			<div class="flex items-center justify-between space-x-50" data-id={execution.id}>
 				<div
 					class="flex-grow space-y-50 p-30 border-solid border-main border-20 rounded-10 shadow-lg">
 					<div class="grid grid-cols-4 gap-x-50">
@@ -72,39 +57,45 @@
 							<span>Sets</span>
 							<input
 								type="number"
-								name="sets"
+								name="sets-{execution.id}"
 								value={execution.sets}
-								on:input={(e) => onSetInput(e, execution.id)} />
+								data-key="sets"
+								on:input={onExecInput} />
 						</label>
 						{#if execution.duration}
 							<label class="_input flex flex-col">
 								<span>Time</span>
 								<input
 									type="number"
-									name="reps"
+									name="time-{execution.id}"
 									value={execution.duration.amount}
-									on:input={(e) => onTimeAmountInput(e, execution.id)} />
+									data-key="duration.amount"
+									on:input={onExecInput} />
 							</label>
 						{:else}
 							<label class="_input flex flex-col">
 								<span>Reps</span>
 								<input
 									type="number"
-									name="reps"
+									name="reps-{execution.id}"
 									value={execution.reps}
-									on:input={(e) => onRepInput(e, execution.id)} />
+									data-key="reps"
+									on:input={onExecInput} />
 							</label>
 						{/if}
 						<RadioGroup
 							name="setType-{execution.id}"
 							options={SetType}
 							selected={execution.setType}
-							on:change={(e) => console.log('change', e)} />
+							key="setType"
+							on:change={onExecInput} />
 						<RadioGroup
 							name="timeUnit-{execution.id}"
 							options={TimeUnit}
 							selected={execution.duration.unit}
-							disabled={execution.setType === SetType.reps} />
+							key="duration.unit"
+							disabled={execution.setType === SetType.reps}
+							on:change={onExecInput} />
 					</div>
 					<div class="grid grid-cols-4 gap-x-50">
 						<label class="_input flex flex-col col-span-1">
@@ -113,17 +104,22 @@
 								type="number"
 								name="load"
 								value={execution.load?.amount}
-								on:input={(e) => onLoadAmountInput(e, execution.id)} />
+								data-key="load.amount"
+								on:input={onExecInput} />
 						</label>
 						<RadioGroup
 							name="loadUnit-{execution.id}"
 							options={LoadUnit}
-							selected={execution.load.unit} />
+							selected={execution.load.unit}
+							key="load.unit"
+							on:change={onExecInput} />
 						<Checkbox
 							extClass="col-span-2"
 							label="Add Bodyweight"
-							name="bodyweight"
-							checked={execution.load?.bodyweight} />
+							name="bodyweight-{execution.id}"
+							key="load.bodyweight"
+							checked={execution.load?.bodyweight}
+							on:change={onExecInput} />
 					</div>
 				</div>
 				<button

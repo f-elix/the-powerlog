@@ -3,6 +3,7 @@
 	export let name: string = '';
 	export let checked: boolean = false;
 	export let disabled: boolean = false;
+	export let key: string = '';
 
 	const label = value;
 </script>
@@ -27,6 +28,7 @@
 		class="_radio-input absolute w-0 h-0 opacity-0"
 		{value}
 		{name}
+		data-key={key}
 		{checked}
 		{disabled}
 		on:change />
