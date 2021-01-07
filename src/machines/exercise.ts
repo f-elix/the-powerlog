@@ -1,6 +1,6 @@
 import { assertEventType, createExecution, updateObjectKey } from 'src/utils';
 import type { ExerciseInstance } from 'types';
-import { createMachine, assign } from 'xstate';
+import { createMachine, assign, sendParent } from 'xstate';
 
 export interface ExerciseContext {
 	instance: ExerciseInstance;
@@ -53,6 +53,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 				}
 			},
 			cancelled: {
+				entry: ['notifyCancel'],
 				type: 'final'
 			},
 			done: {
@@ -107,7 +108,8 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 						executions
 					};
 				}
-			})
+			}),
+			notifyCancel: sendParent('CANCEL_EXERCISE')
 		}
 	}
 );

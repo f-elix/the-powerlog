@@ -149,15 +149,15 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 									};
 								},
 								userId: (context: EditContext) => context.session?.userId
+							},
+							onDone: {
+								target: 'session',
+								actions: ['updateExercises']
 							}
 						},
 						on: {
 							CANCEL_EXERCISE: {
 								target: 'session'
-							},
-							SAVE_EXERCISE: {
-								target: 'session',
-								actions: ['updateExercises']
 							}
 						}
 					}

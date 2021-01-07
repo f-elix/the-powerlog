@@ -163,7 +163,8 @@ module.exports = {
 	variants: {
 		extend: {
 			ringOpacity: ['focus-visible'],
-			backgroundColor: ['active']
+			backgroundColor: ['active'],
+			backgroundOpacity: ['active']
 		}
 	},
 	plugins: []

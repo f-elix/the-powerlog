@@ -39,6 +39,10 @@
 		send({ type: 'EXECUTION_INPUT', data: { path, value, executionId: id } });
 	};
 
+	const onCancel = () => {
+		send({ type: 'CANCEL' });
+	};
+
 	$: executions = $state.context.instance.executions;
 </script>
 
@@ -132,7 +136,10 @@
 		{/each}
 		<div class="flex flex-col items-end">
 			<div class="flex items-center space-x-50">
-				<button class="p-40 rounded-10 bg-danger shadow-md" aria-label="Cancel">
+				<button
+					class="p-40 rounded-10 bg-danger shadow-md transition-colors pointer:hover:bg-opacity-50 active:bg-opacity-50 _focus-default"
+					aria-label="Cancel"
+					on:click={onCancel}>
 					<svg
 						width="22"
 						height="19"
@@ -144,7 +151,9 @@
 							fill="#F9FAFB" />
 					</svg>
 				</button>
-				<button class="p-40 rounded-10 bg-action shadow-md" aria-label="Confirm">
+				<button
+					class="p-40 rounded-10 bg-action shadow-md transition-colors pointer:hover:bg-opacity-50 active:bg-opacity-50 _focus-default"
+					aria-label="Confirm">
 					<svg
 						width="22"
 						height="17"
