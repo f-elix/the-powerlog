@@ -6,6 +6,7 @@
 	// xstate-svelte
 	import { useService } from 'xstate-svelte';
 	// Components
+	import Label from 'coms/Label.svelte';
 	import RadioGroup from 'coms/RadioGroup.svelte';
 	import Checkbox from 'coms/Checkbox.svelte';
 	import Plus from 'coms/svg/Plus.svelte';
@@ -39,21 +40,20 @@
 	};
 
 	$: executions = $state.context.instance.executions;
-	$: console.log(executions);
 </script>
 
 <fieldset>
 	<div class="space-y-80 p-50 bg-fg">
-		<label class="_input flex flex-col">
+		<Label>
 			<span>Exercise</span>
 			<input type="text" name="exercise" list="exercises" on:input={onExerciseInput} />
-		</label>
+		</Label>
 		{#each executions as execution, i (execution.id)}
 			<div class="flex items-center justify-between space-x-50" data-id={execution.id}>
 				<div
 					class="flex-grow space-y-50 p-30 border-solid border-main border-20 rounded-10 shadow-lg">
 					<div class="grid grid-cols-4 gap-x-50">
-						<label class="_input flex flex-col">
+						<Label>
 							<span>Sets</span>
 							<input
 								type="number"
@@ -61,9 +61,9 @@
 								value={execution.sets}
 								data-key="sets"
 								on:input={onExecInput} />
-						</label>
+						</Label>
 						{#if execution.setType === SetType.time}
-							<label class="_input flex flex-col">
+							<Label>
 								<span>Time</span>
 								<input
 									type="number"
@@ -71,9 +71,9 @@
 									value={execution.duration.amount}
 									data-key="duration.amount"
 									on:input={onExecInput} />
-							</label>
+							</Label>
 						{:else}
-							<label class="_input flex flex-col">
+							<Label>
 								<span>Reps</span>
 								<input
 									type="number"
@@ -81,7 +81,7 @@
 									value={execution.reps}
 									data-key="reps"
 									on:input={onExecInput} />
-							</label>
+							</Label>
 						{/if}
 						<RadioGroup
 							name="setType-{execution.id}"
@@ -98,7 +98,7 @@
 							on:change={onExecInput} />
 					</div>
 					<div class="grid grid-cols-4 gap-x-50">
-						<label class="_input flex flex-col col-span-1">
+						<Label extClass="col-span-1">
 							<span>Weight</span>
 							<input
 								type="number"
@@ -106,7 +106,7 @@
 								value={execution.load?.amount}
 								data-key="load.amount"
 								on:input={onExecInput} />
-						</label>
+						</Label>
 						<RadioGroup
 							name="loadUnit-{execution.id}"
 							options={LoadUnit}

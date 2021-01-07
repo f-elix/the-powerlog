@@ -1,9 +1,8 @@
 <script lang="ts">
 	// Ui
 	import { ui } from 'src/ui';
+	// Components
+	import Label from 'coms/Label.svelte';
 </script>
 
-<label class="_input flex flex-col">
-	<span class="p-30 text-40">{ui.labels.sessionName}</span>
-	<input type="text" name="name" on:input />
-</label>
+<Label><span>{ui.labels.sessionName}</span> <input type="text" name="name" on:input /></Label>

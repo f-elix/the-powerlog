@@ -6,6 +6,7 @@
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
+	import Label from 'coms/Label.svelte';
 	import Name from 'coms/filters/Name.svelte';
 	import DaysAgo from 'coms/filters/DaysAgo.svelte';
 	import WeeksAgo from 'coms/filters/WeeksAgo.svelte';
@@ -78,7 +79,7 @@
 			on:click={onClearFilters}
 			class="absolute top-60 right-0 px-30 border-solid border-danger-light border-20 rounded-10 transition-colors focus:bg-danger-light pointer:hover:bg-danger-light active:bg-danger-light">{ui.clearFilters}</button>
 	{/if}
-	<label class="w-full flex flex-col space-y-70">
+	<Label extClass="space-y-70">
 		<span>{ui.filterBy}</span>
 		<select
 			class="bg-main border-main border-solid border-20 rounded-10 p-30 text-main"
@@ -88,6 +89,6 @@
 				<option value={filter.component}>{filter.name}</option>
 			{/each}
 		</select>
-	</label>
+	</Label>
 	<svelte:component this={filterComponents[selectedFilter]} on:input={onFilterInput} />
 </div>

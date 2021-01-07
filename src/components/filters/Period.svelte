@@ -3,6 +3,8 @@
 	import { createEventDispatcher } from 'svelte';
 	// Ui
 	import { ui } from 'src/ui';
+	// Components
+	import Label from 'coms/Label.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -27,12 +29,12 @@
 </script>
 
 <div class="grid grid-cols-2 gap-50">
-	<label class="_input flex flex-col">
+	<Label>
 		<span>{ui.labels.to}</span>
 		<input type="date" name="from" on:input={onPeriodInput} />
-	</label>
-	<label class="_input flex flex-col">
+	</Label>
+	<Label>
 		<span>{ui.labels.from}</span>
 		<input type="date" name="to" on:input={onPeriodInput} />
-	</label>
+	</Label>
 </div>

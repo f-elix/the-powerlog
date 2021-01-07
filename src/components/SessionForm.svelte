@@ -7,6 +7,7 @@
 	import SessionExercises from 'coms/SessionExercises.svelte';
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
+	import Label from 'coms/Label.svelte';
 
 	export let token: string;
 
@@ -54,7 +55,7 @@
 		<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
 		<div class="flex flex-col space-y-110">
 			<div class="flex flex-col space-y-70 px-50">
-				<label class="_input flex flex-col">
+				<Label>
 					<span>Name</span>
 					<input
 						use:focusInput
@@ -62,11 +63,11 @@
 						name="title"
 						value={session.title}
 						on:input={onNameInput} />
-				</label>
-				<label class="_input flex flex-col">
+				</Label>
+				<Label>
 					<span>Date</span>
 					<input type="date" name="date" value={session.date} on:input={onDateInput} />
-				</label>
+				</Label>
 			</div>
 			<SessionExercises exercises={session.exercises} />
 			<div class="flex flex-col space-y-70 px-50">

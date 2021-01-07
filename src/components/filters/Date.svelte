@@ -1,8 +1,8 @@
 <script lang="ts">
+	// Ui
 	import { ui } from 'src/ui';
+	// Components
+	import Label from 'coms/Label.svelte';
 </script>
 
-<label class="_input flex flex-col">
-	<span>{ui.labels.sessionDate}</span>
-	<input type="date" name="date" on:input />
-</label>
+<Label><span>{ui.labels.sessionDate}</span> <input type="date" name="date" on:input /></Label>
