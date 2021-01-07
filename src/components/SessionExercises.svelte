@@ -4,7 +4,7 @@
 	// Stores
 	import { edit } from 'src/stores/edit';
 	// Components
-	import CardExercise from 'coms/CardExercise.svelte';
+	import ExerciseData from 'coms/ExerciseData.svelte';
 	import ExerciseField from 'coms/ExerciseField.svelte';
 
 	export let exercises: ExerciseInstance[];
@@ -16,9 +16,15 @@
 
 {#if exercises}
 	{#each exercises as exercise}
-		<CardExercise {exercise} />
+		{#if editedExercise && $state.context.editedInstanceId === exercise.id}
+			<ExerciseField service={editedExercise} />
+		{:else}
+			<button>
+				<ExerciseData instance={exercise} />
+			</button>
+		{/if}
 	{/each}
 {/if}
-{#if editedExercise}
+{#if editedExercise && !$state.context.editedInstanceId}
 	<ExerciseField service={editedExercise} />
 {/if}

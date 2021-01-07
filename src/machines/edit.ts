@@ -7,6 +7,7 @@ import { router } from 'src/router';
 interface EditContext {
 	session?: Session;
 	exercises: Exercise[];
+	editedInstanceId?: number;
 }
 
 type EditEvent =
@@ -19,7 +20,7 @@ type EditEvent =
 	| { type: 'DATE_INPUT'; data: { value: string } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
-	| { type: 'EDIT_EXERCISE'; data?: { exerciseId: number } }
+	| { type: 'EDIT_EXERCISE'; data?: { instanceId: number } }
 	| { type: 'CANCEL_EXERCISE' }
 	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } };
 
@@ -115,7 +116,8 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 								target: '#edit.fetching.deleting'
 							},
 							EDIT_EXERCISE: {
-								target: 'exercise'
+								target: 'exercise',
+								actions: ['updateEditedInstanceId']
 							}
 						}
 					},
@@ -130,23 +132,21 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 									if (!session) {
 										return {};
 									}
-									const exerciseId = event.data?.exerciseId;
-									if (!exerciseId) {
+									const instanceId = event.data?.instanceId;
+									if (!instanceId) {
 										return {
 											sessionId: session.id,
 											executions: [createExecution(1)]
 										};
 									}
-									const exercises = session.exercises || [];
-									const exerciseInstance = exercises.find(
-										(instance) => instance.exercise?.id === exerciseId
+									const instances = session.exercises || [];
+									const exerciseInstance = instances.find(
+										(instance) => instance.id === instanceId
 									);
 									if (!exerciseInstance) {
 										return {};
 									}
-									return {
-										...exerciseInstance
-									};
+									return exerciseInstance;
 								},
 								userId: (context: EditContext) => context.session?.userId
 							},
@@ -159,7 +159,8 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							CANCEL_EXERCISE: {
 								target: 'session'
 							}
-						}
+						},
+						exit: ['clearEditedInstanceId']
 					}
 				}
 			},
@@ -214,6 +215,15 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 						date: event.data.value
 					};
 				}
+			}),
+			updateEditedInstanceId: assign({
+				editedInstanceId: (_, event) => {
+					assertEventType(event, 'EDIT_EXERCISE');
+					return event.data?.instanceId;
+				}
+			}),
+			clearEditedInstanceId: assign({
+				editedInstanceId: (_, __) => undefined
 			}),
 			updateExercises: assign({
 				session: (context, event) => {
