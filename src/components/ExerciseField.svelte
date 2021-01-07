@@ -43,6 +43,10 @@
 		send({ type: 'CANCEL' });
 	};
 
+	const onSave = () => {
+		send({ type: 'SAVE' });
+	};
+
 	$: executions = $state.context.instance.executions;
 </script>
 
@@ -153,7 +157,8 @@
 				</button>
 				<button
 					class="p-40 rounded-10 bg-action shadow-md transition-colors pointer:hover:bg-opacity-50 active:bg-opacity-50 _focus-default"
-					aria-label="Confirm">
+					aria-label="Confirm"
+					on:click={onSave}>
 					<svg
 						width="22"
 						height="17"

@@ -21,7 +21,7 @@ type EditEvent =
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'EDIT_EXERCISE'; data?: { exerciseId: number } }
 	| { type: 'CANCEL_EXERCISE' }
-	| { type: 'SAVE_EXERCISE'; data: { exercise: ExerciseInstance } };
+	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } };
 
 type EditState =
 	| {
@@ -217,7 +217,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 			}),
 			updateExercises: assign({
 				session: (context, event) => {
-					assertEventType(event, 'SAVE_EXERCISE');
+					assertEventType(event, 'done.invoke.exercise');
 					const { session } = context;
 					if (!session) {
 						return undefined;
