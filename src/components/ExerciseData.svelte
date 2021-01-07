@@ -4,8 +4,6 @@
 	import type { ExerciseInstance } from 'types';
 
 	export let instance: ExerciseInstance;
-
-	$: console.log(instance);
 </script>
 
 <div class="flex flex-col items-start space-y-50 p-50 bg-fg-light odd:bg-fg">
