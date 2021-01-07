@@ -21,5 +21,6 @@ export const ui: Ui = {
 	newSession: 'New session',
 	clearFilters: 'Clear',
 	creatingSession: 'Creating session...',
-	newExercise: 'New exercise'
+	newExercise: 'New exercise',
+	exerciseRequired: 'Exercise is required'
 };

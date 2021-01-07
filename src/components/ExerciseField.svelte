@@ -5,6 +5,8 @@
 	import type { ExerciseContext, ExerciseEvent, ExerciseState } from 'src/machines/exercise';
 	// xstate-svelte
 	import { useService } from 'xstate-svelte';
+	// Ui
+	import { ui } from 'src/ui';
 	// Components
 	import Label from 'coms/Label.svelte';
 	import RadioGroup from 'coms/RadioGroup.svelte';
@@ -14,6 +16,9 @@
 	export let service: Interpreter<ExerciseContext, any, ExerciseEvent, ExerciseState>;
 
 	const { state, send } = useService(service);
+
+	$: instance = $state.context.instance;
+	$: executions = instance.executions;
 
 	const onExerciseInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
@@ -46,8 +51,6 @@
 	const onSave = () => {
 		send({ type: 'SAVE' });
 	};
-
-	$: executions = $state.context.instance.executions;
 </script>
 
 <fieldset>
@@ -56,6 +59,7 @@
 			<span>Exercise</span>
 			<input type="text" name="exercise" list="exercises" on:input={onExerciseInput} />
 		</Label>
+		{#if $state.matches('error')}<small class="text-danger">{ui.exerciseRequired}</small>{/if}
 		{#each executions as execution, i (execution.id)}
 			<div class="flex items-center justify-between space-x-50" data-id={execution.id}>
 				<div

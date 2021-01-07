@@ -5,6 +5,7 @@ import { createMachine, assign, sendParent } from 'xstate';
 export interface ExerciseContext {
 	instance: ExerciseInstance;
 	userId: string;
+	exerciseError?: string;
 }
 
 export type ExerciseEvent =
@@ -22,6 +23,11 @@ export type ExerciseState =
 	| {
 			value: 'cancelled';
 			context: ExerciseContext;
+	  }
+	| {
+			value: 'error';
+			context: ExerciseContext;
+			exerciseError: string;
 	  }
 	| {
 			value: 'done';
@@ -47,9 +53,15 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 					CANCEL: {
 						target: 'cancelled'
 					},
-					SAVE: {
-						target: 'done'
-					}
+					SAVE: [
+						{
+							cond: 'hasExercise',
+							target: 'done'
+						},
+						{
+							target: 'error'
+						}
+					]
 				}
 			},
 			cancelled: {
@@ -59,6 +71,16 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 			done: {
 				type: 'final',
 				data: (context) => ({ exercise: context })
+			},
+			error: {
+				on: {
+					CANCEL: {
+						target: 'cancelled'
+					},
+					'*': {
+						target: 'editing'
+					}
+				}
 			}
 		}
 	},
@@ -110,6 +132,9 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 				}
 			}),
 			notifyCancel: sendParent('CANCEL_EXERCISE')
+		},
+		guards: {
+			hasExercise: (context) => !!context.instance.exercise
 		}
 	}
 );
