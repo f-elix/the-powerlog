@@ -2,6 +2,7 @@
 	// Types
 	import type { Interpreter } from 'xstate';
 	import { SetType, TimeUnit, LoadUnit } from 'src/utils';
+	import type { Exercise } from 'types';
 	import type { ExerciseContext, ExerciseEvent, ExerciseState } from 'src/machines/exercise';
 	// xstate-svelte
 	import { useService } from 'xstate-svelte';
@@ -20,15 +21,27 @@
 	$: instance = $state.context.instance;
 	$: executions = instance.executions;
 
+	$: console.log($state);
+
 	const onExerciseInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
-		const name = target.value;
+		const name: string = target.value;
+		if (!name) {
+			return;
+		}
 		const list = target.list as HTMLDataListElement;
 		const option = Array.from(list.options).find(
-			(option: HTMLOptionElement) => option.value === target.value
+			(option: HTMLOptionElement) => option.value === name
 		);
-		const id = parseInt(option?.dataset.id || '', 10);
-		send({ type: 'EXERCISE_INPUT', data: { exercise: { name, id } } });
+		const id = parseInt(option?.dataset.id || '0', 10);
+		const exercise: Exercise = {
+			name,
+			userId: ''
+		};
+		if (id) {
+			exercise.id = id;
+		}
+		send({ type: 'EXERCISE_INPUT', data: { exercise } });
 	};
 
 	const onNewExecution = () => {

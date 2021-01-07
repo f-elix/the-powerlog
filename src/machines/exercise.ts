@@ -9,8 +9,8 @@ export interface ExerciseContext {
 }
 
 export type ExerciseEvent =
-	| { type: 'EXECUTION_INPUT'; data: { path: string; value: any; executionId: number } }
 	| { type: 'EXERCISE_INPUT'; data: { exercise: { name: string; id?: number } } }
+	| { type: 'EXECUTION_INPUT'; data: { path: string; value: any; executionId: number } }
 	| { type: 'NEW_EXECUTION' }
 	| { type: 'CANCEL' }
 	| { type: 'SAVE' };

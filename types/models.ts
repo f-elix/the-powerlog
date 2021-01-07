@@ -30,6 +30,7 @@ export interface ExerciseInstance {
 	id?: number;
 	sessionId: number;
 	exercise?: Exercise;
+	exerciseId?: number;
 	superset?: string;
 	executions: Execution[];
 }
@@ -48,4 +49,20 @@ export interface Execution {
 		amount?: number;
 		unit: TimeUnit;
 	};
+}
+
+export interface ExerciseInput {
+	data: {
+		name: string;
+		userId: string;
+	};
+}
+
+export interface ExerciseInstanceInput {
+	id?: number;
+	sessionId: number;
+	exercise?: ExerciseInput;
+	exerciseId?: number;
+	superset?: string;
+	executions: Execution[];
 }

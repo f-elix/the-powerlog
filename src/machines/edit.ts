@@ -22,7 +22,8 @@ type EditEvent =
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'EDIT_EXERCISE'; data?: { instanceId: number } }
 	| { type: 'CANCEL_EXERCISE' }
-	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } };
+	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } }
+	| { type: 'SAVE'; data: { token?: string } };
 
 type EditState =
 	| {
@@ -98,6 +99,19 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 								target: '#edit.error'
 							}
 						}
+					},
+					saving: {
+						invoke: {
+							id: 'updateSession',
+							src: 'updateSession',
+							onDone: {
+								target: '#edit.idle',
+								actions: ['clearSession', 'redirectToDashboard']
+							},
+							onError: {
+								target: '#edit.error'
+							}
+						}
 					}
 				}
 			},
@@ -118,6 +132,9 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							EDIT_EXERCISE: {
 								target: 'exercise',
 								actions: ['updateEditedInstanceId']
+							},
+							SAVE: {
+								target: '#edit.fetching.saving'
 							}
 						}
 					},
@@ -185,10 +202,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 				}
 			}),
 			clearSession: assign({
-				session: (_, event) => {
-					assertEventType(event, 'done.invoke.deleteSession');
-					return undefined;
-				}
+				session: (_, __) => undefined
 			}),
 			updateTitle: assign({
 				session: (context, event) => {
@@ -240,8 +254,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 					};
 				}
 			}),
-			redirectToDashboard: (_, event) => {
-				assertEventType(event, 'done.invoke.deleteSession');
+			redirectToDashboard: () => {
 				router.send('DASHBOARD');
 			}
 		},
@@ -280,6 +293,28 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 				} catch (error) {
 					console.warn(error);
 					throw new Error('Problem deleting session');
+				}
+			},
+			updateSession: async (context, event) => {
+				assertEventType(event, 'SAVE');
+				try {
+					const { session } = context;
+					if (!session) {
+						return;
+					}
+					const sessionToUpdate = session;
+					delete sessionToUpdate.user;
+					const { token } = event.data;
+					await fetch('/.netlify/functions/update-session', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${token}`
+						},
+						body: JSON.stringify({ session: sessionToUpdate })
+					});
+				} catch (error) {
+					console.warn(error);
+					throw new Error('Problem saving session');
 				}
 			},
 			exercise: exerciseMachine

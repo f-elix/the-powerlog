@@ -15,8 +15,8 @@
 
 	let form: HTMLFormElement;
 
-	const onSave = (e: Event) => {
-		// edit.send({ type: 'SAVE', data: { formData } });
+	const onSave = () => {
+		edit.send({ type: 'SAVE', data: { token } });
 	};
 
 	const onNameInput = (e: Event) => {
