@@ -32,14 +32,14 @@
 	const onExecInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
 		const path = target.dataset.key || '';
-		const value = target.value;
+		const value = target.type === 'checkbox' ? target.checked : target.value;
 		const parent = target.closest('[data-id]') as HTMLDivElement;
 		const id = parseInt(parent.dataset.id || '0', 10);
 		send({ type: 'EXECUTION_INPUT', data: { path, value, executionId: id } });
 	};
 
 	$: executions = $state.context.instance.executions;
-	$: console.log($state);
+	$: console.log(executions);
 </script>
 
 <fieldset>
@@ -62,7 +62,7 @@
 								data-key="sets"
 								on:input={onExecInput} />
 						</label>
-						{#if execution.duration}
+						{#if execution.setType === SetType.time}
 							<label class="_input flex flex-col">
 								<span>Time</span>
 								<input
