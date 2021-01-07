@@ -70,7 +70,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 			},
 			done: {
 				type: 'final',
-				data: (context) => ({ exercise: context })
+				data: (context) => ({ exercise: context.instance })
 			},
 			error: {
 				on: {
