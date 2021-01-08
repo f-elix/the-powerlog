@@ -11,6 +11,7 @@ export interface ExerciseContext {
 export type ExerciseEvent =
 	| { type: 'EXERCISE_INPUT'; data: { exercise: { name: string; id?: number } } }
 	| { type: 'EXECUTION_INPUT'; data: { path: string; value: any; executionId: number } }
+	| { type: 'DELETE_EXECUTION'; data: { executionId: number } }
 	| { type: 'NEW_EXECUTION' }
 	| { type: 'CANCEL' }
 	| { type: 'SAVE' };
@@ -49,6 +50,9 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 					},
 					EXECUTION_INPUT: {
 						actions: ['updateExecution']
+					},
+					DELETE_EXECUTION: {
+						actions: ['deleteExecution']
 					},
 					CANCEL: {
 						target: 'cancelled'
@@ -102,9 +106,10 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 				instance: (context, event) => {
 					assertEventType(event, 'NEW_EXECUTION');
 					const currentExecutions = context.instance.executions;
+					const lastExec = currentExecutions[currentExecutions.length - 1];
 					const updatedExecutions = [
 						...currentExecutions,
-						createExecution(currentExecutions.length + 1)
+						createExecution(lastExec.id + 1)
 					];
 					return {
 						...context.instance,
@@ -119,7 +124,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 					const executionIndex = context.instance.executions.findIndex(
 						(ex) => ex.id === event.data.executionId
 					);
-					const execution = context.instance.executions[executionIndex];
+					const execution = executions[executionIndex];
 					executions[executionIndex] = updateObjectKey(
 						execution,
 						event.data.path,
@@ -128,6 +133,19 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 					return {
 						...context.instance,
 						executions
+					};
+				}
+			}),
+			deleteExecution: assign({
+				instance: (context, event) => {
+					assertEventType(event, 'DELETE_EXECUTION');
+					const { executions } = context.instance;
+					const updatedExecutions = executions.filter(
+						(exec) => exec.id !== event.data.executionId
+					);
+					return {
+						...context.instance,
+						executions: updatedExecutions
 					};
 				}
 			}),

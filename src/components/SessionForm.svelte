@@ -46,7 +46,6 @@
 	};
 
 	$: sessionData = $state.context.session;
-	$: console.log($state);
 </script>
 
 <section class="space-y-100">
