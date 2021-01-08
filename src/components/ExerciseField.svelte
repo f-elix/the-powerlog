@@ -13,10 +13,16 @@
 	import RadioGroup from 'coms/RadioGroup.svelte';
 	import Checkbox from 'coms/Checkbox.svelte';
 	import Plus from 'coms/svg/Plus.svelte';
+	import { onMount } from 'svelte';
 
 	export let service: Interpreter<ExerciseContext, any, ExerciseEvent, ExerciseState>;
 
 	const { state, send } = useService(service);
+
+	let exerciseInput: HTMLInputElement;
+	onMount(() => {
+		exerciseInput.focus();
+	});
 
 	$: instance = $state.context.instance;
 	$: executions = instance.executions;
@@ -70,7 +76,12 @@
 	<div class="space-y-80 p-50 bg-fg">
 		<Label>
 			<span>Exercise</span>
-			<input type="text" name="exercise" list="exercises" on:input={onExerciseInput} />
+			<input
+				type="text"
+				name="exercise"
+				list="exercises"
+				on:input={onExerciseInput}
+				bind:this={exerciseInput} />
 		</Label>
 		{#if $state.matches('error')}<small class="text-danger">{ui.exerciseRequired}</small>{/if}
 		{#each executions as execution, i (execution.id)}

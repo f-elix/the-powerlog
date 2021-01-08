@@ -52,7 +52,9 @@
 				<option value={exercise.name} data-id={exercise.id} />
 			{/each}
 		</datalist>
-		<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
+		{#if $state.matches('editing.session')}
+			<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
+		{/if}
 		<div class="flex flex-col space-y-110">
 			<div class="flex flex-col space-y-70 px-50">
 				<Label>
@@ -70,10 +72,12 @@
 				</Label>
 			</div>
 			<SessionExercises exercises={session.exercises} />
-			<div class="flex flex-col space-y-70 px-50">
-				<Button type="submit" theme="success">Save</Button>
-				<Button theme="danger" on:click={onCancel}>Cancel</Button>
-			</div>
+			{#if $state.matches('editing.session')}
+				<div class="flex flex-col space-y-70 px-50">
+					<Button type="submit" theme="success">Save</Button>
+					<Button theme="danger" on:click={onCancel}>Cancel</Button>
+				</div>
+			{/if}
 		</div>
 	</form>
 {/if}

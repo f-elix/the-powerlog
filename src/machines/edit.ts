@@ -51,6 +51,19 @@ type EditState =
 			};
 	  }
 	| {
+			value: 'editing.session';
+			context: EditContext & {
+				session: Session;
+			};
+	  }
+	| {
+			value: 'editing.exercise';
+			context: EditContext & {
+				session: Session;
+				editedInstanceId: number;
+			};
+	  }
+	| {
 			value: 'error';
 			context: EditContext;
 	  };
