@@ -19,6 +19,9 @@ export const handler: (
 	return gqlQuery({
 		query: `
 			mutation deleteSession($id: Int!) {
+				delete_exercise_instances(where: {sessionId: {_eq: $id}}) {
+					affected_rows
+				}
 				delete_sessions_by_pk(id: $id) {
 					userId
 				}
