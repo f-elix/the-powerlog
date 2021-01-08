@@ -25,7 +25,7 @@ export interface RouterContext {
 		params?: Params;
 		path?: string;
 	};
-	[key: string]: unknown;
+	[key: string]: any;
 }
 
 export interface RouterEvent extends EventObject {

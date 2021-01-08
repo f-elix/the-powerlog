@@ -143,13 +143,11 @@ export const createRouter: (
 	const service = interpret(routerMachine, interpreterOptions);
 
 	service.onTransition((_, event: RouterEvent) => {
-		if (event.type === RouterEvents.update) {
+		if (event.type === RouterEvents.update || event.type.includes('xstate')) {
 			return;
 		}
 		service.send({ type: RouterEvents.update, query: event.query, params: event.params });
 	});
-
-	const currentUrl = window.location.hash;
 
 	const sendRoutingEvent = (url: string) => {
 		const path = parsePath(url);
@@ -167,8 +165,6 @@ export const createRouter: (
 	};
 
 	service.start();
-
-	sendRoutingEvent(currentUrl);
 
 	const onPopState = () => {
 		sendRoutingEvent(window.location.hash);
