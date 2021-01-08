@@ -22,5 +22,10 @@
 </script>
 
 {#if $state.matches('displaying') && sessionData}
-	<h1 class="p-50 text-center text-70 font-bold">{sessionData.title}</h1>
+	<section>
+		<div class="text-center">
+			<h1 class="p-50 text-70 font-bold">{sessionData.title}</h1>
+			<h2>{sessionData.date}</h2>
+		</div>
+	</section>
 {/if}

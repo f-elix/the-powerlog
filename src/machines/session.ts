@@ -102,7 +102,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							src: 'createSession',
 							onDone: {
 								target: '#session.editing',
-								actions: ['updateContext']
+								actions: ['updateSession']
 							},
 							onError: {
 								target: '#session.error'
@@ -223,20 +223,22 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 	},
 	{
 		actions: {
-			updateContext: assign({
-				session: (_, event) => {
-					assertEventType(event, 'done.invoke.createSession');
-					const session = event.data.insert_sessions_one;
+			updateSession: assign({
+				session: (context, event) => {
+					let session;
+					if (event.type === 'done.invoke.createSession') {
+						session = event.data.insert_sessions_one;
+					}
+					if (event.type === 'done.invoke.getSession') {
+						session = event.data.sessions_by_pk;
+					}
+					if (!session) {
+						return context.session;
+					}
 					return {
 						...session,
 						date: new Date(session.date).toLocaleDateString('en-CA')
 					};
-				}
-			}),
-			updateSession: assign({
-				session: (_, event) => {
-					assertEventType(event, 'done.invoke.getSession');
-					return event.data.sessions_by_pk;
 				}
 			}),
 			clearSession: assign({
