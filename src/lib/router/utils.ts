@@ -19,10 +19,22 @@ export const toQueryString: (query?: string | Record<string, string>) => string 
 	return `?${qs}`;
 };
 
-export const toParamsString: (params?: Params) => string = (params = {}) =>
-	Object.values(params)
-		.map((param) => `/${param}`)
-		.join('');
+export const addParamsToPath: (path: string, params: Record<string, string>) => string = (
+	path,
+	params
+) =>
+	path
+		.split('/')
+		.slice(1)
+		.map((segment) => {
+			if (!segment.startsWith(':')) {
+				return segment;
+			}
+			const paramKey = segment.replace(':', '');
+			const param = params[paramKey];
+			return param || '';
+		})
+		.join('/');
 
 export const matchUrlToRoute: (
 	url: string,
@@ -82,4 +94,16 @@ export const stateToUrl: (config: RouterConfig, parentState?: string) => Routes 
 			{}
 		);
 	return routes;
+};
+
+export const getWhich = (event: MouseEvent): number =>
+	event.which === null ? event.button : event.which;
+
+export const findAnchor = (node: Node): Node | null => {
+	let el: Node | null = node;
+	while (el && el.nodeName.toUpperCase() !== 'A') {
+		// SVG <a> elements have a lowercase name
+		el = el.parentNode;
+	}
+	return el;
 };

@@ -181,7 +181,7 @@ const router = createRouter({
 });
 ```
 
-## Accessing query string and dynamic parameters
+## Accessing query string, dynamic parameters and page path
 
 The router will pass down the router context and event to the `props` object of the current views. You can access all the route parameters in the `$page` property of the context.
 
@@ -204,7 +204,8 @@ props: {
 			},
 			query: {
 				some: 'querystring'
-			}
+			},
+			path: '/articles/article-title?some=querystring'
 		}
 	}
 }
@@ -214,8 +215,6 @@ props: {
 
 The router object returned by `createRouter` has the following properties:
 
--   init (method): Initializes the router (better called when the components are mounted or on 'DOMContentLoaded');
--   update (method): When the router initializes, it queries all the links that have a relative url in order to intercept the event. If some links are added to the DOM dynamically, they won't be known to the router unless this method is called.
 -   send (method): The `service.send` method, to send an event to the router service.
 -   getViews (method): A method that takes a callback function as parameter. The list of components of the current state is passed to the callback function so you can do whatever you want with it. (See https://github.com/tivac/xstate-component-tree).
 

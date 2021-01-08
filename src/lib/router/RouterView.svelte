@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 
 	import type { Router, View } from './types';
@@ -10,10 +9,6 @@
 		router.getViews((list: View[]) => {
 			set(list);
 		});
-	});
-
-	onMount(() => {
-		router && router.init();
 	});
 </script>
 

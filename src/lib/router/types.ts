@@ -21,8 +21,9 @@ export type Routes = Record<string, string>;
 
 export interface RouterContext {
 	$page?: {
-		query: Query;
-		params: Params;
+		query?: Query;
+		params?: Params;
+		path?: string;
 	};
 	[key: string]: unknown;
 }
@@ -48,9 +49,7 @@ export interface RouterTypestate {
 }
 
 export interface Router {
-	init: () => void;
 	send: Interpreter<RouterContext, any, RouterEvent, RouterTypestate>['send'];
-	update: () => void;
 	getViews: (cb: (list: View[]) => void) => ComponentTree;
 }
 
