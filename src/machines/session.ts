@@ -150,7 +150,14 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					}
 				}
 			},
-			displaying: {},
+			displaying: {
+				on: {
+					DELETE: {
+						target: '#session.fetching.deleting',
+						actions: ['redirectToDashboard']
+					}
+				}
+			},
 			editing: {
 				initial: 'session',
 				states: {
