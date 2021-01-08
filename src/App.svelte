@@ -3,6 +3,6 @@
 	import { router } from './router';
 </script>
 
-<div class="max-w-ip mx-auto h-100vh">
+<div class="max-w-ip mx-auto">
 	<RouterView {router} />
 </div>

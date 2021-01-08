@@ -40,7 +40,7 @@
 	log.send({ type: 'LOAD', data: { token } });
 </script>
 
-<section class="space-y-70 px-50 h-full overflow-y-auto">
+<section class="space-y-70 px-50">
 	<Fab label={ui.newSession} on:click={onNewSession} />
 	<div class="flex items-center justify-center relative py-50">
 		<Logout extClass="absolute left-0" />
