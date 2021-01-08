@@ -2,8 +2,8 @@
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
 	import type { User } from 'netlify-identity-widget';
-	// Machines
-	import { edit } from 'src/stores/edit';
+	// Stores
+	import { session } from 'src/stores/session';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -12,12 +12,11 @@
 	export let props: ViewProps;
 	export let children: View[];
 
-	edit.service.start();
-
 	const user = props.context.user as User;
 	const token = user.token?.access_token;
 
-	edit.send({ type: 'CREATE', data: { token } });
+	session.service.start();
+	session.send({ type: 'CREATE', data: { token } });
 </script>
 
 <section class="space-y-100">

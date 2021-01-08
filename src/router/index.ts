@@ -69,7 +69,7 @@ export const router = createRouter(
 		meta: {
 			routes: {
 				'session.new': '/session/new',
-				'session.id': '/session/:id'
+				'session.id.viewing': '/session/:id'
 			}
 		}
 	},

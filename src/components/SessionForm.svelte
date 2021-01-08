@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Stores
-	import { edit } from 'src/stores/edit';
+	import { session } from 'src/stores/session';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -11,30 +11,30 @@
 
 	export let token: string;
 
-	const { state } = edit;
+	const { state } = session;
 
 	let form: HTMLFormElement;
 
 	const onSave = () => {
-		edit.send({ type: 'SAVE', data: { token } });
+		session.send({ type: 'SAVE', data: { token } });
 	};
 
 	const onNameInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
-		edit.send({ type: 'TITLE_INPUT', data: { value: target.value } });
+		session.send({ type: 'TITLE_INPUT', data: { value: target.value } });
 	};
 
 	const onDateInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
-		edit.send({ type: 'DATE_INPUT', data: { value: target.value } });
+		session.send({ type: 'DATE_INPUT', data: { value: target.value } });
 	};
 
 	const onCancel = () => {
-		edit.send({ type: 'DELETE', data: { token } });
+		session.send({ type: 'DELETE', data: { token } });
 	};
 
 	const onNewExercise = () => {
-		edit.send({ type: 'EDIT_EXERCISE' });
+		session.send({ type: 'EDIT_EXERCISE' });
 	};
 
 	const focusInput: () => void = (node: HTMLInputElement) => {

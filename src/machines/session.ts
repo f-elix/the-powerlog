@@ -4,13 +4,14 @@ import { assertEventType, createExecution } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { router } from 'src/router';
 
-interface EditContext {
+interface SessionContext {
 	session?: Session;
 	exercises: Exercise[];
 	editedInstanceId?: number;
 }
 
-type EditEvent =
+type SessionEvent =
+	| { type: 'VIEW'; data: { token?: string; sessionId?: string } }
 	| { type: 'CREATE'; data: { token?: string } }
 	| {
 			type: 'done.invoke.createSession';
@@ -25,52 +26,52 @@ type EditEvent =
 	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } }
 	| { type: 'SAVE'; data: { token?: string } };
 
-type EditState =
+type SessionState =
 	| {
 			value: 'idle';
-			context: EditContext & {
+			context: SessionContext & {
 				session: undefined;
 			};
 	  }
 	| {
 			value: 'fetching.creating';
-			context: EditContext & {
+			context: SessionContext & {
 				session: undefined;
 			};
 	  }
 	| {
 			value: 'fetching.deleting';
-			context: EditContext & {
+			context: SessionContext & {
 				session: Session;
 			};
 	  }
 	| {
 			value: 'editing';
-			context: EditContext & {
+			context: SessionContext & {
 				session: Session;
 			};
 	  }
 	| {
 			value: 'editing.session';
-			context: EditContext & {
+			context: SessionContext & {
 				session: Session;
 			};
 	  }
 	| {
 			value: 'editing.exercise';
-			context: EditContext & {
+			context: SessionContext & {
 				session: Session;
 				editedInstanceId: number;
 			};
 	  }
 	| {
 			value: 'error';
-			context: EditContext;
+			context: SessionContext;
 	  };
 
-export const editMachine = createMachine<EditContext, EditEvent, EditState>(
+export const sessionMachine = createMachine<SessionContext, SessionEvent, SessionState>(
 	{
-		id: 'edit',
+		id: 'session',
 		initial: 'idle',
 		context: {
 			session: undefined,
@@ -81,6 +82,9 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 				on: {
 					CREATE: {
 						target: 'fetching.creating'
+					},
+					VIEW: {
+						target: 'fetching.session'
 					}
 				}
 			},
@@ -92,11 +96,11 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							id: 'createSession',
 							src: 'createSession',
 							onDone: {
-								target: '#edit.editing',
+								target: '#session.editing',
 								actions: ['updateContext']
 							},
 							onError: {
-								target: '#edit.error'
+								target: '#session.error'
 							}
 						}
 					},
@@ -105,11 +109,11 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							id: 'deleteSession',
 							src: 'deleteSession',
 							onDone: {
-								target: '#edit.idle',
+								target: '#session.idle',
 								actions: ['clearSession', 'redirectToDashboard']
 							},
 							onError: {
-								target: '#edit.error'
+								target: '#session.error'
 							}
 						}
 					},
@@ -118,11 +122,24 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							id: 'updateSession',
 							src: 'updateSession',
 							onDone: {
-								target: '#edit.idle',
+								target: '#session.idle',
 								actions: ['clearSession', 'redirectToDashboard']
 							},
 							onError: {
-								target: '#edit.error'
+								target: '#session.error'
+							}
+						}
+					},
+					session: {
+						invoke: {
+							id: 'getSession',
+							src: 'getSession',
+							onDone: {
+								target: '#session.editing',
+								actions: ['updateContext']
+							},
+							onError: {
+								target: '#session.error'
 							}
 						}
 					}
@@ -140,14 +157,14 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 								actions: ['updateDate']
 							},
 							DELETE: {
-								target: '#edit.fetching.deleting'
+								target: '#session.fetching.deleting'
 							},
 							EDIT_EXERCISE: {
 								target: 'exercise',
 								actions: ['updateEditedInstanceId']
 							},
 							SAVE: {
-								target: '#edit.fetching.saving'
+								target: '#session.fetching.saving'
 							}
 						}
 					},
@@ -156,7 +173,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 							id: 'exercise',
 							src: 'exercise',
 							data: {
-								instance: (context: EditContext, event: EditEvent) => {
+								instance: (context: SessionContext, event: SessionEvent) => {
 									assertEventType(event, 'EDIT_EXERCISE');
 									const { session } = context;
 									if (!session) {
@@ -178,7 +195,7 @@ export const editMachine = createMachine<EditContext, EditEvent, EditState>(
 									}
 									return exerciseInstance;
 								},
-								userId: (context: EditContext) => context.session?.userId
+								userId: (context: SessionContext) => context.session?.userId
 							},
 							onDone: {
 								target: 'session',

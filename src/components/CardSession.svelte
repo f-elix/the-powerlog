@@ -9,7 +9,7 @@
 	export let session: Session;
 </script>
 
-<Button>
+<Button href="/session/{session.id}">
 	<div class="flex flex-col space-y-30 px-50 text-left">
 		<span class="text-50">{session.title}</span>
 		<div class="flex items-center font-normal">

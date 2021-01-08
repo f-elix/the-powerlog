@@ -2,14 +2,14 @@
 	// Types
 	import type { ExerciseInstance } from 'types';
 	// Stores
-	import { edit } from 'src/stores/edit';
+	import { session } from 'src/stores/session';
 	// Components
 	import ExerciseData from 'coms/ExerciseData.svelte';
 	import ExerciseField from 'coms/ExerciseField.svelte';
 
 	export let exercises: ExerciseInstance[];
 
-	const { state } = edit;
+	const { state } = session;
 
 	$: editedExercise = $state.children.exercise;
 </script>

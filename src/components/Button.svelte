@@ -19,52 +19,61 @@
 	export let variant: Variant = Variant.filled;
 	export let theme: Theme = Theme.primary;
 	export let type: Type = Type.button;
+	export let href: string | undefined = undefined;
 </script>
 
 <style>
-	button.filled {
+	._button.filled {
 		background-color: var(--theme);
 	}
 
-	button.primary {
+	._button.primary {
 		@apply border-primary bg-primary;
 	}
 
-	button.info {
+	._button.info {
 		@apply border-info bg-info;
 	}
 
-	button.success {
+	._button.success {
 		@apply border-success bg-success;
 	}
 
-	button.danger {
+	._button.danger {
 		@apply border-danger bg-danger;
 	}
 
-	button.filled,
-	button.outlined {
+	._button.filled,
+	._button.outlined {
 		@apply border-solid border-20;
 	}
 
-	button.outlined {
+	._button.outlined {
 		@apply bg-opacity-0;
 	}
 
-	button:active {
+	._button:active {
 		@apply bg-opacity-50 border-opacity-0;
 	}
 
 	@screen pointer {
-		button:hover {
+		._button:hover {
 			@apply bg-opacity-50 border-opacity-0;
 		}
 	}
 </style>
 
-<button
-	{type}
-	class="{variant} {theme} py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default"
-	on:click>
-	<slot />
-</button>
+{#if href}
+	<a
+		{href}
+		class="{variant} {theme} _button py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default">
+		<slot />
+	</a>
+{:else}
+	<button
+		{type}
+		class="{variant} {theme} _button py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default"
+		on:click>
+		<slot />
+	</button>
+{/if}
