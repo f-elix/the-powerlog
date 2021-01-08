@@ -128,7 +128,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							src: 'updateSession',
 							onDone: {
 								target: '#session.idle',
-								actions: ['clearSession', 'redirectToDashboard']
+								actions: ['clearSession']
 							},
 							onError: {
 								target: '#session.error'
@@ -163,7 +163,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['updateDate']
 							},
 							DELETE: {
-								target: '#session.fetching.deleting'
+								target: '#session.fetching.deleting',
+								actions: ['redirectToDashboard']
 							},
 							EDIT_EXERCISE: {
 								target: 'exercise',
