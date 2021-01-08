@@ -14,22 +14,36 @@ export const handler: (
 		};
 	}
 
-	const { cursor, limit } = JSON.parse(event.body || '{}');
+	const { sessionId } = JSON.parse(event.body || '{}');
+
+	if (!sessionId) {
+		return {
+			statusCode: 400
+		};
+	}
 
 	return gqlQuery({
 		query: `
-				query getSessions($userId: String!, $dateCursor: timestamptz, $limit: Int!)	{
-					sessions(where: {userId: {_eq: $userId}, date: {_lt: $dateCursor}}, order_by: {date: desc}, limit: $limit) {
+			query getSession($id: Int!) {
+				sessions_by_pk(id: $id) {
+					id
+					date
+					title
+					exercises {
 						id
-						date
-						title
+						sessionId
+						executions
+						exercise {
+							id
+							name
+						}
+						superset
 					}
 				}
+			}
 			`,
 		variables: {
-			userId: user.sub,
-			dateCursor: cursor,
-			limit
+			id: sessionId
 		}
 	});
 };

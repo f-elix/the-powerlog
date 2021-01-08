@@ -11,7 +11,8 @@ export const router = createRouter(
 	{
 		initial: 'auth',
 		context: {
-			user: null
+			user: null,
+			exercises: null
 		},
 		states: {
 			auth: view(Auth, {
@@ -27,21 +28,39 @@ export const router = createRouter(
 					}
 				}
 			}),
-			dashboard: view(Dashboard, {
+			dashboard: {
 				entry: ['closeWidget'],
 				always: {
 					cond: 'isLoggedOut',
 					target: 'auth'
 				},
+				initial: 'fetchingExercises',
+				states: {
+					fetchingExercises: {
+						invoke: {
+							id: 'getExercises',
+							src: 'getExercises',
+							onDone: {
+								target: 'loaded',
+								actions: ['updateExercises']
+							},
+							onError: 'loaded'
+						}
+					},
+					loaded: view(Dashboard, {
+						on: {
+							SESSION_NEW: '#router.session.new',
+							SESSION: '#router.session.id'
+						}
+					})
+				},
 				on: {
 					LOGOUT: {
 						target: 'auth',
 						actions: ['logout']
-					},
-					SESSION_NEW: 'session.new',
-					SESSION: 'session.id'
+					}
 				}
-			}),
+			},
 			session: {
 				always: {
 					cond: 'isLoggedOut',
@@ -68,6 +87,8 @@ export const router = createRouter(
 		entry: ['initNetlifyIdentity'],
 		meta: {
 			routes: {
+				'dashboard.fetchingExercises': '/dashboard',
+				'dashboard.loaded': '/dashboard',
 				'session.new': '/session/new',
 				'session.id.viewing': '/session/:id'
 			}
@@ -92,6 +113,40 @@ export const router = createRouter(
 			}),
 			closeWidget: () => {
 				netlifyIdentity.close();
+			},
+			updateExercises: assign({
+				exercises: (_, event) => event.data.exercises
+			})
+		},
+		services: {
+			getExercises: async (context) => {
+				const { user } = context;
+				if (!user) {
+					return {
+						exercises: context.exercises
+					};
+				}
+				const token = user.token?.access_token;
+				if (!token) {
+					return {
+						exercises: context.exercises
+					};
+				}
+				try {
+					const res = await fetch('/.netlify/functions/get-exercises', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					return data;
+				} catch (error) {
+					console.warn(error);
+					return {
+						exercises: context.exercises
+					};
+				}
 			}
 		},
 		guards: {

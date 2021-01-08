@@ -1,4 +1,6 @@
 <script lang="ts">
+	// Types
+	import type { Exercise } from 'types';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Ui
@@ -10,6 +12,7 @@
 	import Label from 'coms/Label.svelte';
 
 	export let token: string;
+	export let exercises: Exercise[];
 
 	const { state } = session;
 
@@ -41,11 +44,10 @@
 		node.focus();
 	};
 
-	$: session = $state.context.session;
-	$: exercises = $state.context.exercises;
+	$: sessionData = $state.context.session;
 </script>
 
-{#if $state.matches('editing') && session}
+{#if $state.matches('editing') && sessionData}
 	<form bind:this={form} on:submit|preventDefault={onSave} novalidate>
 		<datalist id="exercises">
 			{#each exercises as exercise (exercise.id)}
@@ -63,15 +65,19 @@
 						use:focusInput
 						type="text"
 						name="title"
-						value={session.title}
+						value={sessionData.title}
 						on:input={onNameInput} />
 				</Label>
 				<Label>
 					<span>Date</span>
-					<input type="date" name="date" value={session.date} on:input={onDateInput} />
+					<input
+						type="date"
+						name="date"
+						value={sessionData.date}
+						on:input={onDateInput} />
 				</Label>
 			</div>
-			<SessionExercises exercises={session.exercises} />
+			<SessionExercises exercises={sessionData.exercises} />
 			{#if $state.matches('editing.session')}
 				<div class="flex flex-col space-y-70 px-50">
 					<Button type="submit" theme="success">Save</Button>

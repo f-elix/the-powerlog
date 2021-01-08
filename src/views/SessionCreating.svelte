@@ -12,8 +12,10 @@
 	export let props: ViewProps;
 	export let children: View[];
 
-	const user = props.context.user as User;
+	const { context } = props;
+	const user = context.user as User;
 	const token = user.token?.access_token;
+	const exercises = context.exercises;
 
 	session.service.start();
 	session.send({ type: 'CREATE', data: { token } });
@@ -21,5 +23,5 @@
 
 <section class="space-y-100">
 	<h1 class="mt-70 px-50 text-70 font-bold">{ui.creatingSession}</h1>
-	<SessionForm {token} />
+	<SessionForm {token} {exercises} />
 </section>

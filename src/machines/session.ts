@@ -1,4 +1,4 @@
-import type { Session, ExerciseInstance, Exercise } from 'types';
+import type { Session, ExerciseInstance } from 'types';
 import { createMachine, assign } from 'xstate';
 import { assertEventType, createExecution } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
@@ -6,16 +6,16 @@ import { router } from 'src/router';
 
 interface SessionContext {
 	session?: Session;
-	exercises: Exercise[];
 	editedInstanceId?: number;
 }
 
 type SessionEvent =
 	| { type: 'VIEW'; data: { token?: string; sessionId?: string } }
+	| { type: 'done.invoke.getSession'; data: { sessions_by_pk: Session } }
 	| { type: 'CREATE'; data: { token?: string } }
 	| {
 			type: 'done.invoke.createSession';
-			data: { insert_sessions_one: Session; exercises: Exercise[] };
+			data: { insert_sessions_one: Session };
 	  }
 	| { type: 'TITLE_INPUT'; data: { value: string } }
 	| { type: 'DATE_INPUT'; data: { value: string } }
@@ -65,6 +65,12 @@ type SessionState =
 			};
 	  }
 	| {
+			value: 'displaying';
+			context: SessionContext & {
+				session: Session;
+			};
+	  }
+	| {
 			value: 'error';
 			context: SessionContext;
 	  };
@@ -74,8 +80,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		id: 'session',
 		initial: 'idle',
 		context: {
-			session: undefined,
-			exercises: []
+			session: undefined
 		},
 		states: {
 			idle: {
@@ -135,8 +140,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							id: 'getSession',
 							src: 'getSession',
 							onDone: {
-								target: '#session.editing',
-								actions: ['updateContext']
+								target: '#session.displaying',
+								actions: ['updateSession']
 							},
 							onError: {
 								target: '#session.error'
@@ -145,6 +150,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					}
 				}
 			},
+			displaying: {},
 			editing: {
 				initial: 'session',
 				states: {
@@ -224,11 +230,12 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						...session,
 						date: new Date(session.date).toLocaleDateString('en-CA')
 					};
-				},
-				exercises: (_, event) => {
-					assertEventType(event, 'done.invoke.createSession');
-					const session = event.data.insert_sessions_one;
-					return session.user?.exercises || [];
+				}
+			}),
+			updateSession: assign({
+				session: (_, event) => {
+					assertEventType(event, 'done.invoke.getSession');
+					return event.data.sessions_by_pk;
 				}
 			}),
 			clearSession: assign({
@@ -345,6 +352,24 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				} catch (error) {
 					console.warn(error);
 					throw new Error('Problem saving session');
+				}
+			},
+			getSession: async (_, event) => {
+				assertEventType(event, 'VIEW');
+				try {
+					const { token, sessionId } = event.data;
+					const res = await fetch('/.netlify/functions/get-session', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${token}`
+						},
+						body: JSON.stringify({ sessionId })
+					});
+					const data = await res.json();
+					return data;
+				} catch (error) {
+					console.warn(error);
+					throw new Error('Problem fetching session');
 				}
 			},
 			exercise: exerciseMachine

@@ -14,22 +14,18 @@ export const handler: (
 		};
 	}
 
-	const { cursor, limit } = JSON.parse(event.body || '{}');
-
 	return gqlQuery({
 		query: `
-				query getSessions($userId: String!, $dateCursor: timestamptz, $limit: Int!)	{
-					sessions(where: {userId: {_eq: $userId}, date: {_lt: $dateCursor}}, order_by: {date: desc}, limit: $limit) {
-						id
-						date
-						title
-					}
+			query getExercises($userId: String!) {
+				exercises(where: {userId: {_eq: $userId}}) {
+					id
+					name
+					userId
 				}
-			`,
+			}
+		`,
 		variables: {
-			userId: user.sub,
-			dateCursor: cursor,
-			limit
+			userId: user.sub
 		}
 	});
 };
