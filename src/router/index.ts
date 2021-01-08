@@ -1,8 +1,7 @@
 import Auth from 'src/views/Auth.svelte';
 import Dashboard from 'src/views/Dashboard.svelte';
-import SessionCreating from 'src/views/SessionCreating.svelte';
-import SessionViewing from 'src/views/SessionViewing.svelte';
-import SessionEditing from 'src/views/SessionEditing.svelte';
+import SessionNew from 'src/views/SessionNew.svelte';
+import Session from 'src/views/Session.svelte';
 import { assign } from 'xstate';
 import netlifyIdentity from 'netlify-identity-widget';
 import { createRouter, view } from '../lib/router/index';
@@ -68,14 +67,8 @@ export const router = createRouter(
 				},
 				initial: 'new',
 				states: {
-					new: view(SessionCreating),
-					id: {
-						initial: 'viewing',
-						states: {
-							viewing: view(SessionViewing),
-							editing: view(SessionEditing)
-						}
-					}
+					new: view(SessionNew),
+					id: view(Session)
 				},
 				on: {
 					DASHBOARD: {
@@ -90,7 +83,7 @@ export const router = createRouter(
 				'dashboard.fetchingExercises': '/dashboard',
 				'dashboard.loaded': '/dashboard',
 				'session.new': '/session/new',
-				'session.id.viewing': '/session/:id'
+				'session.id': '/session/:id'
 			}
 		}
 	},

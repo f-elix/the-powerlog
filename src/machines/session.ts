@@ -10,9 +10,11 @@ interface SessionContext {
 }
 
 type SessionEvent =
+	| { type: 'CANCEL'; data: { token?: string } }
 	| { type: 'VIEW'; data: { token?: string; sessionId?: string } }
 	| { type: 'done.invoke.getSession'; data: { sessions_by_pk: Session } }
 	| { type: 'CREATE'; data: { token?: string } }
+	| { type: 'EDIT' }
 	| {
 			type: 'done.invoke.createSession';
 			data: { insert_sessions_one: Session };
@@ -53,6 +55,18 @@ type SessionState =
 	  }
 	| {
 			value: 'editing.session';
+			context: SessionContext & {
+				session: Session;
+			};
+	  }
+	| {
+			value: 'editing.session.creating';
+			context: SessionContext & {
+				session: Session;
+			};
+	  }
+	| {
+			value: 'editing.session.editing';
 			context: SessionContext & {
 				session: Session;
 			};
@@ -152,6 +166,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			},
 			displaying: {
 				on: {
+					EDIT: {
+						target: 'editing.session.editing'
+					},
 					DELETE: {
 						target: '#session.fetching.deleting',
 						actions: ['redirectToDashboard']
@@ -162,6 +179,28 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				initial: 'session',
 				states: {
 					session: {
+						initial: 'creating',
+						states: {
+							creating: {
+								on: {
+									CANCEL: {
+										target: '#session.fetching.deleting',
+										actions: ['redirectToDashboard']
+									}
+								}
+							},
+							editing: {
+								on: {
+									CANCEL: {
+										target: '#session.idle',
+										actions: ['redirectToDashboard']
+									}
+								}
+							},
+							last: {
+								type: 'history'
+							}
+						},
 						on: {
 							TITLE_INPUT: {
 								actions: ['updateTitle']
@@ -169,12 +208,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							DATE_INPUT: {
 								actions: ['updateDate']
 							},
-							DELETE: {
-								target: '#session.fetching.deleting',
-								actions: ['redirectToDashboard']
-							},
+
 							EDIT_EXERCISE: {
-								target: 'exercise',
+								target: '#session.editing.exercise',
 								actions: ['updateEditedInstanceId']
 							},
 							SAVE: {
@@ -212,7 +248,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								userId: (context: SessionContext) => context.session?.userId
 							},
 							onDone: {
-								target: 'session',
+								target: 'session.last',
 								actions: ['updateExercises']
 							}
 						},
@@ -324,7 +360,11 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				}
 			},
 			deleteSession: async (context, event) => {
-				assertEventType(event, 'DELETE');
+				if (event.type !== 'DELETE' && event.type !== 'CANCEL') {
+					throw new Error(
+						`Invalid event: expected "DELETE" or "CANCEL", got "${event.type}"`
+					);
+				}
 				try {
 					const id = context.session?.id;
 					const { token } = event.data;

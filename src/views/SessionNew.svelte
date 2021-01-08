@@ -21,7 +21,4 @@
 	session.send({ type: 'CREATE', data: { token } });
 </script>
 
-<section class="space-y-100">
-	<h1 class="mt-70 px-50 text-70 font-bold">{ui.creatingSession}</h1>
-	<SessionForm {token} {exercises} />
-</section>
+<SessionForm {token} {exercises} title={ui.creatingSession} />
