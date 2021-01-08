@@ -11,20 +11,24 @@
 
 	const { state } = session;
 
+	$: console.log($state);
+
 	$: editedExercise = $state.children.exercise;
 </script>
 
-{#if exercises}
-	{#each exercises as exercise}
-		{#if editedExercise && $state.context.editedInstanceId === exercise.id}
-			<ExerciseField service={editedExercise} />
-		{:else}
-			<button>
-				<ExerciseData instance={exercise} />
-			</button>
-		{/if}
-	{/each}
-{/if}
-{#if editedExercise && !$state.context.editedInstanceId}
-	<ExerciseField service={editedExercise} />
-{/if}
+<div class="flex flex-col">
+	{#if exercises}
+		{#each exercises as exercise}
+			{#if editedExercise && $state.context.editedInstanceId === exercise.id}
+				<ExerciseField service={editedExercise} />
+			{:else}
+				<button>
+					<ExerciseData instance={exercise} />
+				</button>
+			{/if}
+		{/each}
+	{/if}
+	{#if editedExercise && !$state.context.editedInstanceId}
+		<ExerciseField service={editedExercise} />
+	{/if}
+</div>
