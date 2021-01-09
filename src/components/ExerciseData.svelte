@@ -7,10 +7,10 @@
 </script>
 
 <div class="flex flex-col items-start space-y-50 p-50">
-	<span class="font-bold text-60">{instance.exercise?.name}</span>
+	<span class="font-bold text-50">{instance.exercise?.name}</span>
 	{#each instance.executions as execution (execution.id)}
 		{#if !!execution.sets}
-			<div class="flex items-center space-x-50 text-50">
+			<div class="flex items-center space-x-50 text-40">
 				<span>{execution.sets}</span>
 				<span>X</span>
 				{#if execution.setType === SetType.time}
