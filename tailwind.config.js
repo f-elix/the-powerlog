@@ -132,6 +132,8 @@ module.exports = {
 			},
 			textColor: {
 				main: colors.coolGray[50],
+				gray: colors.blueGray[400],
+				info: colors.blue[400],
 				highlight: colors.amber[300],
 				danger: colors.red[400]
 			},

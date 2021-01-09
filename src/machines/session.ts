@@ -1,12 +1,18 @@
 import type { Session, ExerciseInstance } from 'types';
-import { createMachine, assign } from 'xstate';
+import type { Interpreter } from 'xstate';
+import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
+import { createMachine, assign, spawn } from 'xstate';
 import { assertEventType, createExecution } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
+import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
+
+export type Modes = Interpreter<ModesContext, any, ModesEvent, ModesState>;
 
 interface SessionContext {
 	session?: Session;
 	editedIndex?: number;
+	modes?: Modes;
 }
 
 type SessionEvent =
@@ -103,6 +109,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		context: {
 			session: undefined
 		},
+		entry: ['spawnSessionModes'],
 		states: {
 			idle: {
 				on: {
@@ -298,6 +305,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 	},
 	{
 		actions: {
+			spawnSessionModes: assign({
+				modes: () => spawn(modesMachine, 'modes')
+			}),
 			updateSession: assign({
 				session: (context, event) => {
 					let session;

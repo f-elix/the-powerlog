@@ -1,11 +1,14 @@
 <script lang="ts">
 	// Types
 	import type { Exercise } from 'types';
+	// xstate-svelte
+	import { useService } from 'xstate-svelte';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
+	import SessionModes from 'coms/SessionModes.svelte';
 	import SessionExercises from 'coms/SessionExercises.svelte';
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
@@ -46,6 +49,9 @@
 	};
 
 	$: sessionData = $state.context.session;
+	$: sessionModes = $state.context.modes;
+	$: modes = sessionModes ? useService(sessionModes) : undefined;
+	$: console.log(modes);
 </script>
 
 <section class="space-y-100">
@@ -80,6 +86,7 @@
 							on:input={onDateInput} />
 					</Label>
 				</div>
+				<SessionModes {modes} />
 				<SessionExercises exercises={sessionData.exercises} />
 				{#if $state.matches('editing.session')}
 					<div class="flex flex-col space-y-70 px-50">
