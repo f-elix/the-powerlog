@@ -113,9 +113,14 @@ module.exports = {
 				main: colors.coolGray[800],
 				primary: colors.lightBlue[900],
 				success: colors.emerald[500],
-				info: colors.lightBlue[600],
+				info: {
+					DEFAULT: colors.lightBlue[600],
+					light: colors.blue[500],
+					lighter: colors.blue[400]
+				},
 				danger: {
 					DEFAULT: colors.red[900],
+					medium: colors.red[500],
 					light: colors.red[400]
 				},
 				action: colors.green[500],
@@ -133,7 +138,11 @@ module.exports = {
 			textColor: {
 				main: colors.coolGray[50],
 				gray: colors.blueGray[400],
-				info: colors.blue[400],
+				info: {
+					DEFAULT: colors.lightBlue[600],
+					light: colors.blue[500],
+					lighter: colors.blue[400]
+				},
 				highlight: colors.amber[300],
 				danger: colors.red[400]
 			},

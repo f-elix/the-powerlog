@@ -23,7 +23,7 @@
 
 <style>
 	._reorder {
-		@apply text-info;
+		@apply text-info-light;
 	}
 
 	._history {

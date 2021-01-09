@@ -51,7 +51,6 @@
 	$: sessionData = $state.context.session;
 	$: sessionModes = $state.context.modes;
 	$: modes = sessionModes ? useService(sessionModes) : undefined;
-	$: console.log(modes);
 </script>
 
 <section class="space-y-100">
@@ -87,7 +86,7 @@
 					</Label>
 				</div>
 				<SessionModes {modes} />
-				<SessionExercises exercises={sessionData.exercises} />
+				<SessionExercises exercises={sessionData.exercises} {modes} />
 				{#if $state.matches('editing.session')}
 					<div class="flex flex-col space-y-70 px-50">
 						<Button type="submit" theme="success">Save</Button>
