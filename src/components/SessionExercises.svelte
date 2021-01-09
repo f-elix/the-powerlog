@@ -21,13 +21,24 @@
 	$: editedIndex = $state.context.editedIndex;
 </script>
 
+<style>
+	._disabled {
+		opacity: 0.25;
+		cursor: default;
+	}
+</style>
+
 <div class="flex flex-col">
 	{#if exercises}
 		{#each exercises as exercise, i}
 			{#if $state.matches('editing.exercise.editing') && i === editedIndex}
 				<ExerciseField service={editedExercise} />
 			{:else}
-				<button type="button" on:click={() => onEditExercise(i)}>
+				<button
+					class="bg-fg-light odd:bg-fg"
+					class:_disabled={$state.matches('editing.exercise.editing') && i !== editedIndex}
+					type="button"
+					on:click={() => onEditExercise(i)}>
 					<ExerciseData instance={exercise} />
 				</button>
 			{/if}
