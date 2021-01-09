@@ -11,24 +11,29 @@
 
 	const { state } = session;
 
+	const onEditExercise = (index: number) => {
+		session.send({ type: 'EDIT_EXERCISE', data: { instanceIndex: index } });
+	};
+
 	$: console.log($state);
 
 	$: editedExercise = $state.children.exercise;
+	$: editedIndex = $state.context.editedIndex;
 </script>
 
 <div class="flex flex-col">
 	{#if exercises}
-		{#each exercises as exercise}
-			{#if editedExercise && $state.context.editedInstanceId === exercise.id}
+		{#each exercises as exercise, i}
+			{#if $state.matches('editing.exercise.editing') && i === editedIndex}
 				<ExerciseField service={editedExercise} />
 			{:else}
-				<button>
+				<button type="button" on:click={() => onEditExercise(i)}>
 					<ExerciseData instance={exercise} />
 				</button>
 			{/if}
 		{/each}
 	{/if}
-	{#if editedExercise && !$state.context.editedInstanceId}
+	{#if $state.matches('editing.exercise.creating')}
 		<ExerciseField service={editedExercise} />
 	{/if}
 </div>

@@ -86,6 +86,7 @@
 				type="text"
 				name="exercise"
 				list="exercises"
+				value={instance.exercise?.name || ''}
 				on:input={onExerciseInput}
 				bind:this={exerciseInput} />
 		</Label>

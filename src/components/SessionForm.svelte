@@ -38,7 +38,7 @@
 	};
 
 	const onNewExercise = () => {
-		session.send({ type: 'EDIT_EXERCISE' });
+		session.send({ type: 'NEW_EXERCISE' });
 	};
 
 	const focusInput: () => void = (node: HTMLInputElement) => {

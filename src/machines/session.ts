@@ -6,7 +6,7 @@ import { router } from 'src/router';
 
 interface SessionContext {
 	session?: Session;
-	editedInstanceId?: number;
+	editedIndex?: number;
 }
 
 type SessionEvent =
@@ -23,7 +23,8 @@ type SessionEvent =
 	| { type: 'DATE_INPUT'; data: { value: string } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
-	| { type: 'EDIT_EXERCISE'; data?: { instanceId: number } }
+	| { type: 'EDIT_EXERCISE'; data: { instanceIndex: number } }
+	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
 	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } }
 	| { type: 'SAVE'; data: { token?: string } };
@@ -72,10 +73,16 @@ type SessionState =
 			};
 	  }
 	| {
-			value: 'editing.exercise';
+			value: 'editing.exercise.creating';
 			context: SessionContext & {
 				session: Session;
-				editedInstanceId: number;
+			};
+	  }
+	| {
+			value: 'editing.exercise.editing';
+			context: SessionContext & {
+				session: Session;
+				editedIndex: number;
 			};
 	  }
 	| {
@@ -208,10 +215,12 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							DATE_INPUT: {
 								actions: ['updateDate']
 							},
-
+							NEW_EXERCISE: {
+								target: '#session.editing.exercise.creating'
+							},
 							EDIT_EXERCISE: {
-								target: '#session.editing.exercise',
-								actions: ['updateEditedInstanceId']
+								target: '#session.editing.exercise.editing',
+								actions: ['updateEditedIndex']
 							},
 							SAVE: {
 								target: '#session.fetching.saving'
@@ -219,45 +228,68 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						}
 					},
 					exercise: {
-						invoke: {
-							id: 'exercise',
-							src: 'exercise',
-							data: {
-								instance: (context: SessionContext, event: SessionEvent) => {
-									assertEventType(event, 'EDIT_EXERCISE');
-									const { session } = context;
-									if (!session) {
-										return {};
+						initial: 'creating',
+						states: {
+							creating: {
+								invoke: {
+									id: 'exercise',
+									src: 'exercise',
+									data: {
+										instance: (
+											context: SessionContext,
+											event: SessionEvent
+										) => {
+											assertEventType(event, 'NEW_EXERCISE');
+											const { session } = context;
+											if (!session) {
+												return {};
+											}
+											return {
+												sessionId: session.id,
+												executions: [createExecution(1)]
+											};
+										},
+										userId: (context: SessionContext) => context.session?.userId
+									},
+									onDone: {
+										target: '#session.editing.session.last',
+										actions: ['addExerciseInstance']
 									}
-									const instanceId = event.data?.instanceId;
-									if (!instanceId) {
-										return {
-											sessionId: session.id,
-											executions: [createExecution(1)]
-										};
-									}
-									const instances = session.exercises || [];
-									const exerciseInstance = instances.find(
-										(instance) => instance.id === instanceId
-									);
-									if (!exerciseInstance) {
-										return {};
-									}
-									return exerciseInstance;
-								},
-								userId: (context: SessionContext) => context.session?.userId
+								}
 							},
-							onDone: {
-								target: 'session.last',
-								actions: ['updateExercises']
+							editing: {
+								invoke: {
+									id: 'exercise',
+									src: 'exercise',
+									data: {
+										instance: (
+											context: SessionContext,
+											event: SessionEvent
+										) => {
+											assertEventType(event, 'EDIT_EXERCISE');
+											const { session } = context;
+											if (!session) {
+												return {};
+											}
+											const { instanceIndex } = event.data;
+											const instances = session.exercises || [];
+											const exerciseInstance = instances[instanceIndex];
+											return exerciseInstance;
+										},
+										userId: (context: SessionContext) => context.session?.userId
+									},
+									onDone: {
+										target: '#session.editing.session.last',
+										actions: ['updateExerciseInstance']
+									}
+								}
 							}
 						},
 						on: {
 							CANCEL_EXERCISE: {
-								target: 'session'
+								target: '#session.editing.session.last'
 							}
-						},
-						exit: ['clearEditedInstanceId']
+						}
 					}
 				}
 			},
@@ -313,27 +345,39 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
-			updateEditedInstanceId: assign({
-				editedInstanceId: (_, event) => {
+			updateEditedIndex: assign({
+				editedIndex: (_, event) => {
 					assertEventType(event, 'EDIT_EXERCISE');
-					return event.data?.instanceId;
+					return event.data?.instanceIndex;
 				}
 			}),
-			clearEditedInstanceId: assign({
-				editedInstanceId: (_, __) => undefined
-			}),
-			updateExercises: assign({
+			addExerciseInstance: assign({
 				session: (context, event) => {
 					assertEventType(event, 'done.invoke.exercise');
 					const { session } = context;
 					if (!session) {
-						return undefined;
+						return session;
 					}
-					const exercises = session?.exercises || [];
+					const exercises = session.exercises || [];
 					const updatedExercises = [...exercises, event.data.exercise];
 					return {
 						...session,
 						exercises: updatedExercises
+					};
+				}
+			}),
+			updateExerciseInstance: assign({
+				session: (context, event) => {
+					assertEventType(event, 'done.invoke.exercise');
+					const { session, editedIndex } = context;
+					if (!session || !editedIndex) {
+						return session;
+					}
+					const exercises = session.exercises || [];
+					exercises[editedIndex] = event.data.exercise;
+					return {
+						...session,
+						exercises
 					};
 				}
 			}),
