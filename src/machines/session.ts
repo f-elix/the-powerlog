@@ -109,7 +109,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		context: {
 			session: undefined
 		},
-		entry: ['spawnSessionModes'],
+		// entry: ['spawnSessionModes'],
 		states: {
 			idle: {
 				on: {
@@ -215,6 +215,10 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								type: 'history'
 							}
 						},
+						invoke: {
+							id: 'modes',
+							src: 'modes'
+						},
 						on: {
 							TITLE_INPUT: {
 								actions: ['updateTitle']
@@ -305,9 +309,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 	},
 	{
 		actions: {
-			spawnSessionModes: assign({
-				modes: () => spawn(modesMachine, 'modes')
-			}),
+			// spawnSessionModes: assign({
+			// 	modes: () => spawn(modesMachine, 'modes')
+			// }),
 			updateSession: assign({
 				session: (context, event) => {
 					let session;
@@ -476,7 +480,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					throw new Error('Problem fetching session');
 				}
 			},
-			exercise: exerciseMachine
+			exercise: exerciseMachine,
+			modes: modesMachine
 		}
 	}
 );

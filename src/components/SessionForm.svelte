@@ -49,7 +49,7 @@
 	};
 
 	$: sessionData = $state.context.session;
-	$: sessionModes = $state.context.modes;
+	$: sessionModes = $state.children.modes;
 	$: modes = sessionModes ? useService(sessionModes) : undefined;
 </script>
 
