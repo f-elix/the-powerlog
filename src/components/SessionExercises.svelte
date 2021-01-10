@@ -13,15 +13,15 @@
 	export let exercises: ExerciseInstance[];
 	export let modes: any;
 
-	const { state: sessionState } = session;
-	const { state: modesState } = modes;
+	const sessionState = session.state;
+	const modesState = modes.state;
 
 	const onEditExercise = (index: number) => {
 		session.send({ type: 'EDIT_EXERCISE', data: { instanceIndex: index } });
 	};
 
 	const onDeleteExercise = (index: number) => {
-		session.send({ type: 'DELETE_EXERCISE', data: { instanceIndex: index } });
+		modes.send({ type: 'DELETE_EXERCISE', data: { instanceIndex: index } });
 	};
 
 	$: editedExercise = $sessionState.children.exercise;

@@ -1,7 +1,8 @@
 <script lang="ts">
 	// Types
 	import type { Exercise } from 'types';
-	// xstate-svelte
+	import type { Modes } from 'src/machines/session';
+	// // xstate-svelte
 	import { useService } from 'xstate-svelte';
 	// Stores
 	import { session } from 'src/stores/session';
@@ -13,6 +14,7 @@
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
 	import Label from 'coms/Label.svelte';
+	import type { Interpreter } from 'xstate';
 
 	export let token: string;
 	export let exercises: Exercise[];
@@ -50,7 +52,7 @@
 
 	$: sessionData = $state.context.session;
 	$: sessionModes = $state.children.modes;
-	$: modes = sessionModes ? useService(sessionModes) : undefined;
+	$: modes = sessionModes ? useService(sessionModes as Modes) : undefined;
 </script>
 
 <section class="space-y-100">

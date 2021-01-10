@@ -1,11 +1,15 @@
 import type { ExerciseInstance } from 'types';
-import { createMachine } from 'xstate';
+import { createMachine, sendParent } from 'xstate';
 
 export interface ModesContext {
 	instances: ExerciseInstance[];
 }
 
-export type ModesEvent = { type: 'REORDER' } | { type: 'HISTORY' } | { type: 'DELETE' };
+export type ModesEvent =
+	| { type: 'REORDER' }
+	| { type: 'HISTORY' }
+	| { type: 'DELETE' }
+	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } };
 
 export type ModesState =
 	| {
@@ -25,30 +29,40 @@ export type ModesState =
 			context: ModesContext;
 	  };
 
-export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>({
-	id: 'modes',
-	initial: 'idle',
-	states: {
-		idle: {},
-		reordering: {
-			on: {
-				REORDER: 'idle'
+export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
+	{
+		id: 'modes',
+		initial: 'idle',
+		states: {
+			idle: {},
+			reordering: {
+				on: {
+					REORDER: 'idle'
+				}
+			},
+			history: {
+				on: {
+					HISTORY: 'idle'
+				}
+			},
+			deleting: {
+				on: {
+					DELETE: 'idle',
+					DELETE_EXERCISE: {
+						actions: ['notifyDeleteExercise']
+					}
+				}
 			}
 		},
-		history: {
-			on: {
-				HISTORY: 'idle'
-			}
-		},
-		deleting: {
-			on: {
-				DELETE: 'idle'
-			}
+		on: {
+			REORDER: 'reordering',
+			HISTORY: 'history',
+			DELETE: 'deleting'
 		}
 	},
-	on: {
-		REORDER: 'reordering',
-		HISTORY: 'history',
-		DELETE: 'deleting'
+	{
+		actions: {
+			notifyDeleteExercise: sendParent((_, event) => event)
+		}
 	}
-});
+);
