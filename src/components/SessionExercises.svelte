@@ -12,6 +12,7 @@
 
 	export let exercises: ExerciseInstance[];
 	export let modes: any;
+	export let token: string;
 
 	const sessionState = session.state;
 	const modesState = modes.state;
@@ -22,6 +23,10 @@
 
 	const onDeleteExercise = (index: number) => {
 		modes.send({ type: 'DELETE_EXERCISE', data: { instanceIndex: index } });
+	};
+
+	const onGetExerciseHistory = (exerciseId?: number) => {
+		modes.send({ type: 'EXERCISE_HISTORY', data: { exerciseId, token } });
 	};
 
 	$: editedExercise = $sessionState.children.exercise;
@@ -40,7 +45,7 @@
 
 <div class="flex flex-col">
 	{#if exercises}
-		{#each exercises as exercise, i}
+		{#each exercises as instance, i}
 			{#if $sessionState.matches('editing.exercise.editing') && i === editedIndex}
 				<ExerciseField service={editedExercise} />
 			{:else}
@@ -48,7 +53,7 @@
 					class="relative flex bg-fg-light odd:bg-fg"
 					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}>
 					<button class="w-full" type="button" on:click={() => onEditExercise(i)}>
-						<ExerciseData instance={exercise} />
+						<ExerciseData {instance} />
 					</button>
 					{#if $modesState.matches('reordering')}
 						<button
@@ -60,11 +65,12 @@
 							</div>
 						</button>
 					{/if}
-					{#if $modesState.matches('history')}
+					{#if $modesState.matches('history') && instance.exercise?.id}
 						<button
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-highlight' : 'bg-highlight-light'}"
-							aria-label="Exercise history">
+							aria-label="Exercise history"
+							on:click={() => onGetExerciseHistory(instance.exercise?.id)}>
 							<div class="flex items-center justify-center">
 								<History extClass="w-80 h-80" />
 							</div>
