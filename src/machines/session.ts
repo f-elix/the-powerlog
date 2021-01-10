@@ -29,6 +29,7 @@ type SessionEvent =
 	| { type: 'DATE_INPUT'; data: { value: string } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
+	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
 	| { type: 'EDIT_EXERCISE'; data: { instanceIndex: number } }
 	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
@@ -233,6 +234,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								target: '#session.editing.exercise.editing',
 								actions: ['updateEditedIndex']
 							},
+							DELETE_EXERCISE: {
+								actions: ['deleteExercise']
+							},
 							SAVE: {
 								target: '#session.fetching.saving'
 							}
@@ -392,6 +396,22 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					return {
 						...session,
 						exercises
+					};
+				}
+			}),
+			deleteExercise: assign({
+				session: (context, event) => {
+					assertEventType(event, 'DELETE_EXERCISE');
+					const { session } = context;
+					if (!session) {
+						return session;
+					}
+					const exercises = session.exercises || [];
+					const updatedExercises = exercises;
+					updatedExercises.splice(event.data.instanceIndex);
+					return {
+						...session,
+						exercises: updatedExercises
 					};
 				}
 			}),

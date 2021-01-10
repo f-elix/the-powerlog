@@ -20,6 +20,10 @@
 		session.send({ type: 'EDIT_EXERCISE', data: { instanceIndex: index } });
 	};
 
+	const onDeleteExercise = (index: number) => {
+		session.send({ type: 'DELETE_EXERCISE', data: { instanceIndex: index } });
+	};
+
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedIndex = $sessionState.context.editedIndex;
 </script>
@@ -60,7 +64,7 @@
 						<button
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-highlight' : 'bg-highlight-light'}"
-							aria-label="Drag handle">
+							aria-label="Exercise history">
 							<div class="flex items-center justify-center">
 								<History extClass="w-80 h-80" />
 							</div>
@@ -70,7 +74,8 @@
 						<button
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-danger-medium' : 'bg-danger-light'}"
-							aria-label="Drag handle">
+							aria-label="Delete exercise"
+							on:click={() => onDeleteExercise(i)}>
 							<div class="flex items-center justify-center">
 								<Delete extClass="w-80 h-80" />
 							</div>
