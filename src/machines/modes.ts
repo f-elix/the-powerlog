@@ -16,100 +16,124 @@ export type ModesEvent =
 			type: 'done.invoke.getHistory';
 			data: ExerciseInstance;
 	  }
-	| { type: 'DISMISS' };
+	| { type: 'DISMISS' }
+	| { type: 'ENABLE' }
+	| { type: 'DISABLE' };
 
 export type ModesState =
 	| {
-			value: 'idle';
+			value: 'enabled.idle';
 			context: ModesContext;
 	  }
 	| {
-			value: 'reordering';
+			value: 'enabled.reordering';
 			context: ModesContext;
 	  }
 	| {
-			value: 'history.idle';
+			value: 'enabled.history.idle';
 			context: ModesContext & {
 				history: undefined;
 			};
 	  }
 	| {
-			value: 'history.fetching';
+			value: 'enabled.history.fetching';
 			context: ModesContext & {
 				history: undefined;
 			};
 	  }
 	| {
-			value: 'history.loaded';
+			value: 'enabled.history.loaded';
 			context: ModesContext & {
 				history: ExerciseInstance;
 			};
 	  }
 	| {
-			value: 'deleting';
+			value: 'enabled.deleting';
+			context: ModesContext;
+	  }
+	| {
+			value: 'enabled.last';
+			context: ModesContext;
+	  }
+	| {
+			value: 'disabled';
 			context: ModesContext;
 	  };
 
 export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 	{
 		id: 'modes',
-		initial: 'idle',
+		initial: 'enabled',
 		context: {
 			history: undefined
 		},
 		states: {
-			idle: {},
-			reordering: {
-				on: {
-					REORDER: 'idle'
-				}
-			},
-			history: {
+			enabled: {
 				initial: 'idle',
 				states: {
-					idle: {
+					idle: {},
+					reordering: {
 						on: {
-							EXERCISE_HISTORY: 'fetching'
+							REORDER: 'idle'
 						}
 					},
-					fetching: {
-						invoke: {
-							id: 'getHistory',
-							src: 'getHistory',
-							onDone: {
-								target: 'loaded',
-								actions: ['updateHistory']
+					history: {
+						initial: 'ready',
+						states: {
+							ready: {
+								on: {
+									EXERCISE_HISTORY: 'fetching'
+								}
 							},
-							onError: {
-								target: 'loaded'
+							fetching: {
+								invoke: {
+									id: 'getHistory',
+									src: 'getHistory',
+									onDone: {
+										target: 'loaded',
+										actions: ['updateHistory']
+									},
+									onError: {
+										target: 'loaded'
+									}
+								}
+							},
+							loaded: {
+								on: {
+									DISMISS: {
+										target: 'ready'
+									}
+								}
+							}
+						},
+						on: {
+							HISTORY: 'idle'
+						}
+					},
+					deleting: {
+						on: {
+							DELETE: 'idle',
+							DELETE_EXERCISE: {
+								actions: ['notifyDeleteExercise']
 							}
 						}
 					},
-					loaded: {
-						on: {
-							DISMISS: {
-								target: 'idle'
-							}
-						}
+					last: {
+						type: 'history'
 					}
 				},
 				on: {
-					HISTORY: '#modes.idle'
+					REORDER: '.reordering',
+					HISTORY: '.history',
+					DELETE: '.deleting',
+					DISABLE: '#modes.disabled'
 				}
 			},
-			deleting: {
+			disabled: {
 				on: {
-					DELETE: 'idle',
-					DELETE_EXERCISE: {
-						actions: ['notifyDeleteExercise']
-					}
+					ENABLE: 'enabled.last'
 				}
 			}
-		},
-		on: {
-			REORDER: 'reordering',
-			HISTORY: 'history',
-			DELETE: 'deleting'
 		}
 	},
 	{

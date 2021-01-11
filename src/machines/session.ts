@@ -1,7 +1,7 @@
 import type { Session, ExerciseInstance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
-import { createMachine, assign } from 'xstate';
+import { createMachine, assign, send } from 'xstate';
 import { assertEventType, createExecution } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
@@ -190,14 +190,13 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			},
 			editing: {
 				initial: 'session',
+				invoke: {
+					id: 'modes',
+					src: 'modes'
+				},
 				states: {
 					session: {
 						initial: 'creating',
-						// @TODO find a better way to manage the 'modes' service
-						invoke: {
-							id: 'modes',
-							src: 'modes'
-						},
 						states: {
 							creating: {
 								on: {
@@ -243,6 +242,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					},
 					exercise: {
 						initial: 'creating',
+						entry: ['disableModes'],
 						states: {
 							creating: {
 								invoke: {
@@ -303,7 +303,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							CANCEL_EXERCISE: {
 								target: '#session.editing.session.last'
 							}
-						}
+						},
+						exit: ['enableModes']
 					}
 				}
 			},
@@ -411,6 +412,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
+			disableModes: send('DISABLE', { to: 'modes' }),
+			enableModes: send('ENABLE', { to: 'modes' }),
 			redirectToDashboard: () => {
 				router.send('DASHBOARD');
 			}

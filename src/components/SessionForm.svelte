@@ -86,9 +86,7 @@
 							on:input={onDateInput} />
 					</Label>
 				</div>
-				{#if $state.matches('editing.session')}
-					<SessionModes {modes} />
-				{/if}
+				<SessionModes {modes} />
 				<SessionExercises exercises={sessionData.exercises} {modes} {token} />
 				{#if $state.matches('editing.session')}
 					<div class="flex flex-col space-y-70 px-50">

@@ -16,7 +16,7 @@
 	export let token: string;
 
 	const sessionState = session.state;
-	$: modesState = modes?.state;
+	const modesState = modes.state;
 
 	const onEditExercise = (index: number) => {
 		session.send({ type: 'EDIT_EXERCISE', data: { instanceIndex: index } });
@@ -39,7 +39,7 @@
 
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedIndex = $sessionState.context.editedIndex;
-	$: historyInstance = $modesState?.context.history;
+	$: historyInstance = $modesState.context.history;
 </script>
 
 <style>
@@ -53,7 +53,7 @@
 </style>
 
 <div class="flex flex-col">
-	{#if $modesState.matches('history.loaded')}
+	{#if $modesState.matches('enabled.history.loaded')}
 		<HistoryModal instance={historyInstance} on:done={onHistoryDismiss} />
 	{/if}
 	{#if exercises}
@@ -67,7 +67,7 @@
 					<button class="w-full" type="button" on:click={() => onEditExercise(i)}>
 						<ExerciseData {instance} />
 					</button>
-					{#if $modesState.matches('reordering')}
+					{#if $modesState.matches('enabled.reordering')}
 						<button
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-info-light' : 'bg-info-lighter'}"
@@ -77,7 +77,7 @@
 							</div>
 						</button>
 					{/if}
-					{#if $modesState.matches('history') && instance.exercise?.id}
+					{#if $modesState.matches('enabled.history') && instance.exercise?.id}
 						<button
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-highlight' : 'bg-highlight-light'}"
@@ -88,7 +88,7 @@
 							</div>
 						</button>
 					{/if}
-					{#if $modesState.matches('deleting')}
+					{#if $modesState.matches('enabled.deleting')}
 						<button
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-danger-medium' : 'bg-danger-light'}"
