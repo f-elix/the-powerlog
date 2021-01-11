@@ -16,7 +16,7 @@
 	};
 </script>
 
-<section class="flex flex-col items-center justify-center h-full space-y-110">
+<section class="flex flex-col items-center justify-center h-100vh space-y-110">
 	<div class="flex flex-col items-center space-y-110 max-w-180 mx-auto px-50 text-center">
 		<Icon />
 		<h1 class="text-70 font-bold">{ui.appName}</h1>
