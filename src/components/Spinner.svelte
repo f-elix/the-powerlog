@@ -5,7 +5,7 @@
 
 	circle {
 		fill: none;
-		stroke: theme('textColor.highlight');
+		stroke: theme('colors.highlight.lighter');
 		stroke-width: 2;
 		stroke-dasharray: 1, 200;
 		stroke-dashoffset: 0;
