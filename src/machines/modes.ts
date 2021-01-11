@@ -12,7 +12,10 @@ export type ModesEvent =
 	| { type: 'DELETE' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
 	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; token: string } }
-	| { type: 'done.invoke.getHistory'; data: { exercises_by_pk: ExerciseInstance } }
+	| {
+			type: 'done.invoke.getHistory';
+			data: ExerciseInstance;
+	  }
 	| { type: 'DISMISS' };
 
 export type ModesState =
@@ -115,7 +118,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			updateHistory: assign({
 				history: (_, event) => {
 					assertEventType(event, 'done.invoke.getHistory');
-					return event.data.exercises_by_pk;
+					return event.data;
 				}
 			})
 		},
@@ -135,7 +138,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 						body: JSON.stringify({ exerciseId })
 					});
 					const data = await res.json();
-					return data;
+					const instance = data.exercises_by_pk.exercise_instances[0];
+					return instance;
 				} catch (error) {
 					console.warn(error);
 					throw error;

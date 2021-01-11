@@ -14,7 +14,6 @@
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
 	import Label from 'coms/Label.svelte';
-	import type { Interpreter } from 'xstate';
 
 	export let token: string;
 	export let exercises: Exercise[];
@@ -87,7 +86,9 @@
 							on:input={onDateInput} />
 					</Label>
 				</div>
-				<SessionModes {modes} />
+				{#if $state.matches('editing.session')}
+					<SessionModes {modes} />
+				{/if}
 				<SessionExercises exercises={sessionData.exercises} {modes} {token} />
 				{#if $state.matches('editing.session')}
 					<div class="flex flex-col space-y-70 px-50">

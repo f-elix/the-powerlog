@@ -6,7 +6,8 @@
 
 	export let modes: any;
 
-	const { state, send } = modes;
+	$: state = modes?.state;
+	$: send = modes?.send;
 
 	const onReorder = () => {
 		send({ type: 'REORDER' });
@@ -27,7 +28,7 @@
 	}
 
 	._history {
-		@apply text-highlight;
+		@apply text-highlight-lighter;
 	}
 
 	._delete {

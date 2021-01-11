@@ -6,6 +6,7 @@
 	// Components
 	import ExerciseData from 'coms/ExerciseData.svelte';
 	import ExerciseField from 'coms/ExerciseField.svelte';
+	import HistoryModal from 'coms/HistoryModal.svelte';
 	import Reorder from 'coms/svg/Reorder.svelte';
 	import History from 'coms/svg/History.svelte';
 	import Delete from 'coms/svg/Delete.svelte';
@@ -15,7 +16,7 @@
 	export let token: string;
 
 	const sessionState = session.state;
-	const modesState = modes.state;
+	$: modesState = modes?.state;
 
 	const onEditExercise = (index: number) => {
 		session.send({ type: 'EDIT_EXERCISE', data: { instanceIndex: index } });
@@ -26,11 +27,19 @@
 	};
 
 	const onGetExerciseHistory = (exerciseId?: number) => {
+		if (!exerciseId) {
+			return;
+		}
 		modes.send({ type: 'EXERCISE_HISTORY', data: { exerciseId, token } });
+	};
+
+	const onHistoryDismiss = () => {
+		modes.send({ type: 'DISMISS' });
 	};
 
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedIndex = $sessionState.context.editedIndex;
+	$: historyInstance = $modesState?.context.history;
 </script>
 
 <style>
@@ -44,6 +53,9 @@
 </style>
 
 <div class="flex flex-col">
+	{#if $modesState.matches('history.loaded')}
+		<HistoryModal instance={historyInstance} on:done={onHistoryDismiss} />
+	{/if}
 	{#if exercises}
 		{#each exercises as instance, i}
 			{#if $sessionState.matches('editing.exercise.editing') && i === editedIndex}

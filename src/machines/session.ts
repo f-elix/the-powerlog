@@ -193,6 +193,11 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				states: {
 					session: {
 						initial: 'creating',
+						// @TODO find a better way to manage the 'modes' service
+						invoke: {
+							id: 'modes',
+							src: 'modes'
+						},
 						states: {
 							creating: {
 								on: {
@@ -213,10 +218,6 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							last: {
 								type: 'history'
 							}
-						},
-						invoke: {
-							id: 'modes',
-							src: 'modes'
 						},
 						on: {
 							TITLE_INPUT: {
