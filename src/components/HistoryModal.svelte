@@ -17,7 +17,7 @@
 		dispatch('done');
 	};
 
-	const exercises = session.exercises || [];
+	const exercises = session?.exercises || [];
 </script>
 
 <div class="fixed z-50 inset-0 px-50 pt-120">
