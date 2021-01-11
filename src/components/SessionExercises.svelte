@@ -30,7 +30,10 @@
 		if (!exerciseId) {
 			return;
 		}
-		modes.send({ type: 'EXERCISE_HISTORY', data: { exerciseId, token } });
+		modes.send({
+			type: 'EXERCISE_HISTORY',
+			data: { exerciseId, token, date: $sessionState.context.session?.date }
+		});
 	};
 
 	const onHistoryDismiss = () => {
@@ -39,7 +42,7 @@
 
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedIndex = $sessionState.context.editedIndex;
-	$: historyInstance = $modesState.context.history;
+	$: historySession = $modesState.context.history;
 </script>
 
 <style>
@@ -54,7 +57,7 @@
 
 <div class="flex flex-col">
 	{#if $modesState.matches('enabled.history.loaded')}
-		<HistoryModal instance={historyInstance} on:done={onHistoryDismiss} />
+		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
 	{#if exercises}
 		{#each exercises as instance, i}

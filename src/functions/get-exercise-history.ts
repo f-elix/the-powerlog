@@ -14,27 +14,26 @@ export const handler: (
 		};
 	}
 
-	const { exerciseId } = JSON.parse(event.body || '{}');
+	const { exerciseId, date } = JSON.parse(event.body || '{}');
 
 	return gqlQuery({
 		query: `
-			query getExeciseHistory($id: Int!) {
-				exercises_by_pk(id: $id) {
-					exercise_instances(limit: 1, order_by: {session: {date: desc}}) {
-						executions
-						exercise {
-							name
-						}
-						session {
-							date
-							bodyweight
-						}
-					}
+		query getExeciseHistory($id: Int!, $date: timestamptz!) {
+			sessions(limit: 1, where: {exercises: {exerciseId: {_eq: $id}}, date: {_lt: $date}}) {
+			  date
+			  bodyweight
+			  exercises(where: {exerciseId: {_eq: $id}}) {
+				executions
+				exercise {
+				  name
 				}
+			  }
 			}
+		  }
 		`,
 		variables: {
-			id: exerciseId
+			id: exerciseId,
+			date
 		}
 	});
 };

@@ -1,9 +1,9 @@
-import type { ExerciseInstance } from 'types';
+import type { Session } from 'types';
 import { assign, createMachine, sendParent } from 'xstate';
 import { assertEventType } from 'src/utils';
 
 export interface ModesContext {
-	history?: ExerciseInstance;
+	history?: Partial<Session>;
 }
 
 export type ModesEvent =
@@ -11,10 +11,10 @@ export type ModesEvent =
 	| { type: 'HISTORY' }
 	| { type: 'DELETE' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
-	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; token: string } }
+	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; date: string; token: string } }
 	| {
 			type: 'done.invoke.getHistory';
-			data: ExerciseInstance;
+			data: Partial<Session>;
 	  }
 	| { type: 'DISMISS' }
 	| { type: 'ENABLE' }
@@ -44,7 +44,7 @@ export type ModesState =
 	| {
 			value: 'enabled.history.loaded';
 			context: ModesContext & {
-				history: ExerciseInstance;
+				history: Partial<Session>;
 			};
 	  }
 	| {
@@ -147,22 +147,19 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			})
 		},
 		services: {
-			getHistory: async (context, event) => {
+			getHistory: async (_, event) => {
 				assertEventType(event, 'EXERCISE_HISTORY');
-				const { token, exerciseId } = event.data;
-				if (context.history?.exerciseId === exerciseId) {
-					return context.history;
-				}
+				const { token, exerciseId, date } = event.data;
 				try {
 					const res = await fetch('/.netlify/functions/get-exercise-history', {
 						method: 'POST',
 						headers: {
 							Authorization: `Bearer ${token}`
 						},
-						body: JSON.stringify({ exerciseId })
+						body: JSON.stringify({ exerciseId, date })
 					});
 					const data = await res.json();
-					const instance = data.exercises_by_pk.exercise_instances[0];
+					const instance = data.sessions[0];
 					return instance;
 				} catch (error) {
 					console.warn(error);
