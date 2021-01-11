@@ -19,8 +19,6 @@
 	const onDelete = () => {
 		send({ type: 'DELETE' });
 	};
-
-	$: console.log($state);
 </script>
 
 <style>
