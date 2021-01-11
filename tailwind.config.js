@@ -108,68 +108,46 @@ module.exports = {
 			20: '2px',
 			30: '4px'
 		},
+		colors: {
+			transparent: 'transparent',
+			current: 'currentColor',
+			white: colors.coolGray[50],
+			black: colors.coolGray[800],
+			primary: colors.lightBlue[900],
+			info: {
+				DEFAULT: colors.lightBlue[600],
+				light: colors.blue[500],
+				lighter: colors.blue[400]
+			},
+			danger: {
+				DEFAULT: colors.red[900],
+				medium: colors.red[500],
+				light: colors.red[400]
+			},
+			action: colors.green[500],
+			success: colors.emerald[500],
+			highlight: {
+				DEFAULT: colors.amber[700],
+				light: colors.amber[600],
+				lighter: colors.amber[300]
+			},
+			fg: {
+				DEFAULT: colors.blueGray[700],
+				light: colors.blueGray[600],
+				lighter: colors.blueGray[400]
+			},
+			gray: colors.blueGray[400]
+		},
 		extend: {
-			backgroundColor: {
-				main: colors.coolGray[800],
-				primary: colors.lightBlue[900],
-				success: colors.emerald[500],
-				info: {
-					DEFAULT: colors.lightBlue[600],
-					light: colors.blue[500],
-					lighter: colors.blue[400]
-				},
-				danger: {
-					DEFAULT: colors.red[900],
-					medium: colors.red[500],
-					light: colors.red[400]
-				},
-				action: colors.green[500],
-				fg: {
-					DEFAULT: colors.blueGray[700],
-					light: colors.blueGray[600],
-					lighter: colors.blueGray[400]
-				},
-				highlight: {
-					DEFAULT: colors.amber[700],
-					light: colors.amber[600],
-					lighter: colors.amber[300]
-				}
-			},
-			textColor: {
-				main: colors.coolGray[50],
-				gray: colors.blueGray[400],
-				info: {
-					DEFAULT: colors.lightBlue[600],
-					light: colors.blue[500],
-					lighter: colors.blue[400]
-				},
-				highlight: colors.amber[300],
-				danger: colors.red[400]
-			},
-			borderColor: {
-				main: colors.coolGray[50],
-				primary: colors.lightBlue[900],
-				success: colors.emerald[500],
-				info: colors.lightBlue[600],
-				danger: {
-					DEFAULT: colors.red[900],
-					light: colors.red[400]
-				},
-				action: colors.green[500],
-				fg: {
-					DEFAULT: colors.blueGray[700],
-					light: colors.blueGray[600],
-					lighter: colors.blueGray[400]
-				},
-				highlight: {
-					DEFAULT: colors.amber[700],
-					light: colors.amber[600],
-					lighter: colors.amber[300]
-				}
-			},
-			ringColor: {
-				highlight: colors.amber[300]
-			}
+			backgroundColor: (theme) => ({
+				main: theme('colors.black')
+			}),
+			textColor: (theme) => ({
+				main: theme('colors.white')
+			}),
+			borderColor: (theme) => ({
+				main: theme('colors.white')
+			})
 		}
 	},
 	variants: {
