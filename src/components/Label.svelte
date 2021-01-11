@@ -20,6 +20,6 @@
 
 <label
 	class:inline
-	class="_input flex flex-col transition-colors focus-within:text-highlight {extClass}">
+	class="_input flex flex-col transition-colors focus-within:text-highlight-lighter {extClass}">
 	<slot />
 </label>

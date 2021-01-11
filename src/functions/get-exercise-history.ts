@@ -19,9 +19,16 @@ export const handler: (
 	return gqlQuery({
 		query: `
 			query getExeciseHistory($id: Int!) {
-				exercises_by_pk(id:$id) {
+				exercises_by_pk(id: $id) {
 					exercise_instances(limit: 1, order_by: {session: {date: desc}}) {
 						executions
+						exercise {
+							name
+						}
+						session {
+							date
+							bodyweight
+						}
 					}
 				}
 			}

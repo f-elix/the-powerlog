@@ -14,7 +14,7 @@
 	<ul class="flex flex-col space-y-50">
 		{#each sessions as session, i (session?.id)}
 			{#if !sessions[i - 1] || getLocalDate(session.date).getMonth() !== getLocalDate(sessions[i - 1].date).getMonth()}
-				<h2 class="mb-70 text-60 font-bold text-highlight">
+				<h2 class="mb-70 text-60 font-bold text-highlight-lighter">
 					{getLocalDate(session.date).toLocaleString('default', { month: 'long' })}
 					{getLocalDate(session.date).getFullYear()}
 				</h2>
