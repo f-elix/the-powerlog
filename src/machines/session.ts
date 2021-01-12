@@ -237,7 +237,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['deleteExercise']
 							},
 							REORDER_EXERCISES: {
-								actions: ['reorderExercises']
+								actions: ['reorderExercises', 'notifyReordered']
 							},
 							SAVE: {
 								target: '#session.fetching.saving'
@@ -440,6 +440,16 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
+			notifyReordered: send(
+				(_, event) => {
+					assertEventType(event, 'REORDER_EXERCISES');
+					return {
+						type: 'EXERCISES_REORDERED',
+						data: { to: event.data.to }
+					};
+				},
+				{ to: 'modes' }
+			),
 			disableModes: send('DISABLE', { to: 'modes' }),
 			enableModes: send('ENABLE', { to: 'modes' }),
 			redirectToDashboard: () => {

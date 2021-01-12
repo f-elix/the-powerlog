@@ -52,7 +52,7 @@
 
 	const onDrag = (e: PointerEvent | TouchEvent, index: number, id: number) => {
 		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		modes.send({ type: 'DRAG', data: { index, y, id } });
+		modes.send({ type: 'DRAG', data: { index, y, id, exerciseEls } });
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
@@ -61,22 +61,6 @@
 		}
 		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
 		modes.send({ type: 'MOVE', data: { y } });
-		const prevIndex = draggedIndex - 1;
-		const nextIndex = draggedIndex + 1;
-		const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
-		if (!targetMid) {
-			return;
-		}
-		const prevElMid = getElMidPoint(exerciseEls[prevIndex]);
-		const nextElMid = getElMidPoint(exerciseEls[nextIndex]);
-		if (prevElMid && targetMid <= prevElMid) {
-			modes.send({ type: 'SWAP', data: { swappedIndex: prevIndex } });
-			return;
-		}
-		if (nextElMid && targetMid >= nextElMid) {
-			modes.send({ type: 'SWAP', data: { swappedIndex: nextIndex } });
-			return;
-		}
 	};
 
 	const onDrop = () => {
@@ -119,8 +103,10 @@
 			{#if $sessionState.matches('editing.exercise.editing') && i === editedIndex}
 				<ExerciseField service={editedExercise} />
 			{:else}
+				<!-- @TODO add transitions -->
+				<!-- transition-all duration-500 ease-out-expo -->
 				<div
-					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
+					class="relative flex bg-fg-light odd:bg-fg "
 					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}
 					class:_dragging={$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId}
 					style="--y: {$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId ? $modesState.context.y : 0}px"

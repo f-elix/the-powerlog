@@ -1,6 +1,6 @@
 import type { Session } from 'types';
 import { assign, createMachine, sendParent } from 'xstate';
-import { assertEventType } from 'src/utils';
+import { assertEventType, getElMidPoint } from 'src/utils';
 
 export interface ModesContext {
 	history?: Partial<Session>;
@@ -8,6 +8,7 @@ export interface ModesContext {
 	pointery: number;
 	draggedIndex?: number;
 	draggedId?: number;
+	exerciseEls?: HTMLElement[];
 }
 
 export type ModesEvent =
@@ -23,9 +24,10 @@ export type ModesEvent =
 	| { type: 'DISMISS' }
 	| { type: 'ENABLE' }
 	| { type: 'DISABLE' }
-	| { type: 'DRAG'; data: { y: number; index: number; id: number } }
+	| { type: 'DRAG'; data: { y: number; index: number; id: number; exerciseEls: HTMLElement[] } }
 	| { type: 'MOVE'; data: { y: number } }
 	| { type: 'SWAP'; data: { swappedIndex: number } }
+	| { type: 'EXERCISES_REORDERED'; data: { to: number } }
 	| { type: 'DROP' };
 
 export type ModesState =
@@ -34,8 +36,18 @@ export type ModesState =
 			context: ModesContext;
 	  }
 	| {
-			value: 'enabled.reordering';
+			value: 'enabled.reordering.idle';
 			context: ModesContext;
+	  }
+	| {
+			value: 'enabled.reordering.dragging';
+			context: ModesContext & {
+				y: number;
+				pointery: number;
+				draggedIndex: number;
+				draggedId: number;
+				exerciseEls: HTMLElement[];
+			};
 	  }
 	| {
 			value: 'enabled.history.idle';
@@ -77,7 +89,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			y: 0,
 			pointery: 0,
 			draggedIndex: undefined,
-			draggedId: undefined
+			draggedId: undefined,
+			exerciseEls: undefined
 		},
 		states: {
 			enabled: {
@@ -97,11 +110,24 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 							},
 							dragging: {
 								on: {
-									MOVE: {
-										actions: ['updateCoords']
-									},
+									MOVE: [
+										{
+											cond: 'isIntersectingPrev',
+											actions: ['updateCoords', 'notifySwapPrev']
+										},
+										{
+											cond: 'isIntersectingNext',
+											actions: ['updateCoords', 'notifySwapNext']
+										},
+										{
+											actions: ['updateCoords']
+										}
+									],
 									SWAP: {
 										actions: ['notifyReorder']
+									},
+									EXERCISES_REORDERED: {
+										actions: ['updateIndex', 'updatePointer']
 									},
 									DROP: {
 										target: 'idle',
@@ -184,11 +210,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			setDragging: assign((_, event) => {
 				assertEventType(event, 'DRAG');
-				const { y, index, id } = event.data;
+				const { y, index, id, exerciseEls } = event.data;
 				return {
 					pointery: y,
 					draggedIndex: index,
-					draggedId: id
+					draggedId: id,
+					exerciseEls
 				};
 			}),
 			clearDragging: assign((_, event) => {
@@ -206,11 +233,48 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					return event.data.y - context.pointery;
 				}
 			}),
-			notifyReorder: sendParent((context, event) => {
-				assertEventType(event, 'SWAP');
+			notifySwapPrev: sendParent((context, event) => {
+				assertEventType(event, 'MOVE');
+				const draggedIndex = context.draggedIndex || 0;
 				return {
 					type: 'REORDER_EXERCISES',
-					data: { from: context.draggedIndex, to: event.data.swappedIndex }
+					data: { from: draggedIndex, to: draggedIndex - 1 }
+				};
+			}),
+			notifySwapNext: sendParent((context, event) => {
+				assertEventType(event, 'MOVE');
+				const draggedIndex = context.draggedIndex || 0;
+				return {
+					type: 'REORDER_EXERCISES',
+					data: { from: draggedIndex, to: draggedIndex + 1 }
+				};
+			}),
+			updateIndex: assign({
+				draggedIndex: (_, event) => {
+					assertEventType(event, 'EXERCISES_REORDERED');
+					return event.data.to;
+				}
+			}),
+			updatePointer: assign((context, event) => {
+				assertEventType(event, 'EXERCISES_REORDERED');
+				const { exerciseEls } = context;
+				if (!exerciseEls) {
+					return {
+						pointery: context.pointery,
+						y: context.y
+					};
+				}
+				const draggedEl = exerciseEls[event.data.to];
+				if (!draggedEl) {
+					return {
+						pointery: context.pointery,
+						y: context.y
+					};
+				}
+				const draggedElMidPoint = draggedEl.offsetTop + draggedEl.offsetHeight / 2;
+				return {
+					pointery: draggedElMidPoint,
+					y: 0
 				};
 			})
 		},
@@ -233,6 +297,28 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					console.warn(error);
 					throw error;
 				}
+			}
+		},
+		guards: {
+			isIntersectingPrev: (context, event) => {
+				assertEventType(event, 'MOVE');
+				const { exerciseEls, draggedIndex } = context;
+				if (!exerciseEls || typeof draggedIndex === 'undefined') {
+					return false;
+				}
+				const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
+				const prevElMid = getElMidPoint(exerciseEls[draggedIndex - 1]);
+				return !!prevElMid && targetMid <= prevElMid;
+			},
+			isIntersectingNext: (context, event) => {
+				assertEventType(event, 'MOVE');
+				const { exerciseEls, draggedIndex } = context;
+				if (!exerciseEls || typeof draggedIndex === 'undefined') {
+					return false;
+				}
+				const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
+				const nextElMid = getElMidPoint(exerciseEls[draggedIndex + 1]);
+				return !!nextElMid && targetMid >= nextElMid;
 			}
 		}
 	}

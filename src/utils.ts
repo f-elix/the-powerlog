@@ -124,7 +124,7 @@ export const getElMidPoint = (el: HTMLElement): number | false => {
 	}
 	const rect = el.getBoundingClientRect();
 	const { height, top } = rect;
-	return top + height - height / 2;
+	return top + height / 2;
 };
 
 export const reorderArray = (array: any[], from: number, to: number): any[] => {
