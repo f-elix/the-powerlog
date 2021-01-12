@@ -7,6 +7,7 @@ export interface ModesContext {
 	y: number;
 	pointery: number;
 	draggedIndex?: number;
+	draggedId?: number;
 }
 
 export type ModesEvent =
@@ -22,8 +23,9 @@ export type ModesEvent =
 	| { type: 'DISMISS' }
 	| { type: 'ENABLE' }
 	| { type: 'DISABLE' }
-	| { type: 'DRAG'; data: { y: number; index: number } }
+	| { type: 'DRAG'; data: { y: number; index: number; id: number } }
 	| { type: 'MOVE'; data: { y: number } }
+	| { type: 'SWAP'; data: { swappedIndex: number } }
 	| { type: 'DROP' };
 
 export type ModesState =
@@ -74,7 +76,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			history: undefined,
 			y: 0,
 			pointery: 0,
-			draggedIndex: undefined
+			draggedIndex: undefined,
+			draggedId: undefined
 		},
 		states: {
 			enabled: {
@@ -96,6 +99,9 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 								on: {
 									MOVE: {
 										actions: ['updateCoords']
+									},
+									SWAP: {
+										actions: ['notifyReorder']
 									},
 									DROP: {
 										target: 'idle',
@@ -178,10 +184,11 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			setDragging: assign((_, event) => {
 				assertEventType(event, 'DRAG');
-				const { y, index } = event.data;
+				const { y, index, id } = event.data;
 				return {
 					pointery: y,
-					draggedIndex: index
+					draggedIndex: index,
+					draggedId: id
 				};
 			}),
 			clearDragging: assign((_, event) => {
@@ -189,7 +196,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				return {
 					y: 0,
 					pointery: 0,
-					draggedIndex: undefined
+					draggedIndex: undefined,
+					draggedId: undefined
 				};
 			}),
 			updateCoords: assign({
@@ -197,6 +205,13 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					assertEventType(event, 'MOVE');
 					return event.data.y - context.pointery;
 				}
+			}),
+			notifyReorder: sendParent((context, event) => {
+				assertEventType(event, 'SWAP');
+				return {
+					type: 'REORDER_EXERCISES',
+					data: { from: context.draggedIndex, to: event.data.swappedIndex }
+				};
 			})
 		},
 		services: {

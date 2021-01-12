@@ -3,6 +3,8 @@
 	import type { ExerciseInstance } from 'types';
 	// Stores
 	import { session } from 'src/stores/session';
+	// Utils
+	import { getElMidPoint } from 'src/utils';
 	// Components
 	import ExerciseData from 'coms/ExerciseData.svelte';
 	import ExerciseField from 'coms/ExerciseField.svelte';
@@ -17,6 +19,14 @@
 
 	const sessionState = session.state;
 	const modesState = modes.state;
+
+	let exerciseEls: HTMLElement[] = [];
+
+	$: editedExercise = $sessionState.children.exercise;
+	$: editedIndex = $sessionState.context.editedIndex;
+	$: draggedIndex = $modesState.context.draggedIndex;
+	$: draggedId = $modesState.context.draggedId;
+	$: historySession = $modesState.context.history;
 
 	const onEditExercise = (index: number) => {
 		session.send({ type: 'EDIT_EXERCISE', data: { instanceIndex: index } });
@@ -40,24 +50,38 @@
 		modes.send({ type: 'DISMISS' });
 	};
 
-	const onDrag = (e: PointerEvent | TouchEvent, index: number) => {
+	const onDrag = (e: PointerEvent | TouchEvent, index: number, id: number) => {
 		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		modes.send({ type: 'DRAG', data: { index, y } });
+		modes.send({ type: 'DRAG', data: { index, y, id } });
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
+		if (!$modesState.matches('enabled.reordering.dragging')) {
+			return;
+		}
 		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
 		modes.send({ type: 'MOVE', data: { y } });
+		const prevIndex = draggedIndex - 1;
+		const nextIndex = draggedIndex + 1;
+		const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
+		if (!targetMid) {
+			return;
+		}
+		const prevElMid = getElMidPoint(exerciseEls[prevIndex]);
+		const nextElMid = getElMidPoint(exerciseEls[nextIndex]);
+		if (prevElMid && targetMid <= prevElMid) {
+			modes.send({ type: 'SWAP', data: { swappedIndex: prevIndex } });
+			return;
+		}
+		if (nextElMid && targetMid >= nextElMid) {
+			modes.send({ type: 'SWAP', data: { swappedIndex: nextIndex } });
+			return;
+		}
 	};
 
 	const onDrop = () => {
 		modes.send({ type: 'DROP' });
 	};
-
-	$: editedExercise = $sessionState.children.exercise;
-	$: editedIndex = $sessionState.context.editedIndex;
-	$: draggedIndex = $modesState.context.draggedIndex;
-	$: historySession = $modesState.context.history;
 </script>
 
 <style>
@@ -75,7 +99,7 @@
 		transition: none;
 	}
 
-	._dragging button {
+	._dragging * {
 		cursor: grabbing;
 	}
 </style>
@@ -96,10 +120,11 @@
 				<ExerciseField service={editedExercise} />
 			{:else}
 				<div
-					class="relative flex bg-fg-light odd:bg-fg transition-transform duration-300 ease-out-expo"
+					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
 					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}
-					class:_dragging={$modesState.matches('enabled.reordering.dragging') && i === draggedIndex}
-					style="--y: {$modesState.matches('enabled.reordering.dragging') && i === draggedIndex ? $modesState.context.y : 0}px">
+					class:_dragging={$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId}
+					style="--y: {$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId ? $modesState.context.y : 0}px"
+					bind:this={exerciseEls[i]}>
 					<button class="w-full" type="button" on:click={() => onEditExercise(i)}>
 						<ExerciseData {instance} />
 					</button>
@@ -108,7 +133,7 @@
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-info-light' : 'bg-info-lighter'} cursor-grab"
 							aria-label="Drag handle"
-							on:pointerdown={(e) => onDrag(e, i)}>
+							on:pointerdown={(e) => onDrag(e, i, instance.id)}>
 							<div class="flex items-center justify-center">
 								<Reorder extClass="w-80 h-80" />
 							</div>

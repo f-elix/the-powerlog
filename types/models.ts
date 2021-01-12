@@ -27,7 +27,7 @@ export interface Exercise {
 }
 
 export interface ExerciseInstance {
-	id?: number;
+	id: number;
 	sessionId: number;
 	exercise?: Exercise;
 	exerciseId?: number;
@@ -59,7 +59,6 @@ export interface ExerciseInput {
 }
 
 export interface ExerciseInstanceInput {
-	id?: number;
 	sessionId: number;
 	exercise?: ExerciseInput;
 	exerciseId?: number;

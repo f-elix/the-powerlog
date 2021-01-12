@@ -2,7 +2,7 @@ import type { Session, ExerciseInstance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import { assertEventType, createExecution } from 'src/utils';
+import { assertEventType, createExecution, reorderArray } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -29,6 +29,7 @@ type SessionEvent =
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
+	| { type: 'REORDER_EXERCISES'; data: { from: number; to: number } }
 	| { type: 'EDIT_EXERCISE'; data: { instanceIndex: number } }
 	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
@@ -235,6 +236,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							DELETE_EXERCISE: {
 								actions: ['deleteExercise']
 							},
+							REORDER_EXERCISES: {
+								actions: ['reorderExercises']
+							},
 							SAVE: {
 								target: '#session.fetching.saving'
 							}
@@ -258,7 +262,12 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 											if (!session) {
 												return {};
 											}
+											const exercises = session.exercises || [];
+											const highestId = Math.max(
+												...exercises.map((ex) => ex.id)
+											);
 											return {
+												id: highestId + 1,
 												sessionId: session.id,
 												executions: [createExecution(1)]
 											};
@@ -406,6 +415,25 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					const exercises = session.exercises || [];
 					const updatedExercises = exercises;
 					updatedExercises.splice(event.data.instanceIndex);
+					return {
+						...session,
+						exercises: updatedExercises
+					};
+				}
+			}),
+			reorderExercises: assign({
+				session: (context, event) => {
+					assertEventType(event, 'REORDER_EXERCISES');
+					const { session } = context;
+					if (!session) {
+						return session;
+					}
+					const exercises = session.exercises || [];
+					const updatedExercises = reorderArray(
+						exercises,
+						event.data.from,
+						event.data.to
+					);
 					return {
 						...session,
 						exercises: updatedExercises

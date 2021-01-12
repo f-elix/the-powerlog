@@ -29,6 +29,7 @@ export const handler: (
 			if (instance.exercise?.id) {
 				const updatedInstance = {
 					...instance,
+					id: undefined,
 					exerciseId: instance.exercise.id
 				};
 				delete updatedInstance.exercise;
@@ -42,11 +43,15 @@ export const handler: (
 				};
 				const updatedInstance = {
 					...instance,
+					id: undefined,
 					exercise: exerciseInput
 				};
 				return updatedInstance;
 			}
-			return instance;
+			return {
+				...instance,
+				id: undefined
+			};
 		}
 	);
 

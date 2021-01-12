@@ -117,3 +117,18 @@ export const updateObjectKey = <TObj extends Record<string, any>>(
 		[key[0]]: updateObjectKey(updatedObj[key[0]], key.slice(1), value)
 	};
 };
+
+export const getElMidPoint = (el: HTMLElement): number | false => {
+	if (!el) {
+		return false;
+	}
+	const rect = el.getBoundingClientRect();
+	const { height, top } = rect;
+	return top + height - height / 2;
+};
+
+export const reorderArray = (array: any[], from: number, to: number): any[] => {
+	const reorderedArray = array;
+	reorderedArray.splice(to, 0, reorderedArray.splice(from, 1)[0]);
+	return reorderedArray;
+};
