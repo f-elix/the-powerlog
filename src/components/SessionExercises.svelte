@@ -103,10 +103,8 @@
 			{#if $sessionState.matches('editing.exercise.editing') && i === editedIndex}
 				<ExerciseField service={editedExercise} />
 			{:else}
-				<!-- @TODO add transitions -->
-				<!-- transition-all duration-500 ease-out-expo -->
 				<div
-					class="relative flex bg-fg-light odd:bg-fg "
+					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
 					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}
 					class:_dragging={$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId}
 					style="--y: {$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId ? $modesState.context.y : 0}px"
@@ -119,7 +117,8 @@
 							type="button"
 							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-info-light' : 'bg-info-lighter'} cursor-grab"
 							aria-label="Drag handle"
-							on:pointerdown={(e) => onDrag(e, i, instance.id)}>
+							on:pointerdown={(e) => onDrag(e, i, instance.id)}
+							on:touchstart|preventDefault={() => {}}>
 							<div class="flex items-center justify-center">
 								<Reorder extClass="w-80 h-80" />
 							</div>

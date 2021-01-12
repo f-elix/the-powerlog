@@ -26,7 +26,6 @@ export type ModesEvent =
 	| { type: 'DISABLE' }
 	| { type: 'DRAG'; data: { y: number; index: number; id: number; exerciseEls: HTMLElement[] } }
 	| { type: 'MOVE'; data: { y: number } }
-	| { type: 'SWAP'; data: { swappedIndex: number } }
 	| { type: 'EXERCISES_REORDERED'; data: { to: number } }
 	| { type: 'DROP' };
 
@@ -109,26 +108,46 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 								}
 							},
 							dragging: {
-								on: {
-									MOVE: [
-										{
-											cond: 'isIntersectingPrev',
-											actions: ['updateCoords', 'notifySwapPrev']
-										},
-										{
-											cond: 'isIntersectingNext',
-											actions: ['updateCoords', 'notifySwapNext']
-										},
-										{
-											actions: ['updateCoords']
+								type: 'parallel',
+								states: {
+									pointer: {
+										on: {
+											MOVE: {
+												actions: ['updateCoords']
+											}
 										}
-									],
-									SWAP: {
-										actions: ['notifyReorder']
 									},
-									EXERCISES_REORDERED: {
-										actions: ['updateIndex', 'updatePointer']
-									},
+									item: {
+										initial: 'normal',
+										states: {
+											normal: {
+												on: {
+													MOVE: [
+														{
+															cond: 'isIntersectingPrev',
+															actions: ['notifySwapPrev'],
+															target: 'swapping'
+														},
+														{
+															cond: 'isIntersectingNext',
+															actions: ['notifySwapNext'],
+															target: 'swapping'
+														}
+													]
+												}
+											},
+											swapping: {
+												on: {
+													EXERCISES_REORDERED: {
+														actions: ['updateIndex', 'updatePointer'],
+														target: 'normal'
+													}
+												}
+											}
+										}
+									}
+								},
+								on: {
 									DROP: {
 										target: 'idle',
 										actions: ['clearDragging']
@@ -307,8 +326,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					return false;
 				}
 				const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
-				const prevElMid = getElMidPoint(exerciseEls[draggedIndex - 1]);
-				return !!prevElMid && targetMid <= prevElMid;
+				const prevEl = exerciseEls[draggedIndex - 1];
+				if (!prevEl) {
+					return false;
+				}
+				const prevElBottom = prevEl.offsetTop + prevEl.offsetHeight;
+				return targetMid <= prevElBottom;
 			},
 			isIntersectingNext: (context, event) => {
 				assertEventType(event, 'MOVE');
@@ -317,8 +340,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					return false;
 				}
 				const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
-				const nextElMid = getElMidPoint(exerciseEls[draggedIndex + 1]);
-				return !!nextElMid && targetMid >= nextElMid;
+				const nextEl = exerciseEls[draggedIndex + 1];
+				if (!nextEl) {
+					return false;
+				}
+				const nextElTop = nextEl.offsetTop;
+				return targetMid >= nextElTop;
 			}
 		}
 	}
