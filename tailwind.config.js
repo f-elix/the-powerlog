@@ -147,7 +147,10 @@ module.exports = {
 			}),
 			borderColor: (theme) => ({
 				main: theme('colors.white')
-			})
+			}),
+			cursor: {
+				grab: 'grab'
+			}
 		}
 	},
 	variants: {

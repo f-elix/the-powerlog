@@ -4,6 +4,9 @@ import { assertEventType } from 'src/utils';
 
 export interface ModesContext {
 	history?: Partial<Session>;
+	y: number;
+	pointery: number;
+	draggedIndex?: number;
 }
 
 export type ModesEvent =
@@ -18,7 +21,10 @@ export type ModesEvent =
 	  }
 	| { type: 'DISMISS' }
 	| { type: 'ENABLE' }
-	| { type: 'DISABLE' };
+	| { type: 'DISABLE' }
+	| { type: 'DRAG'; data: { y: number; index: number } }
+	| { type: 'MOVE'; data: { y: number } }
+	| { type: 'DROP' };
 
 export type ModesState =
 	| {
@@ -65,7 +71,10 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 		id: 'modes',
 		initial: 'enabled',
 		context: {
-			history: undefined
+			history: undefined,
+			y: 0,
+			pointery: 0,
+			draggedIndex: undefined
 		},
 		states: {
 			enabled: {
@@ -73,6 +82,28 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				states: {
 					idle: {},
 					reordering: {
+						initial: 'idle',
+						states: {
+							idle: {
+								on: {
+									DRAG: {
+										target: 'dragging',
+										actions: ['setDragging']
+									}
+								}
+							},
+							dragging: {
+								on: {
+									MOVE: {
+										actions: ['updateCoords']
+									},
+									DROP: {
+										target: 'idle',
+										actions: ['clearDragging']
+									}
+								}
+							}
+						},
 						on: {
 							REORDER: 'idle'
 						}
@@ -143,6 +174,28 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				history: (_, event) => {
 					assertEventType(event, 'done.invoke.getHistory');
 					return event.data;
+				}
+			}),
+			setDragging: assign((_, event) => {
+				assertEventType(event, 'DRAG');
+				const { y, index } = event.data;
+				return {
+					pointery: y,
+					draggedIndex: index
+				};
+			}),
+			clearDragging: assign((_, event) => {
+				assertEventType(event, 'DROP');
+				return {
+					y: 0,
+					pointery: 0,
+					draggedIndex: undefined
+				};
+			}),
+			updateCoords: assign({
+				y: (context, event) => {
+					assertEventType(event, 'MOVE');
+					return event.data.y - context.pointery;
 				}
 			})
 		},

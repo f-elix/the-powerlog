@@ -40,8 +40,23 @@
 		modes.send({ type: 'DISMISS' });
 	};
 
+	const onDrag = (e: PointerEvent | TouchEvent, index: number) => {
+		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		modes.send({ type: 'DRAG', data: { index, y } });
+	};
+
+	const onMove = (e: PointerEvent | TouchEvent) => {
+		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		modes.send({ type: 'MOVE', data: { y } });
+	};
+
+	const onDrop = () => {
+		modes.send({ type: 'DROP' });
+	};
+
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedIndex = $sessionState.context.editedIndex;
+	$: draggedIndex = $modesState.context.draggedIndex;
 	$: historySession = $modesState.context.history;
 </script>
 
@@ -53,7 +68,22 @@
 	._disabled button {
 		cursor: default;
 	}
+
+	._dragging {
+		@apply relative z-50;
+		transform: translateY(var(--y));
+	}
+
+	._dragging button {
+		cursor: grabbing;
+	}
 </style>
+
+<svelte:body
+	on:pointerup={onDrop}
+	on:touchend={onDrop}
+	on:pointermove={onMove}
+	on:touchmove={onMove} />
 
 <div class="flex flex-col">
 	{#if $modesState.matches('enabled.history.loaded')}
@@ -66,15 +96,18 @@
 			{:else}
 				<div
 					class="relative flex bg-fg-light odd:bg-fg"
-					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}>
+					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}
+					class:_dragging={$modesState.matches('enabled.reordering.dragging') && i === draggedIndex}
+					style="--y: {$modesState.context.y}px">
 					<button class="w-full" type="button" on:click={() => onEditExercise(i)}>
 						<ExerciseData {instance} />
 					</button>
 					{#if $modesState.matches('enabled.reordering')}
 						<button
 							type="button"
-							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-info-light' : 'bg-info-lighter'}"
-							aria-label="Drag handle">
+							class="absolute top-0 right-0 h-full w-140 {i % 2 === 0 ? 'bg-info-light' : 'bg-info-lighter'} cursor-grab"
+							aria-label="Drag handle"
+							on:pointerdown={(e) => onDrag(e, i)}>
 							<div class="flex items-center justify-center">
 								<Reorder extClass="w-80 h-80" />
 							</div>
