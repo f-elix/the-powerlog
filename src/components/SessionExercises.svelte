@@ -70,8 +70,9 @@
 	}
 
 	._dragging {
-		@apply relative z-50;
+		@apply relative z-50 shadow-xl;
 		transform: translateY(var(--y));
+		transition: none;
 	}
 
 	._dragging button {
@@ -95,10 +96,10 @@
 				<ExerciseField service={editedExercise} />
 			{:else}
 				<div
-					class="relative flex bg-fg-light odd:bg-fg"
+					class="relative flex bg-fg-light odd:bg-fg transition-transform duration-300 ease-out-expo"
 					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}
 					class:_dragging={$modesState.matches('enabled.reordering.dragging') && i === draggedIndex}
-					style="--y: {$modesState.context.y}px">
+					style="--y: {$modesState.matches('enabled.reordering.dragging') && i === draggedIndex ? $modesState.context.y : 0}px">
 					<button class="w-full" type="button" on:click={() => onEditExercise(i)}>
 						<ExerciseData {instance} />
 					</button>
