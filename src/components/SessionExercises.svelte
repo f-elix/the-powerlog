@@ -3,8 +3,6 @@
 	import type { ExerciseInstance } from 'types';
 	// Stores
 	import { session } from 'src/stores/session';
-	// Utils
-	import { getElMidPoint } from 'src/utils';
 	// Components
 	import ExerciseData from 'coms/ExerciseData.svelte';
 	import ExerciseField from 'coms/ExerciseField.svelte';
@@ -24,7 +22,6 @@
 
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedIndex = $sessionState.context.editedIndex;
-	$: draggedIndex = $modesState.context.draggedIndex;
 	$: draggedId = $modesState.context.draggedId;
 	$: historySession = $modesState.context.history;
 
@@ -51,7 +48,7 @@
 	};
 
 	const onDrag = (e: PointerEvent | TouchEvent, index: number, id: number) => {
-		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
 		modes.send({ type: 'DRAG', data: { index, y, id, exerciseEls } });
 	};
 
@@ -59,7 +56,7 @@
 		if (!$modesState.matches('enabled.reordering.dragging')) {
 			return;
 		}
-		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
 		modes.send({ type: 'MOVE', data: { y } });
 	};
 
@@ -104,6 +101,8 @@
 				<ExerciseField service={editedExercise} />
 			{:else}
 				<div
+					data-id={instance.id}
+					data-index={i}
 					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
 					class:_disabled={$sessionState.matches('editing.exercise.editing') && i !== editedIndex}
 					class:_dragging={$modesState.matches('enabled.reordering.dragging') && instance.id === draggedId}

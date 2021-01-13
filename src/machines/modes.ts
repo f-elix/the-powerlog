@@ -1,6 +1,6 @@
 import type { Session } from 'types';
 import { assign, createMachine, sendParent } from 'xstate';
-import { assertEventType, getElMidPoint } from 'src/utils';
+import { assertEventType, getElMid, getElOffsetBottom, getElOffsetTop } from 'src/utils';
 
 export interface ModesContext {
 	history?: Partial<Session>;
@@ -254,7 +254,10 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			notifySwapPrev: sendParent((context, event) => {
 				assertEventType(event, 'MOVE');
-				const draggedIndex = context.draggedIndex || 0;
+				const { draggedIndex } = context;
+				if (typeof draggedIndex === 'undefined') {
+					return { type: '' };
+				}
 				return {
 					type: 'REORDER_EXERCISES',
 					data: { from: draggedIndex, to: draggedIndex - 1 }
@@ -262,7 +265,10 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			notifySwapNext: sendParent((context, event) => {
 				assertEventType(event, 'MOVE');
-				const draggedIndex = context.draggedIndex || 0;
+				const { draggedIndex } = context;
+				if (typeof draggedIndex === 'undefined') {
+					return { type: '' };
+				}
 				return {
 					type: 'REORDER_EXERCISES',
 					data: { from: draggedIndex, to: draggedIndex + 1 }
@@ -325,12 +331,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				if (!exerciseEls || typeof draggedIndex === 'undefined') {
 					return false;
 				}
-				const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
+				const targetMid = getElMid(exerciseEls[draggedIndex]);
 				const prevEl = exerciseEls[draggedIndex - 1];
 				if (!prevEl) {
 					return false;
 				}
-				const prevElBottom = prevEl.offsetTop + prevEl.offsetHeight;
+				const prevElBottom = getElOffsetBottom(prevEl);
 				return targetMid <= prevElBottom;
 			},
 			isIntersectingNext: (context, event) => {
@@ -339,12 +345,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				if (!exerciseEls || typeof draggedIndex === 'undefined') {
 					return false;
 				}
-				const targetMid = getElMidPoint(exerciseEls[draggedIndex]);
+				const targetMid = getElMid(exerciseEls[draggedIndex]);
 				const nextEl = exerciseEls[draggedIndex + 1];
 				if (!nextEl) {
 					return false;
 				}
-				const nextElTop = nextEl.offsetTop;
+				const nextElTop = getElOffsetTop(nextEl);
 				return targetMid >= nextElTop;
 			}
 		}

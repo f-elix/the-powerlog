@@ -118,13 +118,57 @@ export const updateObjectKey = <TObj extends Record<string, any>>(
 	};
 };
 
-export const getElMidPoint = (el: HTMLElement): number | false => {
+export const getElMid = (el: HTMLElement): number | false => {
 	if (!el) {
 		return false;
 	}
 	const rect = el.getBoundingClientRect();
 	const { height, top } = rect;
 	return top + height / 2;
+};
+
+export const getPosition = (element: HTMLElement): { x: number; y: number } => {
+	let xPos = 0;
+	let yPos = 0;
+
+	let el: HTMLElement | null = element;
+
+	while (el) {
+		if (el.tagName === 'BODY') {
+			// deal with browser quirks with body/window/document and page scroll
+			const xScroll = el.scrollLeft || document.documentElement.scrollLeft;
+			const yScroll = el.scrollTop || document.documentElement.scrollTop;
+
+			xPos += el.offsetLeft - xScroll + el.clientLeft;
+			yPos += el.offsetTop - yScroll + el.clientTop;
+		} else {
+			// for all other non-BODY elements
+			xPos += el.offsetLeft - el.scrollLeft + el.clientLeft;
+			yPos += el.offsetTop - el.scrollTop + el.clientTop;
+		}
+
+		el = el.offsetParent as HTMLElement;
+	}
+	return {
+		x: xPos,
+		y: yPos
+	};
+};
+
+export const getElOffsetTop = (el: HTMLElement): number | false => {
+	if (!el) {
+		return false;
+	}
+	const top = getPosition(el).y;
+	return top;
+};
+
+export const getElOffsetBottom = (el: HTMLElement): number | false => {
+	if (!el) {
+		return false;
+	}
+	const top = getPosition(el).y;
+	return top + el.offsetHeight;
 };
 
 export const reorderArray = (array: any[], from: number, to: number): any[] => {
