@@ -25,8 +25,6 @@
 
 	const { state } = session;
 
-	$: console.log($state.context);
-
 	let form: HTMLFormElement;
 
 	const onSave = () => {
