@@ -66,8 +66,6 @@
 	const onSave = () => {
 		send({ type: 'SAVE' });
 	};
-
-	$: console.log($state);
 </script>
 
 <fieldset>
