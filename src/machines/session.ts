@@ -9,6 +9,11 @@ import { router } from 'src/router';
 
 export type Modes = Interpreter<ModesContext, any, ModesEvent, ModesState>;
 
+export type SessionFormData = {
+	title: string;
+	date: string;
+};
+
 interface SessionContext {
 	session?: Session;
 	editedIndex?: number;
@@ -24,8 +29,7 @@ type SessionEvent =
 			type: 'done.invoke.createSession';
 			data: { insert_sessions_one: Session };
 	  }
-	| { type: 'TITLE_INPUT'; data: { value: string } }
-	| { type: 'DATE_INPUT'; data: { value: string } }
+	| { type: 'SAVE'; data: { token: string; formData: SessionFormData } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
@@ -33,8 +37,7 @@ type SessionEvent =
 	| { type: 'EDIT_EXERCISE'; data: { instanceIndex: number } }
 	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
-	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } }
-	| { type: 'SAVE'; data: { token?: string } };
+	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } };
 
 type SessionState =
 	| {
@@ -220,12 +223,6 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							}
 						},
 						on: {
-							TITLE_INPUT: {
-								actions: ['updateTitle']
-							},
-							DATE_INPUT: {
-								actions: ['updateDate']
-							},
 							NEW_EXERCISE: {
 								target: '#session.editing.exercise.creating'
 							},
@@ -342,32 +339,6 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			}),
 			clearSession: assign({
 				session: (_, __) => undefined
-			}),
-			updateTitle: assign({
-				session: (context, event) => {
-					assertEventType(event, 'TITLE_INPUT');
-					const { session } = context;
-					if (!session) {
-						return undefined;
-					}
-					return {
-						...session,
-						title: event.data.value
-					};
-				}
-			}),
-			updateDate: assign({
-				session: (context, event) => {
-					assertEventType(event, 'DATE_INPUT');
-					const { session } = context;
-					if (!session) {
-						return undefined;
-					}
-					return {
-						...session,
-						date: event.data.value
-					};
-				}
 			}),
 			updateEditedIndex: assign({
 				editedIndex: (_, event) => {
@@ -504,7 +475,10 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					if (!session) {
 						return;
 					}
-					const sessionToUpdate = session;
+					const sessionToUpdate = {
+						...session,
+						...event.data.formData
+					};
 					delete sessionToUpdate.user;
 					const { token } = event.data;
 					await fetch('/.netlify/functions/update-session', {

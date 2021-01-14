@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types
 	import type { Exercise } from 'types';
-	import type { Modes } from 'src/machines/session';
+	import type { Modes, SessionFormData } from 'src/machines/session';
 	// // xstate-svelte
 	import { useService } from 'xstate-svelte';
 	// Stores
@@ -24,17 +24,9 @@
 	let form: HTMLFormElement;
 
 	const onSave = () => {
-		session.send({ type: 'SAVE', data: { token } });
-	};
-
-	const onNameInput = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		session.send({ type: 'TITLE_INPUT', data: { value: target.value } });
-	};
-
-	const onDateInput = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		session.send({ type: 'DATE_INPUT', data: { value: target.value } });
+		const data = new FormData(form);
+		const formData = Object.fromEntries(data) as SessionFormData;
+		session.send({ type: 'SAVE', data: { token, formData } });
 	};
 
 	const onCancel = () => {
@@ -45,7 +37,7 @@
 		session.send({ type: 'NEW_EXERCISE' });
 	};
 
-	const focusInput: () => void = (node: HTMLInputElement) => {
+	const focusInput = (node: HTMLInputElement): void => {
 		node.focus();
 	};
 
@@ -70,20 +62,11 @@
 				<div class="flex flex-col space-y-70 px-50">
 					<Label>
 						<span>Name</span>
-						<input
-							use:focusInput
-							type="text"
-							name="title"
-							value={sessionData.title}
-							on:input={onNameInput} />
+						<input use:focusInput type="text" name="title" value={sessionData.title} />
 					</Label>
 					<Label>
 						<span>Date</span>
-						<input
-							type="date"
-							name="date"
-							value={sessionData.date}
-							on:input={onDateInput} />
+						<input type="date" name="date" value={sessionData.date} />
 					</Label>
 				</div>
 				<SessionModes {modes} />
