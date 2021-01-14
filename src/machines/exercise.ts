@@ -18,17 +18,17 @@ export type ExerciseEvent =
 
 export type ExerciseState =
 	| {
-			value: 'editing';
+			value: 'editing.valid';
 			context: ExerciseContext;
+	  }
+	| {
+			value: 'editing.invalid';
+			context: ExerciseContext;
+			exerciseError: string;
 	  }
 	| {
 			value: 'cancelled';
 			context: ExerciseContext;
-	  }
-	| {
-			value: 'error';
-			context: ExerciseContext;
-			exerciseError: string;
 	  }
 	| {
 			value: 'done';
@@ -41,9 +41,15 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 		initial: 'editing',
 		states: {
 			editing: {
+				initial: 'valid',
+				states: {
+					valid: {},
+					invalid: {}
+				},
 				on: {
 					EXERCISE_INPUT: {
-						actions: ['updateExercise']
+						actions: ['updateExercise'],
+						target: '.valid'
 					},
 					NEW_EXECUTION: {
 						actions: ['addExecution']
@@ -63,7 +69,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 							target: 'done'
 						},
 						{
-							target: 'error'
+							target: '.invalid'
 						}
 					]
 				}
@@ -75,16 +81,6 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 			done: {
 				type: 'final',
 				data: (context) => ({ exercise: context.instance })
-			},
-			error: {
-				on: {
-					CANCEL: {
-						target: 'cancelled'
-					},
-					'*': {
-						target: 'editing'
-					}
-				}
 			}
 		}
 	},
@@ -152,7 +148,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 			notifyCancel: sendParent('CANCEL_EXERCISE')
 		},
 		guards: {
-			hasExercise: (context) => !!context.instance.exercise
+			hasExercise: (context) => !!context.instance.exercise?.name
 		}
 	}
 );

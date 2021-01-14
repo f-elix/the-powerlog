@@ -6,6 +6,8 @@
 	import { useService } from 'xstate-svelte';
 	// Stores
 	import { session } from 'src/stores/session';
+	// Utils
+	import { focusInput } from 'src/utils';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -35,10 +37,6 @@
 
 	const onNewExercise = () => {
 		session.send({ type: 'NEW_EXERCISE' });
-	};
-
-	const focusInput = (node: HTMLInputElement): void => {
-		node.focus();
 	};
 
 	$: sessionData = $state.context.session;

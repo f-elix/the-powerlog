@@ -176,3 +176,7 @@ export const reorderArray = (array: any[], from: number, to: number): any[] => {
 	reorderedArray.splice(to, 0, reorderedArray.splice(from, 1)[0]);
 	return reorderedArray;
 };
+
+export const focusInput = (node: HTMLInputElement): void => {
+	node.focus();
+};
