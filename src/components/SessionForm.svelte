@@ -7,7 +7,7 @@
 	// Stores
 	import { session } from 'src/stores/session';
 	// Utils
-	import { focusInput } from 'src/utils';
+	import { focusInput, LoadUnit } from 'src/utils';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -16,6 +16,8 @@
 	import Button from 'coms/Button.svelte';
 	import Fab from 'coms/Fab.svelte';
 	import Label from 'coms/Label.svelte';
+	import RadioGroup from 'coms/RadioGroup.svelte';
+	import { keys } from 'xstate/lib/utils';
 
 	export let token: string;
 	export let exercises: Exercise[];
@@ -23,11 +25,12 @@
 
 	const { state } = session;
 
+	$: console.log($state.context);
+
 	let form: HTMLFormElement;
 
 	const onSave = () => {
-		const data = new FormData(form);
-		const formData = Object.fromEntries(data) as SessionFormData;
+		const formData = Object.fromEntries(new FormData(form)) as SessionFormData;
 		session.send({ type: 'SAVE', data: { token, formData } });
 	};
 
@@ -66,6 +69,23 @@
 						<span>Date</span>
 						<input type="date" name="date" value={sessionData.date} />
 					</Label>
+					<div class="grid grid-cols-2 gap-x-50">
+						<Label>
+							<span>Bodyweight</span>
+							<input
+								type="number"
+								name="bodyweightAmount"
+								min="0"
+								step=".01"
+								value={sessionData.bodyweightAmount}
+							/>
+						</Label>
+						<RadioGroup
+							name="bodyweightUnit"
+							options={LoadUnit}
+							selected={sessionData.bodyweightUnit || LoadUnit.lbs}
+						/>
+					</div>
 				</div>
 				<SessionModes {modes} />
 				<SessionExercises exercises={sessionData.exercises} {modes} {token} />

@@ -12,6 +12,8 @@ export type Modes = Interpreter<ModesContext, any, ModesEvent, ModesState>;
 export type SessionFormData = {
 	title: string;
 	date: string;
+	bodyweightAmount?: string;
+	bodyweightUnit: string;
 };
 
 interface SessionContext {

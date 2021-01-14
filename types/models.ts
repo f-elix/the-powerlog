@@ -13,10 +13,8 @@ export interface Session {
 	title: string;
 	date: string;
 	exercises?: ExerciseInstance[];
-	bodyweight?: {
-		amount?: number;
-		unit?: string;
-	};
+	bodyweightAmount?: number;
+	bodyweightUnit: LoadUnit;
 	user?: User;
 }
 

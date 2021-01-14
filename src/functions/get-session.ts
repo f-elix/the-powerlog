@@ -29,6 +29,8 @@ export const handler: (
 					id
 					date
 					title
+					bodyweightAmount
+					bodyweightUnit
 					exercises {
 						id
 						sessionId

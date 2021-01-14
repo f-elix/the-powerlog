@@ -57,14 +57,14 @@ export const handler: (
 
 	return gqlQuery({
 		query: `
-		mutation replaceInstances($sessionId: Int!, $instances: [exercise_instances_insert_input!]!, $session: sessions_pk_columns_input!, $date: timestamptz!, $title:String!) {
+		mutation replaceInstances($sessionId: Int!, $instances: [exercise_instances_insert_input!]!, $session: sessions_pk_columns_input!, $date: timestamptz!, $title: String!, $bodyweightUnit: String!, $bodyweightAmount: numeric) {
 			delete_exercise_instances(where: {sessionId: {_eq: $sessionId}}) {
 			  affected_rows
 			}
 			insert_exercise_instances(objects: $instances) {
 			  affected_rows
 			},
-			update_sessions_by_pk(pk_columns: $session, _set:{date:$date, title:$title}) {
+			update_sessions_by_pk(pk_columns: $session, _set:{date: $date, title: $title, bodyweightAmount: $bodyweightAmount, bodyweightUnit: $bodyweightUnit}) {
 				id
 				date
 				title
@@ -78,7 +78,9 @@ export const handler: (
 				id: updatedSession.id
 			},
 			date: updatedSession.date,
-			title: updatedSession.title
+			title: updatedSession.title,
+			bodyweightAmount: updatedSession.bodyweightAmount,
+			bodyweightUnit: updatedSession.bodyweightUnit
 		}
 	});
 };
