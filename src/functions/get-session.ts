@@ -39,7 +39,7 @@ export const handler: (
 							id
 							name
 						}
-						superset
+						supersetId
 					}
 				}
 			}

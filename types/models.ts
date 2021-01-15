@@ -29,7 +29,7 @@ export interface ExerciseInstance {
 	sessionId: number;
 	exercise?: Exercise;
 	exerciseId?: number;
-	superset?: string;
+	supersetId?: number;
 	executions: Execution[];
 }
 

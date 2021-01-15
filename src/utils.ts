@@ -1,5 +1,5 @@
 import type { EventObject, State, StateMachine } from 'xstate';
-import type { Session, Execution } from 'types';
+import type { Session, Execution, ExerciseInstance } from 'types';
 import { useMachine } from 'xstate-svelte';
 
 export const usePersistedMachine: (machine: StateMachine<any, any, any>, options?: any) => any = (
@@ -86,6 +86,8 @@ export enum LoadUnit {
 	kg = 'kg'
 }
 
+export const generateId = (): number => Math.floor(Math.random() * Date.now());
+
 export const createExecution: (id: number) => Execution = (id) => ({
 	id,
 	setType: SetType.reps,
@@ -95,6 +97,12 @@ export const createExecution: (id: number) => Execution = (id) => ({
 	load: {
 		unit: LoadUnit.lbs
 	}
+});
+
+export const createExerciseInstance = (sessionId: number): ExerciseInstance => ({
+	id: generateId(),
+	sessionId,
+	executions: [createExecution(generateId())]
 });
 
 export const updateObjectKey = <TObj extends Record<string, any>>(

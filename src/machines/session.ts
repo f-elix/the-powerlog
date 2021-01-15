@@ -2,7 +2,13 @@ import type { Session, ExerciseInstance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import { assertEventType, createExecution, reorderArray } from 'src/utils';
+import {
+	assertEventType,
+	createExecution,
+	createExerciseInstance,
+	generateId,
+	reorderArray
+} from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -18,7 +24,7 @@ export type SessionFormData = {
 
 interface SessionContext {
 	session?: Session;
-	editedIndex?: number;
+	editedId?: number;
 }
 
 type SessionEvent =
@@ -34,12 +40,12 @@ type SessionEvent =
 	| { type: 'SAVE'; data: { token: string; formData: SessionFormData } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
-	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
+	| { type: 'DELETE_EXERCISE'; data: { instanceId: number } }
 	| { type: 'REORDER_EXERCISES'; data: { from: number; to: number } }
-	| { type: 'EDIT_EXERCISE'; data: { instanceIndex: number } }
+	| { type: 'EDIT_EXERCISE'; data: { instanceId: number } }
 	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
-	| { type: 'done.invoke.exercise'; data: { exercise: ExerciseInstance } };
+	| { type: 'done.invoke.exercise'; data: { instances: ExerciseInstance[] } };
 
 type SessionState =
 	| {
@@ -94,7 +100,7 @@ type SessionState =
 			value: 'editing.exercise.editing';
 			context: SessionContext & {
 				session: Session;
-				editedIndex: number;
+				editedId: number;
 			};
 	  }
 	| {
@@ -230,7 +236,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							},
 							EDIT_EXERCISE: {
 								target: '#session.editing.exercise.editing',
-								actions: ['updateEditedIndex']
+								actions: ['updateEditedId']
 							},
 							DELETE_EXERCISE: {
 								actions: ['deleteExercise']
@@ -251,27 +257,19 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								invoke: {
 									id: 'exercise',
 									src: 'exercise',
-									data: {
-										instance: (
-											context: SessionContext,
-											event: SessionEvent
-										) => {
-											assertEventType(event, 'NEW_EXERCISE');
-											const { session } = context;
-											if (!session) {
-												return {};
-											}
-											const exercises = session.exercises || [];
-											const highestId = Math.max(
-												...exercises.map((ex) => ex.id)
-											);
-											return {
-												id: highestId + 1,
-												sessionId: session.id,
-												executions: [createExecution(1)]
-											};
-										},
-										userId: (context: SessionContext) => context.session?.userId
+									data: (context: SessionContext, event: SessionEvent) => {
+										assertEventType(event, 'NEW_EXERCISE');
+										const { session } = context;
+										if (!session) {
+											return {};
+										}
+										const { id, userId } = session;
+										return {
+											instances: [createExerciseInstance(id)],
+											userId,
+											sessionId: id,
+											supersetId: generateId()
+										};
 									},
 									onDone: {
 										target: '#session.editing.session.last',
@@ -283,26 +281,38 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								invoke: {
 									id: 'exercise',
 									src: 'exercise',
-									data: {
-										instance: (
-											context: SessionContext,
-											event: SessionEvent
-										) => {
-											assertEventType(event, 'EDIT_EXERCISE');
-											const { session } = context;
-											if (!session) {
-												return {};
-											}
-											const { instanceIndex } = event.data;
-											const instances = session.exercises || [];
-											const exerciseInstance = instances[instanceIndex];
-											return exerciseInstance;
-										},
-										userId: (context: SessionContext) => context.session?.userId
+									data: (context: SessionContext, event: SessionEvent) => {
+										assertEventType(event, 'EDIT_EXERCISE');
+										const { session } = context;
+										if (!session) {
+											return {};
+										}
+										const { userId, id } = session;
+										const { instanceId } = event.data;
+										const instances = session.exercises || [];
+										const instance = instances.find(
+											(inst) => inst.id === instanceId
+										);
+										if (!instance) {
+											return {};
+										}
+										const { supersetId } = instance;
+										if (!supersetId) {
+											return [instance];
+										}
+										const supersetInstances = instances.filter(
+											(inst) => inst.supersetId === supersetId
+										);
+										return {
+											instances: supersetInstances,
+											userId,
+											sessionId: id,
+											supersetId
+										};
 									},
 									onDone: {
 										target: '#session.editing.session.last',
-										actions: ['updateExerciseInstance']
+										actions: ['updateExerciseInstances']
 									}
 								}
 							}
@@ -342,10 +352,10 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			clearSession: assign({
 				session: (_, __) => undefined
 			}),
-			updateEditedIndex: assign({
-				editedIndex: (_, event) => {
+			updateEditedId: assign({
+				editedId: (_, event) => {
 					assertEventType(event, 'EDIT_EXERCISE');
-					return event.data?.instanceIndex;
+					return event.data?.instanceId;
 				}
 			}),
 			addExerciseInstance: assign({
@@ -356,22 +366,28 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						return session;
 					}
 					const exercises = session.exercises || [];
-					const updatedExercises = [...exercises, event.data.exercise];
+					const updatedExercises = [...exercises, ...event.data.instances];
 					return {
 						...session,
 						exercises: updatedExercises
 					};
 				}
 			}),
-			updateExerciseInstance: assign({
+			updateExerciseInstances: assign({
 				session: (context, event) => {
 					assertEventType(event, 'done.invoke.exercise');
-					const { session, editedIndex } = context;
-					if (!session || !editedIndex) {
+					const { session, editedId } = context;
+					if (!session || typeof editedId === 'undefined') {
 						return session;
 					}
 					const exercises = session.exercises || [];
-					exercises[editedIndex] = event.data.exercise;
+					const editedInstances = event.data.instances;
+					editedInstances.forEach((instance) => {
+						const exerciseIndex = exercises.findIndex(
+							(sessionEx) => sessionEx.id === instance.id
+						);
+						exercises[exerciseIndex] = instance;
+					});
 					return {
 						...session,
 						exercises
@@ -386,8 +402,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						return session;
 					}
 					const exercises = session.exercises || [];
-					const updatedExercises = exercises;
-					updatedExercises.splice(event.data.instanceIndex);
+					const updatedExercises = exercises.filter(
+						(inst) => inst.id !== event.data.instanceId
+					);
 					return {
 						...session,
 						exercises: updatedExercises

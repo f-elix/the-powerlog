@@ -1,18 +1,35 @@
-import { assertEventType, createExecution, updateObjectKey } from 'src/utils';
+import {
+	assertEventType,
+	createExecution,
+	createExerciseInstance,
+	updateObjectKey,
+	generateId
+} from 'src/utils';
 import type { ExerciseInstance } from 'types';
 import { createMachine, assign, sendParent } from 'xstate';
+import { update } from 'xstate/lib/actionTypes';
 
 export interface ExerciseContext {
-	instance: ExerciseInstance;
+	instances: ExerciseInstance[];
 	userId: string;
+	sessionId?: number;
+	supersetId?: number;
 	exerciseError?: string;
 }
 
 export type ExerciseEvent =
-	| { type: 'EXERCISE_INPUT'; data: { exercise: { name: string; id?: number } } }
-	| { type: 'EXECUTION_INPUT'; data: { path: string; value: any; executionId: number } }
-	| { type: 'DELETE_EXECUTION'; data: { executionId: number } }
-	| { type: 'NEW_EXECUTION' }
+	| {
+			type: 'EXERCISE_INPUT';
+			data: { exercise: { name: string; id?: number }; instanceId: number };
+	  }
+	| {
+			type: 'EXECUTION_INPUT';
+			data: { path: string; value: any; instanceId: number; executionId: number };
+	  }
+	| { type: 'DELETE_EXECUTION'; data: { instanceId: number; executionId: number } }
+	| { type: 'NEW_EXECUTION'; data: { instanceId: number } }
+	| { type: 'NEW_INSTANCE' }
+	| { type: 'DELETE_INSTANCE'; data: { instanceId: number } }
 	| { type: 'CANCEL' }
 	| { type: 'SAVE' };
 
@@ -39,6 +56,13 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 	{
 		id: 'exercise',
 		initial: 'editing',
+		context: {
+			instances: [],
+			userId: '',
+			sessionId: undefined,
+			supersetId: undefined,
+			exerciseError: undefined
+		},
 		states: {
 			editing: {
 				initial: 'valid',
@@ -60,6 +84,12 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 					DELETE_EXECUTION: {
 						actions: ['deleteExecution']
 					},
+					NEW_INSTANCE: {
+						actions: ['addNewInstance']
+					},
+					DELETE_INSTANCE: {
+						actions: ['removeInstance']
+					},
 					CANCEL: {
 						target: 'cancelled'
 					},
@@ -80,75 +110,129 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 			},
 			done: {
 				type: 'final',
-				data: (context) => ({ exercise: context.instance })
+				data: (context) => ({ instances: context.instances })
 			}
 		}
 	},
 	{
 		actions: {
 			updateExercise: assign({
-				instance: (context, event) => {
+				instances: (context, event) => {
 					assertEventType(event, 'EXERCISE_INPUT');
-					return {
-						...context.instance,
+					const { instanceId, exercise } = event.data;
+					const { instances } = context;
+					const instanceIndex = instances.findIndex((inst) => inst.id === instanceId);
+					const instance = instances[instanceIndex];
+					if (!instance) {
+						return instances;
+					}
+					const updatedInstance = {
+						...instance,
 						exercise: {
-							...event.data.exercise,
+							...exercise,
 							userId: context.userId
 						}
 					};
+					instances[instanceIndex] = updatedInstance;
+					return instances;
 				}
 			}),
 			addExecution: assign({
-				instance: (context, event) => {
+				instances: (context, event) => {
 					assertEventType(event, 'NEW_EXECUTION');
-					const currentExecutions = context.instance.executions;
-					const lastExec = currentExecutions[currentExecutions.length - 1];
+					const { instanceId } = event.data;
+					const { instances } = context;
+					const instanceIndex = instances.findIndex((inst) => inst.id === instanceId);
+					const instance = instances[instanceIndex];
+					if (!instance) {
+						return instances;
+					}
 					const updatedExecutions = [
-						...currentExecutions,
-						createExecution(lastExec.id + 1)
+						...instance.executions,
+						createExecution(generateId())
 					];
-					return {
-						...context.instance,
+					const updatedInstance = {
+						...instance,
 						executions: updatedExecutions
 					};
+					instances[instanceIndex] = updatedInstance;
+					return instances;
 				}
 			}),
 			updateExecution: assign({
-				instance: (context, event) => {
+				instances: (context, event) => {
 					assertEventType(event, 'EXECUTION_INPUT');
-					const { executions } = context.instance;
-					const executionIndex = context.instance.executions.findIndex(
-						(ex) => ex.id === event.data.executionId
-					);
+					const { instanceId, executionId, path, value } = event.data;
+					const { instances } = context;
+					const instanceIndex = instances.findIndex((inst) => inst.id === instanceId);
+					const instance = instances[instanceIndex];
+					if (!instance) {
+						return instances;
+					}
+					const { executions } = instance;
+					const executionIndex = executions.findIndex((ex) => ex.id === executionId);
 					const execution = executions[executionIndex];
-					executions[executionIndex] = updateObjectKey(
-						execution,
-						event.data.path,
-						event.data.value
-					);
-					return {
-						...context.instance,
+					executions[executionIndex] = updateObjectKey(execution, path, value);
+					const updatedInstance = {
+						...instance,
 						executions
 					};
+					instances[instanceIndex] = updatedInstance;
+					return instances;
 				}
 			}),
 			deleteExecution: assign({
-				instance: (context, event) => {
+				instances: (context, event) => {
 					assertEventType(event, 'DELETE_EXECUTION');
-					const { executions } = context.instance;
-					const updatedExecutions = executions.filter(
-						(exec) => exec.id !== event.data.executionId
+					const { instances } = context;
+					const { instanceId, executionId } = event.data;
+					const instanceIndex = instances.findIndex((inst) => inst.id === instanceId);
+					const instance = instances[instanceIndex];
+					if (!instance) {
+						return instances;
+					}
+					const executions = instance.executions.filter(
+						(exec) => exec.id !== executionId
 					);
-					return {
-						...context.instance,
-						executions: updatedExecutions
+					const updatedInstance = {
+						...instance,
+						executions
 					};
+					instances[instanceIndex] = updatedInstance;
+					return instances;
+				}
+			}),
+			addNewInstance: assign({
+				instances: (context, event) => {
+					assertEventType(event, 'NEW_INSTANCE');
+					const { instances, sessionId, supersetId } = context;
+					if (!sessionId) {
+						return instances;
+					}
+					const newInstance = createExerciseInstance(sessionId);
+					const updatedInstances = [...instances, newInstance].map((instance) => ({
+						...instance,
+						supersetId
+					}));
+					return updatedInstances;
+				}
+			}),
+			removeInstance: assign({
+				instances: (context, event) => {
+					assertEventType(event, 'DELETE_INSTANCE');
+					const updatedInstances = context.instances.filter(
+						(instance) => instance.id !== event.data.instanceId
+					);
+					if (updatedInstances.length === 1) {
+						updatedInstances[0].supersetId = undefined;
+					}
+					return updatedInstances;
 				}
 			}),
 			notifyCancel: sendParent('CANCEL_EXERCISE')
 		},
 		guards: {
-			hasExercise: (context) => !!context.instance.exercise?.name
+			hasExercise: (context) => !!context.instances.every((inst) => !!inst.exercise?.name)
 		}
 	}
 );
