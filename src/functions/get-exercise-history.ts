@@ -21,7 +21,6 @@ export const handler: (
 		query getExeciseHistory($id: Int!, $date: timestamptz!) {
 			sessions(limit: 1, where: {exercises: {exerciseId: {_eq: $id}}, date: {_lt: $date}}) {
 			  date
-			  bodyweight
 			  exercises(where: {exerciseId: {_eq: $id}}) {
 				executions
 				exercise {
