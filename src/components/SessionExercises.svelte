@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types
-	import type { ExerciseInstance } from 'types';
+	import type { Exercise, ExerciseInstance } from 'types';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -64,17 +64,36 @@
 		modes.send({ type: 'DROP' });
 	};
 
-	const findSuperset = (id?: number) => {
-		if (!id) {
-			return [];
-		}
-		return exercises.filter((exercise) => {
-			const { supersetId } = exercise;
-			return typeof supersetId !== 'undefined' && supersetId === id;
-		});
-	};
+	const groupBySupersetId = (
+		data: ExerciseInstance[]
+	): Array<ExerciseInstance | Array<ExerciseInstance>> => {
+		const supersets: {
+			[key: number]: {
+				index: number;
+				instances: ExerciseInstance[];
+			};
+		} = {};
 
-	$: console.log(findSuperset(1510519340959));
+		const computedInstances: Array<ExerciseInstance | Array<ExerciseInstance>> = data;
+
+		data.forEach((instance, i) => {
+			const { supersetId } = instance;
+			if (!supersetId) {
+				return;
+			}
+			if (supersets[supersetId]) {
+				supersets[supersetId].instances.push(instance);
+			} else {
+				supersets[supersetId] = { index: i, instances: [instance] };
+			}
+		});
+
+		Object.values(supersets).forEach((superset) => {
+			computedInstances.splice(superset.index, superset.instances.length, superset.instances);
+		});
+
+		return computedInstances;
+	};
 </script>
 
 <svelte:body
@@ -88,7 +107,7 @@
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
 	{#if exercises}
-		{#each exercises as instance, i}
+		{#each groupBySupersetId(exercises) as instance, i}
 			{#if $sessionState.matches('editing.exercise.editing') && instance.id === editedId}
 				<ExerciseField service={editedExercise} />
 			{:else}
@@ -105,16 +124,27 @@
 						: 0}px"
 					bind:this={exerciseEls[i]}
 				>
-					<div class="flex flex-col">
-						{#each findSuperset(instance.supersetId) as supersetInstance}
-							<button
-								class="w-full"
-								type="button"
-								on:click={() => onEditExercise(supersetInstance.id)}>
-								<ExerciseData instance={supersetInstance} />
-							</button>
-						{/each}
-					</div>
+					{#if Array.isArray(instance)}
+						<button
+							class="w-full"
+							type="button"
+							on:click={() => onEditExercise(instance[0].id)}>
+							<div class="flex flex-col">
+								{#each instance as supersetInstance, i}
+									<span class="flex items-center px-50"
+										>{i + 1})<ExerciseData instance={supersetInstance} /></span
+									>
+								{/each}
+							</div>
+						</button>
+					{:else}
+						<button
+							class="w-full"
+							type="button"
+							on:click={() => onEditExercise(instance.id)}>
+							<ExerciseData {instance} />
+						</button>
+					{/if}
 					{#if $modesState.matches('enabled.reordering')}
 						<button
 							type="button"
