@@ -1,9 +1,9 @@
 <script lang="ts">
+	// Svelte
+	import { setContext } from 'svelte';
 	// Types
 	import type { Exercise } from 'types';
-	import type { Modes, SessionFormData } from 'src/machines/session';
-	// // xstate-svelte
-	import { useService } from 'xstate-svelte';
+	import type { SessionFormData, Modes } from 'src/machines/session';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Utils
@@ -17,7 +17,7 @@
 	import Fab from 'coms/Fab.svelte';
 	import Label from 'coms/Label.svelte';
 	import RadioGroup from 'coms/RadioGroup.svelte';
-	import { keys } from 'xstate/lib/utils';
+	import { useService } from 'xstate-svelte';
 
 	export let token: string;
 	export let exercises: Exercise[];
@@ -25,7 +25,12 @@
 
 	const { state } = session;
 
+	const modes = useService($state.children.modes as Modes);
+
+	setContext('modes', modes);
+
 	let form: HTMLFormElement;
+	$: sessionData = $state.context.session;
 
 	const onSave = () => {
 		const formData = Object.fromEntries(new FormData(form)) as SessionFormData;
@@ -39,10 +44,6 @@
 	const onNewExercise = () => {
 		session.send({ type: 'NEW_EXERCISE' });
 	};
-
-	$: sessionData = $state.context.session;
-	$: sessionModes = $state.children.modes;
-	$: modes = sessionModes ? useService(sessionModes as Modes) : undefined;
 </script>
 
 <section class="space-y-100">
@@ -85,8 +86,8 @@
 						/>
 					</div>
 				</div>
-				<SessionModes {modes} />
-				<SessionExercises exercises={sessionData.exercises} {modes} {token} />
+				<SessionModes />
+				<SessionExercises exercises={sessionData.exercises} {token} />
 				{#if $state.matches('editing.session')}
 					<div class="flex flex-col space-y-70 px-50">
 						<Button type="submit" theme="success">Save</Button>

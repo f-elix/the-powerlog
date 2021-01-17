@@ -2,13 +2,7 @@ import type { Session, ExerciseInstance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import {
-	assertEventType,
-	createExecution,
-	createExerciseInstance,
-	generateId,
-	reorderArray
-} from 'src/utils';
+import { assertEventType, createExerciseInstance, generateId, reorderArray } from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -121,6 +115,10 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		context: {
 			session: undefined
 		},
+		invoke: {
+			id: 'modes',
+			src: 'modes'
+		},
 		states: {
 			idle: {
 				on: {
@@ -202,10 +200,6 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			},
 			editing: {
 				initial: 'session',
-				invoke: {
-					id: 'modes',
-					src: 'modes'
-				},
 				states: {
 					session: {
 						initial: 'creating',

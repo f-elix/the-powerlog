@@ -1,12 +1,12 @@
 <script lang="ts">
+	// Svelte
+	import { getContext } from 'svelte';
 	// Components
 	import Reorder from 'coms/svg/Reorder.svelte';
 	import History from 'coms/svg/History.svelte';
 	import Delete from 'coms/svg/Delete.svelte';
 
-	export let modes: any;
-
-	const { state, send } = modes;
+	const { state, send } = getContext('modes');
 
 	const onReorder = () => {
 		send({ type: 'REORDER' });
@@ -20,20 +20,6 @@
 		send({ type: 'DELETE' });
 	};
 </script>
-
-<style>
-	._reorder {
-		@apply text-info-light;
-	}
-
-	._history {
-		@apply text-highlight-lighter;
-	}
-
-	._delete {
-		@apply text-danger;
-	}
-</style>
 
 <div class="flex items-center justify-end space-x-80 px-50">
 	<button
@@ -61,3 +47,17 @@
 		<Delete />
 	</button>
 </div>
+
+<style>
+	._reorder {
+		@apply text-info-light;
+	}
+
+	._history {
+		@apply text-highlight-lighter;
+	}
+
+	._delete {
+		@apply text-danger;
+	}
+</style>

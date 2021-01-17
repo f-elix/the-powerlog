@@ -22,6 +22,21 @@
 	export let href: string | undefined = undefined;
 </script>
 
+{#if href}
+	<a
+		{href}
+		class="{variant} {theme} _button py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default">
+		<slot />
+	</a>
+{:else}
+	<button
+		{type}
+		class="{variant} {theme} _button py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default"
+		on:click>
+		<slot />
+	</button>
+{/if}
+
 <style>
 	._button.filled {
 		background-color: var(--theme);
@@ -62,18 +77,3 @@
 		}
 	}
 </style>
-
-{#if href}
-	<a
-		{href}
-		class="{variant} {theme} _button py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default">
-		<slot />
-	</a>
-{:else}
-	<button
-		{type}
-		class="{variant} {theme} _button py-50 font-bold rounded-10 shadow-lg transition-colors _focus-default"
-		on:click>
-		<slot />
-	</button>
-{/if}
