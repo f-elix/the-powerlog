@@ -9,6 +9,7 @@
 	import ExerciseField from 'coms/ExerciseField.svelte';
 	import ExerciseButton from 'coms/ExerciseButton.svelte';
 	import HistoryModal from 'coms/HistoryModal.svelte';
+	import type SvelteComponentDev from 'coms/ExerciseField.svelte';
 
 	export let exercises: ExerciseInstance[];
 	export let token: string;
@@ -18,8 +19,11 @@
 	const sessionState = session.state;
 	const modesState = modes.state;
 
+	let exerciseEls: HTMLElement[] = [];
+
 	$: editedExercise = $sessionState.children.exercise;
 	$: editedId = $sessionState.context.editedId;
+	$: draggedId = $modesState.context.draggedId;
 	$: historySession = $modesState.context.history;
 
 	const supersetIds: (number | undefined)[] = [
@@ -39,6 +43,11 @@
 
 	const onHistoryDismiss = () => {
 		modes.send({ type: 'DISMISS' });
+	};
+
+	const onDrag = (e: PointerEvent | TouchEvent, id: number, index: number) => {
+		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		modes.send({ type: 'DRAG', data: { index, y, id, exerciseEls } });
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
@@ -62,16 +71,31 @@
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
 	{#if exercises}
-		{#each exercises as instance, i (instance.id)}
+		{#each exercises as instance, i}
 			{#if $sessionState.matches('editing.exercise.editing') && instance.id === editedId}
 				<ExerciseField service={editedExercise} />
 			{:else}
-				<ExerciseButton
-					{instance}
-					index={i}
-					{token}
-					supersetClass={supersetClass(instance.supersetId)}
-				/>
+				<div
+					data-id={instance.id}
+					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo {supersetClass(
+						instance.supersetId
+					)}"
+					class:_disabled={$sessionState.matches('editing.exercise.editing')}
+					class:_dragging={$modesState.matches('enabled.reordering.dragging') &&
+						instance.id === draggedId}
+					style="--y: {$modesState.matches('enabled.reordering.dragging') &&
+					instance.id === draggedId
+						? $modesState.context.y
+						: 0}px"
+					bind:this={exerciseEls[i]}
+				>
+					<ExerciseButton
+						{instance}
+						index={i}
+						{token}
+						on:pointerdown={(e) => onDrag(e, instance.id, i)}
+					/>
+				</div>
 			{/if}
 		{/each}
 	{/if}
@@ -79,3 +103,31 @@
 		<ExerciseField service={editedExercise} />
 	{/if}
 </div>
+
+<style>
+	._disabled {
+		opacity: 0.25;
+	}
+
+	:global(._disabled button) {
+		cursor: default;
+	}
+
+	._dragging {
+		@apply relative z-50 shadow-xl;
+		transform: translate3d(0, var(--y), 0);
+		transition: none;
+	}
+
+	:global(._dragging *) {
+		cursor: grabbing;
+	}
+
+	._superset-even {
+		@apply border-solid border-success border-l-30;
+	}
+
+	._superset-odd {
+		@apply border-solid border-info border-l-30;
+	}
+</style>
