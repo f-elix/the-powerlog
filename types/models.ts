@@ -7,29 +7,34 @@ export interface User {
 	exercises?: Exercise[];
 }
 
-export interface Session {
-	id: number;
-	userId: string;
-	title: string;
-	date: string;
-	exercises?: ExerciseInstance[];
-	bodyweightAmount?: number;
-	bodyweightUnit: LoadUnit;
-	user?: User;
-}
-
 export interface Exercise {
 	id?: number;
 	userId: string;
 	name: string;
 }
 
-export interface ExerciseInstance {
+export interface Session {
+	id: number;
+	userId: string;
+	title: string;
+	date: string;
+	performances?: Performance[];
+	bodyweightAmount?: number;
+	bodyweightUnit: LoadUnit;
+	user?: User;
+}
+
+export interface Performance {
 	id: number;
 	sessionId: number;
-	exercise?: Exercise;
+	exerciseInstances: ExerciseInstance[];
+}
+
+export interface ExerciseInstance {
+	id: number;
+	performanceId: number;
 	exerciseId?: number;
-	supersetId?: number;
+	exercise?: Exercise;
 	executions: Execution[];
 }
 
