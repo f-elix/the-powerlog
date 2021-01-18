@@ -2,7 +2,13 @@ import type { Session, ExerciseInstance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import { assertEventType, createExerciseInstance, generateId, reorderArray } from 'src/utils';
+import {
+	assertEventType,
+	createExerciseInstance,
+	findNextIndex,
+	generateId,
+	reorderArray
+} from 'src/utils';
 import { exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -19,6 +25,10 @@ export type SessionFormData = {
 interface SessionContext {
 	session?: Session;
 	editedId?: number;
+	drag: {
+		newDragIndex?: number;
+		skippedElements?: number;
+	};
 }
 
 type SessionEvent =
@@ -35,7 +45,7 @@ type SessionEvent =
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceId: number } }
-	| { type: 'REORDER_EXERCISES'; data: { from: number; to: number } }
+	| { type: 'DRAGGING_INTERSECTING'; data: { draggedIndex: number; intersectingIndex: number } }
 	| { type: 'EDIT_EXERCISE'; data: { instanceId: number } }
 	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
@@ -113,7 +123,12 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		id: 'session',
 		initial: 'idle',
 		context: {
-			session: undefined
+			session: undefined,
+			editedId: undefined,
+			drag: {
+				newDragIndex: undefined,
+				skippedElements: 0
+			}
 		},
 		invoke: {
 			id: 'modes',
@@ -235,7 +250,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							DELETE_EXERCISE: {
 								actions: ['deleteExercise']
 							},
-							REORDER_EXERCISES: {
+							DRAGGING_INTERSECTING: {
 								actions: ['reorderExercises', 'notifyReordered']
 							},
 							SAVE: {
@@ -292,7 +307,12 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 										}
 										const { supersetId } = instance;
 										if (!supersetId) {
-											return [instance];
+											return {
+												instances: [instance],
+												userId,
+												sessionId: id,
+												supersetId
+											};
 										}
 										const supersetInstances = instances.filter(
 											(inst) => inst.supersetId === supersetId
@@ -405,31 +425,40 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
-			reorderExercises: assign({
-				session: (context, event) => {
-					assertEventType(event, 'REORDER_EXERCISES');
-					const { session } = context;
-					if (!session) {
-						return session;
-					}
-					const exercises = session.exercises || [];
-					const updatedExercises = reorderArray(
-						exercises,
-						event.data.from,
-						event.data.to
-					);
-					return {
+			reorderExercises: assign((context, event) => {
+				assertEventType(event, 'DRAGGING_INTERSECTING');
+				const { session } = context;
+				if (!session) {
+					return {};
+				}
+				const exercises = session.exercises || [];
+				const { draggedIndex, intersectingIndex } = event.data;
+				const { newIndex, skipped } = findNextIndex(
+					exercises,
+					draggedIndex,
+					intersectingIndex
+				);
+				const updatedExercises = reorderArray(exercises, draggedIndex, newIndex);
+				return {
+					session: {
 						...session,
 						exercises: updatedExercises
-					};
-				}
+					},
+					drag: {
+						newDragIndex: newIndex,
+						skippedElements: skipped
+					}
+				};
 			}),
 			notifyReordered: send(
-				(_, event) => {
-					assertEventType(event, 'REORDER_EXERCISES');
+				(context, event) => {
+					assertEventType(event, 'DRAGGING_INTERSECTING');
 					return {
 						type: 'EXERCISES_REORDERED',
-						data: { to: event.data.to }
+						data: {
+							newIndex: context.drag.newDragIndex,
+							skipped: context.drag.skippedElements
+						}
 					};
 				},
 				{ to: 'modes' }

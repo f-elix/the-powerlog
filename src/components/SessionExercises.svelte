@@ -9,7 +9,7 @@
 	import ExerciseField from 'coms/ExerciseField.svelte';
 	import ExerciseButton from 'coms/ExerciseButton.svelte';
 	import HistoryModal from 'coms/HistoryModal.svelte';
-	import type SvelteComponentDev from 'coms/ExerciseField.svelte';
+	import Reorder from 'coms/svg/Reorder.svelte';
 
 	export let exercises: ExerciseInstance[];
 	export let token: string;
@@ -75,9 +75,11 @@
 			{#if $sessionState.matches('editing.exercise.editing') && instance.id === editedId}
 				<ExerciseField service={editedExercise} />
 			{:else}
+				<!-- transition-all duration-500 ease-out-expo -->
 				<div
 					data-id={instance.id}
-					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo {supersetClass(
+					data-superset-id={instance.supersetId || null}
+					class="relative flex bg-fg-light odd:bg-fg  {supersetClass(
 						instance.supersetId
 					)}"
 					class:_disabled={$sessionState.matches('editing.exercise.editing')}
@@ -124,10 +126,10 @@
 	}
 
 	._superset-even {
-		@apply border-solid border-success border-l-30;
+		@apply border-solid border-success border-l-30 bg-fg-light;
 	}
 
 	._superset-odd {
-		@apply border-solid border-info border-l-30;
+		@apply border-solid border-info border-l-30 bg-fg;
 	}
 </style>

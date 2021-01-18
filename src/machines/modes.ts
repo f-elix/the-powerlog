@@ -8,6 +8,7 @@ export interface ModesContext {
 	pointery: number;
 	draggedIndex?: number;
 	draggedId?: number;
+	skippedElements: number;
 	exerciseEls?: HTMLElement[];
 }
 
@@ -26,7 +27,7 @@ export type ModesEvent =
 	| { type: 'DISABLE' }
 	| { type: 'DRAG'; data: { y: number; index: number; id: number; exerciseEls: HTMLElement[] } }
 	| { type: 'MOVE'; data: { y: number } }
-	| { type: 'EXERCISES_REORDERED'; data: { to: number } }
+	| { type: 'EXERCISES_REORDERED'; data: { newIndex: number; skipped: number } }
 	| { type: 'DROP' };
 
 export type ModesState =
@@ -89,6 +90,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			pointery: 0,
 			draggedIndex: undefined,
 			draggedId: undefined,
+			skippedElements: 0,
 			exerciseEls: undefined
 		},
 		states: {
@@ -139,7 +141,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 											swapping: {
 												on: {
 													EXERCISES_REORDERED: {
-														actions: ['updateIndex', 'updatePointer'],
+														actions: ['updateDragging'],
 														target: 'normal'
 													}
 												}
@@ -254,52 +256,51 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			notifySwapPrev: sendParent((context, event) => {
 				assertEventType(event, 'MOVE');
-				const { draggedIndex } = context;
-				if (typeof draggedIndex === 'undefined') {
+				const { draggedIndex, exerciseEls } = context;
+				if (typeof draggedIndex === 'undefined' || !exerciseEls) {
 					return { type: '' };
 				}
 				return {
-					type: 'REORDER_EXERCISES',
-					data: { from: draggedIndex, to: draggedIndex - 1 }
+					type: 'DRAGGING_INTERSECTING',
+					data: { draggedIndex, intersectingIndex: draggedIndex - 1 }
 				};
 			}),
 			notifySwapNext: sendParent((context, event) => {
 				assertEventType(event, 'MOVE');
-				const { draggedIndex } = context;
-				if (typeof draggedIndex === 'undefined') {
+				const { draggedIndex, exerciseEls } = context;
+				if (typeof draggedIndex === 'undefined' || !exerciseEls) {
 					return { type: '' };
 				}
 				return {
-					type: 'REORDER_EXERCISES',
-					data: { from: draggedIndex, to: draggedIndex + 1 }
+					type: 'DRAGGING_INTERSECTING',
+					data: { draggedIndex, intersectingIndex: draggedIndex + 1 }
 				};
 			}),
-			updateIndex: assign({
-				draggedIndex: (_, event) => {
-					assertEventType(event, 'EXERCISES_REORDERED');
-					return event.data.to;
-				}
-			}),
-			updatePointer: assign((context, event) => {
+			updateDragging: assign((context, event) => {
 				assertEventType(event, 'EXERCISES_REORDERED');
 				const { exerciseEls } = context;
+				const { newIndex, skipped } = event.data;
 				if (!exerciseEls) {
 					return {
 						pointery: context.pointery,
-						y: context.y
+						y: context.y,
+						draggedIndex: newIndex
 					};
 				}
-				const draggedEl = exerciseEls[event.data.to];
+				const draggedEl = exerciseEls[event.data.newIndex];
 				if (!draggedEl) {
 					return {
 						pointery: context.pointery,
-						y: context.y
+						y: context.y,
+						draggedIndex: newIndex,
+						skippedElements: skipped
 					};
 				}
 				const draggedElMidPoint = draggedEl.offsetTop + draggedEl.offsetHeight / 2;
 				return {
 					pointery: draggedElMidPoint,
-					y: 0
+					y: context.y + context.pointery - draggedElMidPoint,
+					draggedIndex: newIndex
 				};
 			})
 		},
