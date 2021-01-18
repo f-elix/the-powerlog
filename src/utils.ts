@@ -184,34 +184,21 @@ export const findNextIndex: (
 	currentIndex: number,
 	intersectingIndex: number,
 	skipped?: number
-) => { newIndex: number; skipped: number } = (
-	exercises,
-	currentIndex,
-	intersectingIndex,
-	skipped = 0
-) => {
+) => number = (exercises, currentIndex, intersectingIndex, skipped = 0) => {
 	const direction = currentIndex > intersectingIndex ? 'up' : 'down';
 	let nextIndex = intersectingIndex;
 	const currentExercise = exercises[currentIndex];
 	if (currentExercise.supersetId) {
-		return {
-			newIndex: nextIndex,
-			skipped
-		};
+		return nextIndex;
 	}
 	const nextExercise = exercises[nextIndex];
 	if (!nextExercise) {
-		return {
-			newIndex: direction === 'down' ? exercises.length - 1 : 0,
-			skipped
-		};
+		return direction === 'down' ? exercises.length - 1 : 0;
 	}
 	const { supersetId } = nextExercise;
 	if (!supersetId) {
-		return {
-			newIndex: nextIndex,
-			skipped
-		};
+		nextIndex = skipped > 0 ? nextIndex - 1 : nextIndex;
+		return nextIndex;
 	}
 	nextIndex = direction === 'down' ? nextIndex + 1 : nextIndex - 1;
 	return findNextIndex(exercises, currentIndex, nextIndex, skipped + 1);

@@ -8,7 +8,6 @@ export interface ModesContext {
 	pointery: number;
 	draggedIndex?: number;
 	draggedId?: number;
-	skippedElements: number;
 	exerciseEls?: HTMLElement[];
 }
 
@@ -27,7 +26,7 @@ export type ModesEvent =
 	| { type: 'DISABLE' }
 	| { type: 'DRAG'; data: { y: number; index: number; id: number; exerciseEls: HTMLElement[] } }
 	| { type: 'MOVE'; data: { y: number } }
-	| { type: 'EXERCISES_REORDERED'; data: { newIndex: number; skipped: number } }
+	| { type: 'EXERCISES_REORDERED'; data: { newIndex: number } }
 	| { type: 'DROP' };
 
 export type ModesState =
@@ -90,7 +89,6 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			pointery: 0,
 			draggedIndex: undefined,
 			draggedId: undefined,
-			skippedElements: 0,
 			exerciseEls: undefined
 		},
 		states: {
@@ -145,6 +143,10 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 														target: 'normal'
 													}
 												}
+												// after: {
+												// 	250: {
+												// 	}
+												// }
 											}
 										}
 									}
@@ -279,7 +281,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			updateDragging: assign((context, event) => {
 				assertEventType(event, 'EXERCISES_REORDERED');
 				const { exerciseEls } = context;
-				const { newIndex, skipped } = event.data;
+				const { newIndex } = event.data;
 				if (!exerciseEls) {
 					return {
 						pointery: context.pointery,
@@ -292,8 +294,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					return {
 						pointery: context.pointery,
 						y: context.y,
-						draggedIndex: newIndex,
-						skippedElements: skipped
+						draggedIndex: newIndex
 					};
 				}
 				const draggedElMidPoint = draggedEl.offsetTop + draggedEl.offsetHeight / 2;

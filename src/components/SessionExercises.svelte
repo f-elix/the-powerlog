@@ -75,11 +75,10 @@
 			{#if $sessionState.matches('editing.exercise.editing') && instance.id === editedId}
 				<ExerciseField service={editedExercise} />
 			{:else}
-				<!-- transition-all duration-500 ease-out-expo -->
 				<div
 					data-id={instance.id}
 					data-superset-id={instance.supersetId || null}
-					class="relative flex bg-fg-light odd:bg-fg  {supersetClass(
+					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo {supersetClass(
 						instance.supersetId
 					)}"
 					class:_disabled={$sessionState.matches('editing.exercise.editing')}

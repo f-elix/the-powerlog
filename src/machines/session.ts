@@ -27,7 +27,6 @@ interface SessionContext {
 	editedId?: number;
 	drag: {
 		newDragIndex?: number;
-		skippedElements?: number;
 	};
 }
 
@@ -126,8 +125,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			session: undefined,
 			editedId: undefined,
 			drag: {
-				newDragIndex: undefined,
-				skippedElements: 0
+				newDragIndex: undefined
 			}
 		},
 		invoke: {
@@ -433,11 +431,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				}
 				const exercises = session.exercises || [];
 				const { draggedIndex, intersectingIndex } = event.data;
-				const { newIndex, skipped } = findNextIndex(
-					exercises,
-					draggedIndex,
-					intersectingIndex
-				);
+				const newIndex = findNextIndex(exercises, draggedIndex, intersectingIndex);
 				const updatedExercises = reorderArray(exercises, draggedIndex, newIndex);
 				return {
 					session: {
@@ -445,8 +439,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						exercises: updatedExercises
 					},
 					drag: {
-						newDragIndex: newIndex,
-						skippedElements: skipped
+						newDragIndex: newIndex
 					}
 				};
 			}),
@@ -456,8 +449,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					return {
 						type: 'EXERCISES_REORDERED',
 						data: {
-							newIndex: context.drag.newDragIndex,
-							skipped: context.drag.skippedElements
+							newIndex: context.drag.newDragIndex
 						}
 					};
 				},
