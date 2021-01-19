@@ -13,7 +13,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	const exercises = session.exercises || [];
+	const performances = session.performances || [];
 
 	const onEdit = () => {
 		dispatch('edit');
@@ -34,9 +34,9 @@
 		<h2>{days[getLocalDate(session.date).getDay()]} {session.date}</h2>
 	</div>
 	<ul>
-		{#each exercises as instance (instance.id)}
+		{#each performances as performance (performance.id)}
 			<li class="bg-fg-light odd:bg-fg">
-				<ExerciseData {instance} />
+				<ExerciseData {performance} />
 			</li>
 		{/each}
 	</ul>

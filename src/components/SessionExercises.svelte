@@ -2,7 +2,7 @@
 	// Svelte
 	import { getContext } from 'svelte';
 	// Types
-	import type { ExerciseInstance } from 'types';
+	import type { Performance } from 'types';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -11,7 +11,7 @@
 	import HistoryModal from 'coms/HistoryModal.svelte';
 	import Reorder from 'coms/svg/Reorder.svelte';
 
-	export let exercises: ExerciseInstance[];
+	export let performances: Performance[] = [];
 	export let token: string;
 
 	const modes: any = getContext('modes');
@@ -25,21 +25,6 @@
 	$: editedId = $sessionState.context.editedId;
 	$: draggedId = $modesState.context.draggedId;
 	$: historySession = $modesState.context.history;
-
-	const supersetIds: (number | undefined)[] = [
-		...new Set(exercises.map((ex) => ex.supersetId).filter(Boolean))
-	];
-
-	const supersetClass = (supersetId: number | undefined): string => {
-		if (!supersetId) {
-			return '';
-		}
-		const index = supersetIds.indexOf(supersetId);
-		if (index % 2 === 0) {
-			return '_superset-even';
-		}
-		return '_superset-odd';
-	};
 
 	const onHistoryDismiss = () => {
 		modes.send({ type: 'DISMISS' });
@@ -70,36 +55,33 @@
 	{#if $modesState.matches('enabled.history.loaded')}
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
-	{#if exercises}
-		{#each exercises as instance, i}
-			{#if $sessionState.matches('editing.exercise.editing') && instance.id === editedId}
-				<ExerciseField service={editedExercise} />
-			{:else}
-				<div
-					data-id={instance.id}
-					data-superset-id={instance.supersetId || null}
-					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo {supersetClass(
-						instance.supersetId
-					)}"
-					class:_disabled={$sessionState.matches('editing.exercise.editing')}
-					class:_dragging={$modesState.matches('enabled.reordering.dragging') &&
-						instance.id === draggedId}
-					style="--y: {$modesState.matches('enabled.reordering.dragging') &&
-					instance.id === draggedId
-						? $modesState.context.y
-						: 0}px"
-					bind:this={exerciseEls[i]}
-				>
+	{#each performances as performance, i}
+		{#if $sessionState.matches('editing.exercise.editing') && performance.id === editedId}
+			<ExerciseField service={editedExercise} />
+		{:else}
+			<div
+				data-id={performance.id}
+				class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
+				class:_disabled={$sessionState.matches('editing.exercise.editing')}
+				class:_dragging={$modesState.matches('enabled.reordering.dragging') &&
+					performance.id === draggedId}
+				style="--y: {$modesState.matches('enabled.reordering.dragging') &&
+				performance.id === draggedId
+					? $modesState.context.y
+					: 0}px"
+				bind:this={exerciseEls[i]}
+			>
+				{#each performance.exerciseInstances as instance, i (instance.id)}
 					<ExerciseButton
 						{instance}
 						index={i}
 						{token}
 						on:pointerdown={(e) => onDrag(e, instance.id, i)}
 					/>
-				</div>
-			{/if}
-		{/each}
-	{/if}
+				{/each}
+			</div>
+		{/if}
+	{/each}
 	{#if $sessionState.matches('editing.exercise.creating')}
 		<ExerciseField service={editedExercise} />
 	{/if}

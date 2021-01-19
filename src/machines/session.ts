@@ -1,14 +1,8 @@
-import type { Session, ExerciseInstance, Performance } from 'types';
+import type { Session, Performance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import {
-	assertEventType,
-	createExerciseInstance,
-	findNextIndex,
-	generateId,
-	reorderArray
-} from 'src/utils';
+import { assertEventType, createExerciseInstance, generateId, reorderArray } from 'src/utils';
 import { ExerciseContext, exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -25,9 +19,6 @@ export type SessionFormData = {
 interface SessionContext {
 	session?: Session;
 	editedId?: number;
-	drag: {
-		newDragIndex?: number;
-	};
 }
 
 type SessionEvent =
@@ -43,7 +34,7 @@ type SessionEvent =
 	| { type: 'SAVE'; data: { token: string; formData: SessionFormData } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
-	| { type: 'DELETE_EXERCISE'; data: { instanceId: number } }
+	| { type: 'DELETE_PERFORMANCE'; data: { performanceId: number } }
 	| { type: 'DRAGGING_INTERSECTING'; data: { draggedIndex: number; intersectingIndex: number } }
 	| { type: 'EDIT_PERFORMANCE'; data: { performanceId: number } }
 	| { type: 'NEW_EXERCISE' }
@@ -123,10 +114,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		initial: 'idle',
 		context: {
 			session: undefined,
-			editedId: undefined,
-			drag: {
-				newDragIndex: undefined
-			}
+			editedId: undefined
 		},
 		invoke: {
 			id: 'modes',
@@ -245,8 +233,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								target: '#session.editing.exercise.editing',
 								actions: ['updateEditedId']
 							},
-							DELETE_EXERCISE: {
-								actions: ['deleteExercise']
+							DELETE_PERFORMANCE: {
+								actions: ['deletePerformance']
 							},
 							DRAGGING_INTERSECTING: {
 								actions: ['reorderExercises', 'notifyReordered']
@@ -395,50 +383,50 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
-			deleteExercise: assign({
+			deletePerformance: assign({
 				session: (context, event) => {
-					assertEventType(event, 'DELETE_EXERCISE');
+					assertEventType(event, 'DELETE_PERFORMANCE');
 					const { session } = context;
 					if (!session) {
 						return session;
 					}
-					const exercises = session.exercises || [];
-					const updatedExercises = exercises.filter(
-						(inst) => inst.id !== event.data.instanceId
+					const performances = session.performances || [];
+					const updatedPerformances = performances.filter(
+						(perf) => perf.id !== event.data.performanceId
 					);
 					return {
 						...session,
-						exercises: updatedExercises
+						performances: updatedPerformances
 					};
 				}
 			}),
-			reorderExercises: assign((context, event) => {
-				assertEventType(event, 'DRAGGING_INTERSECTING');
-				const { session } = context;
-				if (!session) {
-					return {};
-				}
-				const exercises = session.exercises || [];
-				const { draggedIndex, intersectingIndex } = event.data;
-				const newIndex = findNextIndex(exercises, draggedIndex, intersectingIndex);
-				const updatedExercises = reorderArray(exercises, draggedIndex, newIndex);
-				return {
-					session: {
-						...session,
-						exercises: updatedExercises
-					},
-					drag: {
-						newDragIndex: newIndex
+			reorderExercises: assign({
+				session: (context, event) => {
+					assertEventType(event, 'DRAGGING_INTERSECTING');
+					const { session } = context;
+					if (!session) {
+						return session;
 					}
-				};
+					const performances = session.performances || [];
+					const { draggedIndex, intersectingIndex } = event.data;
+					const updatedPerformances = reorderArray(
+						performances,
+						draggedIndex,
+						intersectingIndex
+					);
+					return {
+						...session,
+						performances: updatedPerformances
+					};
+				}
 			}),
 			notifyReordered: send(
-				(context, event) => {
+				(_, event) => {
 					assertEventType(event, 'DRAGGING_INTERSECTING');
 					return {
 						type: 'EXERCISES_REORDERED',
 						data: {
-							newIndex: context.drag.newDragIndex
+							newIndex: event.data.intersectingIndex
 						}
 					};
 				},

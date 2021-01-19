@@ -87,7 +87,7 @@
 					</div>
 				</div>
 				<SessionModes />
-				<SessionExercises exercises={sessionData.exercises} {token} />
+				<SessionExercises performances={sessionData.performances} {token} />
 				{#if $state.matches('editing.session')}
 					<div class="flex flex-col space-y-70 px-50">
 						<Button type="submit" theme="success">Save</Button>

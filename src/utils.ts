@@ -188,31 +188,6 @@ export const getElOffsetBottom = (el: HTMLElement): number | false => {
 	return top + el.offsetHeight;
 };
 
-export const findNextIndex: (
-	exercises: ExerciseInstance[],
-	currentIndex: number,
-	intersectingIndex: number,
-	skipped?: number
-) => number = (exercises, currentIndex, intersectingIndex, skipped = 0) => {
-	const direction = currentIndex > intersectingIndex ? 'up' : 'down';
-	let nextIndex = intersectingIndex;
-	const currentExercise = exercises[currentIndex];
-	if (currentExercise.supersetId) {
-		return nextIndex;
-	}
-	const nextExercise = exercises[nextIndex];
-	if (!nextExercise) {
-		return direction === 'down' ? exercises.length - 1 : 0;
-	}
-	const { supersetId } = nextExercise;
-	if (!supersetId) {
-		nextIndex = skipped > 0 ? nextIndex - 1 : nextIndex;
-		return nextIndex;
-	}
-	nextIndex = direction === 'down' ? nextIndex + 1 : nextIndex - 1;
-	return findNextIndex(exercises, currentIndex, nextIndex, skipped + 1);
-};
-
 export const reorderArray = (array: any[], from: number, to: number): any[] => {
 	const reorderedArray = array;
 	reorderedArray.splice(to, 0, reorderedArray.splice(from, 1)[0]);
