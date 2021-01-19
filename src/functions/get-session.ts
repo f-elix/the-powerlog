@@ -31,15 +31,16 @@ export const handler: (
 					title
 					bodyweightAmount
 					bodyweightUnit
-					exercises {
+					performances {
 						id
-						sessionId
-						executions
-						exercise {
+						exerciseInstances {
 							id
-							name
+							executions
+							exercise {
+								id
+								name
+							}
 						}
-						supersetId
 					}
 				}
 			}
