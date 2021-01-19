@@ -1,4 +1,4 @@
-import type { Session, ExerciseInstance } from 'types';
+import type { Session, ExerciseInstance, Performance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
@@ -9,7 +9,7 @@ import {
 	generateId,
 	reorderArray
 } from 'src/utils';
-import { exerciseMachine } from 'src/machines/exercise';
+import { ExerciseContext, exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
 
@@ -45,10 +45,10 @@ type SessionEvent =
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceId: number } }
 	| { type: 'DRAGGING_INTERSECTING'; data: { draggedIndex: number; intersectingIndex: number } }
-	| { type: 'EDIT_EXERCISE'; data: { instanceId: number } }
+	| { type: 'EDIT_PERFORMANCE'; data: { performanceId: number } }
 	| { type: 'NEW_EXERCISE' }
 	| { type: 'CANCEL_EXERCISE' }
-	| { type: 'done.invoke.exercise'; data: { instances: ExerciseInstance[] } };
+	| { type: 'done.invoke.exercise'; data: { performance: Performance } };
 
 type SessionState =
 	| {
@@ -241,7 +241,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							NEW_EXERCISE: {
 								target: '#session.editing.exercise.creating'
 							},
-							EDIT_EXERCISE: {
+							EDIT_PERFORMANCE: {
 								target: '#session.editing.exercise.editing',
 								actions: ['updateEditedId']
 							},
@@ -264,18 +264,23 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								invoke: {
 									id: 'exercise',
 									src: 'exercise',
-									data: (context: SessionContext, event: SessionEvent) => {
+									data: (
+										context: SessionContext,
+										event: SessionEvent
+									): ExerciseContext => {
 										assertEventType(event, 'NEW_EXERCISE');
 										const { session } = context;
 										if (!session) {
-											return {};
+											throw new Error('No session loaded');
 										}
 										const { id, userId } = session;
 										return {
-											instances: [createExerciseInstance(id)],
-											userId,
-											sessionId: id,
-											supersetId: generateId()
+											performance: {
+												id: generateId(),
+												sessionId: id,
+												exerciseInstances: [createExerciseInstance(id)]
+											},
+											userId
 										};
 									},
 									onDone: {
@@ -288,38 +293,24 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								invoke: {
 									id: 'exercise',
 									src: 'exercise',
-									data: (context: SessionContext, event: SessionEvent) => {
-										assertEventType(event, 'EDIT_EXERCISE');
+									data: (
+										context: SessionContext,
+										event: SessionEvent
+									): ExerciseContext => {
+										assertEventType(event, 'EDIT_PERFORMANCE');
 										const { session } = context;
 										if (!session) {
-											return {};
+											throw new Error('No session loaded');
 										}
-										const { userId, id } = session;
-										const { instanceId } = event.data;
-										const instances = session.exercises || [];
-										const instance = instances.find(
-											(inst) => inst.id === instanceId
-										);
-										if (!instance) {
-											return {};
-										}
-										const { supersetId } = instance;
-										if (!supersetId) {
-											return {
-												instances: [instance],
-												userId,
-												sessionId: id,
-												supersetId
-											};
-										}
-										const supersetInstances = instances.filter(
-											(inst) => inst.supersetId === supersetId
+										const { userId } = session;
+										const { performanceId } = event.data;
+										const performances = session.performances || [];
+										const performance = performances.find(
+											(perf) => perf.id === performanceId
 										);
 										return {
-											instances: supersetInstances,
-											userId,
-											sessionId: id,
-											supersetId
+											performance,
+											userId
 										};
 									},
 									onDone: {
@@ -366,8 +357,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			}),
 			updateEditedId: assign({
 				editedId: (_, event) => {
-					assertEventType(event, 'EDIT_EXERCISE');
-					return event.data?.instanceId;
+					assertEventType(event, 'EDIT_PERFORMANCE');
+					return event.data?.performanceId;
 				}
 			}),
 			addExerciseInstance: assign({
@@ -377,11 +368,11 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					if (!session) {
 						return session;
 					}
-					const exercises = session.exercises || [];
-					const updatedExercises = [...exercises, ...event.data.instances];
+					const performances = session.performances || [];
+					const updatedPerformances = [...performances, event.data.performance];
 					return {
 						...session,
-						exercises: updatedExercises
+						performances: updatedPerformances
 					};
 				}
 			}),
@@ -392,17 +383,15 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					if (!session || typeof editedId === 'undefined') {
 						return session;
 					}
-					const exercises = session.exercises || [];
-					const editedInstances = event.data.instances;
-					editedInstances.forEach((instance) => {
-						const exerciseIndex = exercises.findIndex(
-							(sessionEx) => sessionEx.id === instance.id
-						);
-						exercises[exerciseIndex] = instance;
-					});
+					const performances = session.performances || [];
+					const editedPerformance = event.data.performance;
+					const editedPerformanceIndex = performances.findIndex(
+						(perf) => perf.id === editedId
+					);
+					performances[editedPerformanceIndex] = editedPerformance;
 					return {
 						...session,
-						exercises
+						performances
 					};
 				}
 			}),

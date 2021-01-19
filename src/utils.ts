@@ -1,5 +1,5 @@
 import type { EventObject, State, StateMachine } from 'xstate';
-import type { Session, Execution, ExerciseInstance } from 'types';
+import type { Session, Execution, ExerciseInstance, Performance } from 'types';
 import { useMachine } from 'xstate-svelte';
 
 export const usePersistedMachine: (machine: StateMachine<any, any, any>, options?: any) => any = (
@@ -99,11 +99,20 @@ export const createExecution: (id: number) => Execution = (id) => ({
 	}
 });
 
-export const createExerciseInstance = (sessionId: number): ExerciseInstance => ({
+export const createExerciseInstance = (performanceId: number): ExerciseInstance => ({
 	id: generateId(),
-	sessionId,
+	performanceId,
 	executions: [createExecution(generateId())]
 });
+
+export const createPerformance = (sessionId: number): Performance => {
+	const id = generateId();
+	return {
+		id,
+		sessionId,
+		exerciseInstances: [createExerciseInstance(id)]
+	};
+};
 
 export const updateObjectKey = <TObj extends Record<string, any>>(
 	obj: TObj,
