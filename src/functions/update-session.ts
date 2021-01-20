@@ -40,6 +40,7 @@ export const handler: (
 							...instance,
 							id: undefined,
 							exerciseId: instance.exercise.id,
+							performanceId: undefined,
 							exercise: undefined
 						};
 						return updatedInstance;
@@ -53,6 +54,7 @@ export const handler: (
 						const updatedInstance: ExerciseInstanceInput = {
 							...instance,
 							id: undefined,
+							performanceId: undefined,
 							exercise: exerciseInput
 						};
 						return updatedInstance;
@@ -60,13 +62,17 @@ export const handler: (
 					return {
 						...instance,
 						id: undefined,
+						performanceId: undefined,
 						exercise: undefined
 					};
 				}
 			);
 			return {
-				id: perf.id,
-				exerciseInstances: instances
+				id: undefined,
+				sessionId: updatedSession.id,
+				exerciseInstances: {
+					data: instances
+				}
 			};
 		}
 	);

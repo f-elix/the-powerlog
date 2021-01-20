@@ -70,5 +70,6 @@ export interface ExerciseInstanceInput {
 	id: undefined;
 	exercise?: ExerciseInput;
 	exerciseId?: number;
+	performanceId: undefined;
 	executions: Execution[];
 }
