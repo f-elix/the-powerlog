@@ -21,7 +21,7 @@
 
 	const { state, send } = useService(service);
 
-	$: instances = $state.context.instances;
+	$: instances = $state.context.performance?.exerciseInstances || [];
 
 	const onExerciseInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;

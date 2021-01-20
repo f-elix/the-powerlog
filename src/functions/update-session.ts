@@ -1,5 +1,12 @@
 import type { APIGatewayEvent } from 'aws-lambda';
-import type { ExerciseInstance, Session, ExerciseInstanceInput, ExerciseInput } from 'types';
+import type {
+	ExerciseInstance,
+	Session,
+	ExerciseInstanceInput,
+	Performance,
+	ExerciseInput,
+	PerformanceInput
+} from 'types';
 import { gqlQuery } from './utils/gql-query';
 
 export const handler: (
@@ -24,47 +31,59 @@ export const handler: (
 
 	const updatedSession = session;
 
-	const instances: ExerciseInstanceInput[] = updatedSession.exercises.map(
-		(instance: ExerciseInstance) => {
-			if (instance.exercise?.id) {
-				const updatedInstance = {
-					...instance,
-					id: undefined,
-					exerciseId: instance.exercise.id
-				};
-				delete updatedInstance.exercise;
-				return updatedInstance;
-			}
-			if (instance.exercise) {
-				const exerciseInput: ExerciseInput = {
-					data: {
-						...instance.exercise
+	const performances: PerformanceInput[] = updatedSession.performances.map(
+		(perf: Performance) => {
+			const instances: ExerciseInstanceInput[] = perf.exerciseInstances.map(
+				(instance: ExerciseInstance): ExerciseInstanceInput => {
+					if (instance.exercise?.id) {
+						const updatedInstance: ExerciseInstanceInput = {
+							...instance,
+							id: undefined,
+							exerciseId: instance.exercise.id,
+							exercise: undefined
+						};
+						return updatedInstance;
 					}
-				};
-				const updatedInstance = {
-					...instance,
-					id: undefined,
-					exercise: exerciseInput
-				};
-				return updatedInstance;
-			}
+					if (instance.exercise) {
+						const exerciseInput: ExerciseInput = {
+							data: {
+								...instance.exercise
+							}
+						};
+						const updatedInstance: ExerciseInstanceInput = {
+							...instance,
+							id: undefined,
+							exercise: exerciseInput
+						};
+						return updatedInstance;
+					}
+					return {
+						...instance,
+						id: undefined,
+						exercise: undefined
+					};
+				}
+			);
 			return {
-				...instance,
-				id: undefined
+				id: perf.id,
+				exerciseInstances: instances
 			};
 		}
 	);
 
 	return gqlQuery({
 		query: `
-		mutation replaceInstances($sessionId: Int!, $instances: [exercise_instances_insert_input!]!, $session: sessions_pk_columns_input!, $date: timestamptz!, $title: String!, $bodyweightUnit: String!, $bodyweightAmount: numeric) {
-			delete_exercise_instances(where: {sessionId: {_eq: $sessionId}}) {
-			  affected_rows
+		mutation updateSession($sessionId: Int!, $performances: [performances_insert_input!]!, $sessionPk: sessions_pk_columns_input!, $date: timestamptz!, $title: String!, $bodyweightUnit: String!, $bodyweightAmount: numeric) {
+			delete_exercise_instances(where: {performance: {sessionId: {_eq: $sessionId}}}) {
+				affected_rows
 			}
-			insert_exercise_instances(objects: $instances) {
-			  affected_rows
-			},
-			update_sessions_by_pk(pk_columns: $session, _set:{date: $date, title: $title, bodyweightAmount: $bodyweightAmount, bodyweightUnit: $bodyweightUnit}) {
+			delete_performances(where: {sessionId: {_eq: $sessionId}}) {
+				affected_rows
+			}
+			insert_performances(objects: $performances) {
+				affected_rows
+			}
+			update_sessions_by_pk(pk_columns: $sessionPk, _set:{date: $date, title: $title, bodyweightAmount: $bodyweightAmount, bodyweightUnit: $bodyweightUnit}) {
 				id
 				date
 				title
@@ -73,13 +92,13 @@ export const handler: (
 		`,
 		variables: {
 			sessionId: updatedSession.id,
-			instances,
-			session: {
+			performances,
+			sessionPk: {
 				id: updatedSession.id
 			},
 			date: updatedSession.date,
 			title: updatedSession.title,
-			bodyweightAmount: updatedSession.bodyweightAmount,
+			bodyweightAmount: updatedSession.bodyweightAmount || undefined,
 			bodyweightUnit: updatedSession.bodyweightUnit
 		}
 	});

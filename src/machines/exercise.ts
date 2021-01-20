@@ -189,10 +189,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 						(inst) => inst.id === instanceId
 					);
 					const instance = exerciseInstances[instanceIndex];
-					const updatedExecutions = [
-						...instance.executions,
-						createExecution(generateId())
-					];
+					const updatedExecutions = [...instance.executions, createExecution()];
 					const updatedInstance = {
 						...instance,
 						executions: updatedExecutions
@@ -260,7 +257,7 @@ export const exerciseMachine = createMachine<ExerciseContext, ExerciseEvent, Exe
 				}
 			}),
 
-			notifyCancel: sendParent('CANCEL_EXERCISE')
+			notifyCancel: sendParent('CANCEL_PERFORMANCE')
 		},
 		guards: {
 			hasExercise: (context) =>

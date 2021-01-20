@@ -2,7 +2,7 @@ import type { Session, Performance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import { assertEventType, createExerciseInstance, generateId, reorderArray } from 'src/utils';
+import { assertEventType, createPerformance, reorderArray } from 'src/utils';
 import { ExerciseContext, exerciseMachine } from 'src/machines/exercise';
 import { modesMachine } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -34,11 +34,11 @@ type SessionEvent =
 	| { type: 'SAVE'; data: { token: string; formData: SessionFormData } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
-	| { type: 'DELETE_PERFORMANCE'; data: { performanceId: number } }
+	| { type: 'DELETE_EXERCISE'; data: { performanceId: number; instanceId: number } }
 	| { type: 'DRAGGING_INTERSECTING'; data: { draggedIndex: number; intersectingIndex: number } }
 	| { type: 'EDIT_PERFORMANCE'; data: { performanceId: number } }
-	| { type: 'NEW_EXERCISE' }
-	| { type: 'CANCEL_EXERCISE' }
+	| { type: 'NEW_PERFORMANCE' }
+	| { type: 'CANCEL_PERFORMANCE' }
 	| { type: 'done.invoke.exercise'; data: { performance: Performance } };
 
 type SessionState =
@@ -226,15 +226,15 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							}
 						},
 						on: {
-							NEW_EXERCISE: {
+							NEW_PERFORMANCE: {
 								target: '#session.editing.exercise.creating'
 							},
 							EDIT_PERFORMANCE: {
 								target: '#session.editing.exercise.editing',
 								actions: ['updateEditedId']
 							},
-							DELETE_PERFORMANCE: {
-								actions: ['deletePerformance']
+							DELETE_EXERCISE: {
+								actions: ['deleteExercise']
 							},
 							DRAGGING_INTERSECTING: {
 								actions: ['reorderExercises', 'notifyReordered']
@@ -256,24 +256,20 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 										context: SessionContext,
 										event: SessionEvent
 									): ExerciseContext => {
-										assertEventType(event, 'NEW_EXERCISE');
+										assertEventType(event, 'NEW_PERFORMANCE');
 										const { session } = context;
 										if (!session) {
 											throw new Error('No session loaded');
 										}
 										const { id, userId } = session;
 										return {
-											performance: {
-												id: generateId(),
-												sessionId: id,
-												exerciseInstances: [createExerciseInstance(id)]
-											},
+											performance: createPerformance(id),
 											userId
 										};
 									},
 									onDone: {
 										target: '#session.editing.session.last',
-										actions: ['addExerciseInstance']
+										actions: ['addPerformance']
 									}
 								}
 							},
@@ -309,7 +305,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							}
 						},
 						on: {
-							CANCEL_EXERCISE: {
+							CANCEL_PERFORMANCE: {
 								target: '#session.editing.session.last'
 							}
 						},
@@ -349,7 +345,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					return event.data?.performanceId;
 				}
 			}),
-			addExerciseInstance: assign({
+			addPerformance: assign({
 				session: (context, event) => {
 					assertEventType(event, 'done.invoke.exercise');
 					const { session } = context;
@@ -383,17 +379,30 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
-			deletePerformance: assign({
+			deleteExercise: assign({
 				session: (context, event) => {
-					assertEventType(event, 'DELETE_PERFORMANCE');
+					assertEventType(event, 'DELETE_EXERCISE');
 					const { session } = context;
 					if (!session) {
 						return session;
 					}
+					const { performanceId, instanceId } = event.data;
 					const performances = session.performances || [];
-					const updatedPerformances = performances.filter(
-						(perf) => perf.id !== event.data.performanceId
+					const editedPerformanceIndex = performances.findIndex(
+						(perf) => perf.id === performanceId
 					);
+					const updatedPerformance = performances[editedPerformanceIndex];
+					const performanceInstances = updatedPerformance.exerciseInstances;
+					updatedPerformance.exerciseInstances = performanceInstances.filter(
+						(inst) => inst.id !== instanceId
+					);
+					let updatedPerformances = performances;
+					if (!updatedPerformance.exerciseInstances.length) {
+						updatedPerformances = performances.filter(
+							(perf) => perf.id !== event.data.performanceId
+						);
+					}
+					performances[editedPerformanceIndex] = updatedPerformance;
 					return {
 						...session,
 						performances: updatedPerformances

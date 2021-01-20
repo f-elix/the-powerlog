@@ -27,6 +27,7 @@ export const handler: (
 			query getSession($id: Int!) {
 				sessions_by_pk(id: $id) {
 					id
+					userId
 					date
 					title
 					bodyweightAmount

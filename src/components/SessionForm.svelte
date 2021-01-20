@@ -42,7 +42,7 @@
 	};
 
 	const onNewExercise = () => {
-		session.send({ type: 'NEW_EXERCISE' });
+		session.send({ type: 'NEW_PERFORMANCE' });
 	};
 </script>
 

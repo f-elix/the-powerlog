@@ -22,6 +22,9 @@ export const handler: (
 			  userId
 			  title
 			  date
+			  performances {
+				id
+			  }
 			  user {
 				exercises {
 				  id

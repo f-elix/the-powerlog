@@ -88,8 +88,8 @@ export enum LoadUnit {
 
 export const generateId = (): number => Math.floor(Math.random() * Date.now());
 
-export const createExecution: (id: number) => Execution = (id) => ({
-	id,
+export const createExecution: () => Execution = () => ({
+	id: generateId(),
 	setType: SetType.reps,
 	duration: {
 		unit: TimeUnit.sec
@@ -102,7 +102,7 @@ export const createExecution: (id: number) => Execution = (id) => ({
 export const createExerciseInstance = (performanceId: number): ExerciseInstance => ({
 	id: generateId(),
 	performanceId,
-	executions: [createExecution(generateId())]
+	executions: [createExecution()]
 });
 
 export const createPerformance = (sessionId: number): Performance => {

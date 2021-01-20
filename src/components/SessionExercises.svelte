@@ -71,14 +71,21 @@
 					: 0}px"
 				bind:this={exerciseEls[i]}
 			>
-				{#each performance.exerciseInstances as instance, i (instance.id)}
-					<ExerciseButton
-						{instance}
-						index={i}
-						{token}
-						on:pointerdown={(e) => onDrag(e, instance.id, i)}
-					/>
-				{/each}
+				<ExerciseButton {performance} index={i} {token} />
+				{#if $modesState.matches('enabled.reordering')}
+					<button
+						type="button"
+						class="absolute top-0 right-0 h-full w-140 {i % 2 === 0
+							? 'bg-info-light'
+							: 'bg-info-lighter'} cursor-grab"
+						aria-label="Drag handle"
+						on:pointerdown={(e) => onDrag(e, performance.id, i)}
+						on:touchstart|preventDefault={() => {}}>
+						<div class="flex items-center justify-center">
+							<Reorder extClass="w-80 h-80" />
+						</div>
+					</button>
+				{/if}
 			</div>
 		{/if}
 	{/each}

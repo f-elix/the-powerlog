@@ -54,6 +54,11 @@ export interface Execution {
 	};
 }
 
+export interface PerformanceInput {
+	id: number;
+	exerciseInstances: ExerciseInstanceInput[];
+}
+
 export interface ExerciseInput {
 	data: {
 		name: string;
@@ -62,9 +67,8 @@ export interface ExerciseInput {
 }
 
 export interface ExerciseInstanceInput {
-	sessionId: number;
+	id: undefined;
 	exercise?: ExerciseInput;
 	exerciseId?: number;
-	superset?: string;
 	executions: Execution[];
 }
