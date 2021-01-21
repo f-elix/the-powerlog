@@ -4,7 +4,7 @@
 	import { SetType, TimeUnit, LoadUnit } from 'src/utils';
 	import type { ExerciseContext, ExerciseEvent, ExerciseState } from 'src/machines/exercise';
 	// xstate-svelte
-	import { useService } from 'xstate-svelte';
+	import { useService } from 'src/lib/xstate-svelte';
 	// Utils
 	import { focusInput } from 'src/utils';
 	// Ui
@@ -16,32 +16,34 @@
 	import Plus from 'coms/svg/Plus.svelte';
 	import Close from 'coms/svg/Close.svelte';
 	import Check from 'coms/svg/Check.svelte';
+	import type { ExerciseInstance } from 'types';
 
 	export let service: Interpreter<ExerciseContext, any, ExerciseEvent, ExerciseState>;
 
-	const { state, send } = useService(service);
+	const exercise = useService(service);
 
-	$: instances = $state.context.performance?.exerciseInstances || [];
+	let instances: ExerciseInstance[];
+	$: instances = $exercise.state.context.performance?.exerciseInstances || [];
 
 	const onExerciseInput = (e: Event) => {
 		const target = e.target as HTMLInputElement;
-		const name: string = target.value;
+		const name = target.value;
 		const list = target.list as HTMLDataListElement;
 		const option = Array.from(list.options).find(
 			(option: HTMLOptionElement) => option.value === name
 		);
 		const id = parseInt(option?.dataset.id || '', 10);
-		const exercise = {
+		const exerciseData = {
 			name,
 			id
 		};
 		const instanceEl = target.closest('[data-instance-id]') as HTMLFieldSetElement;
 		const instanceId = parseInt(instanceEl.dataset.instanceId || '', 10);
-		send({ type: 'EXERCISE_INPUT', data: { exercise, instanceId } });
+		$exercise.send({ type: 'EXERCISE_INPUT', data: { exercise: exerciseData, instanceId } });
 	};
 
 	const onNewExecution = (instanceId: number) => {
-		send({ type: 'NEW_EXECUTION', data: { instanceId } });
+		$exercise.send({ type: 'NEW_EXECUTION', data: { instanceId } });
 	};
 
 	const onExecInput = (e: Event) => {
@@ -52,7 +54,7 @@
 		const executionId = parseInt(execEl.dataset.execId || '', 10);
 		const instanceEl = execEl.closest('[data-instance-id]') as HTMLFieldSetElement;
 		const instanceId = parseInt(instanceEl.dataset.instanceId || '', 10);
-		send({ type: 'EXECUTION_INPUT', data: { path, value, executionId, instanceId } });
+		$exercise.send({ type: 'EXECUTION_INPUT', data: { path, value, executionId, instanceId } });
 	};
 
 	const onDeleteExec = (e: Event) => {
@@ -61,23 +63,23 @@
 		const executionId = parseInt(execEl.dataset.execId || '', 10);
 		const instanceEl = execEl.closest('[data-instance-id]') as HTMLFieldSetElement;
 		const instanceId = parseInt(instanceEl.dataset.instanceId || '', 10);
-		send({ type: 'DELETE_EXECUTION', data: { executionId, instanceId } });
+		$exercise.send({ type: 'DELETE_EXECUTION', data: { executionId, instanceId } });
 	};
 
 	const onNewInstance = () => {
-		send({ type: 'NEW_INSTANCE' });
+		$exercise.send({ type: 'NEW_INSTANCE' });
 	};
 
 	const onDeleteInstance = (instanceId: number) => {
-		send({ type: 'DELETE_INSTANCE', data: { instanceId } });
+		$exercise.send({ type: 'DELETE_INSTANCE', data: { instanceId } });
 	};
 
 	const onCancel = () => {
-		send({ type: 'CANCEL' });
+		$exercise.send({ type: 'CANCEL' });
 	};
 
 	const onSave = () => {
-		send({ type: 'SAVE' });
+		$exercise.send({ type: 'SAVE' });
 	};
 </script>
 
@@ -105,7 +107,7 @@
 						</button>
 					{/if}
 				</div>
-				{#if $state.matches('editing.invalid')}<small class="text-danger"
+				{#if $exercise.state.matches('editing.invalid')}<small class="text-danger"
 						>{ui.exerciseRequired}</small
 					>{/if}
 				{#each instance.executions as execution, i (execution.id)}
