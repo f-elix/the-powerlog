@@ -11,6 +11,7 @@
 	// Components
 	import SessionView from 'coms/SessionView.svelte';
 	import SessionForm from 'coms/SessionForm.svelte';
+	import Spinner from 'coms/Spinner.svelte';
 
 	export let props: ViewProps;
 	export let children: View[];
@@ -38,6 +39,11 @@
 	$: sessionData = $session.state.context.session;
 </script>
 
+{#if $session.state.matches('fetching')}
+	<div class="flex items-center justify-center h-100vh">
+		<Spinner />
+	</div>
+{/if}
 {#if $session.state.matches('displaying') && sessionData}
 	<SessionView session={sessionData} on:edit={onEdit} on:delete={onDelete} on:back={onBack} />
 {/if}
