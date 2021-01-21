@@ -46,7 +46,7 @@
 	};
 </script>
 
-<section class="space-y-100">
+<section class="space-y-100 pb-160">
 	{#if $session.state.matches('editing') && sessionData}
 		<h1 class="mt-70 px-50 text-70 font-bold">{title}</h1>
 		<form bind:this={form} on:submit|preventDefault={onSave} novalidate>

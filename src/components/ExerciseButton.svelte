@@ -40,7 +40,7 @@
 	};
 </script>
 
-<div>
+<div class="w-full">
 	<button class="w-full" type="button" on:click={onEditPerformance}>
 		<ExerciseData {performance} />
 	</button>
