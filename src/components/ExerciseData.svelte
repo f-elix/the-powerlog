@@ -4,11 +4,22 @@
 	import type { Performance } from 'types';
 
 	export let performance: Performance;
+
+	const instances = performance.exerciseInstances;
+	const isSuperset = instances.length > 1;
 </script>
 
 <div class="flex flex-col items-start space-y-50 p-50">
-	{#each performance.exerciseInstances as instance (instance.id)}
-		<span class="font-bold text-50">{instance.exercise?.name}</span>
+	{#if isSuperset}
+		<div>Superset</div>
+	{/if}
+	{#each instances as instance, i (instance.id)}
+		<div class="font-bold text-50">
+			{#if isSuperset}
+				<span>{i + 1})</span>
+			{/if}
+			<span>{instance.exercise?.name}</span>
+		</div>
 		{#each instance.executions as execution (execution.id)}
 			{#if !!execution.sets}
 				<div class="flex items-center space-x-50 text-40">
