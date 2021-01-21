@@ -14,8 +14,7 @@
 		"node-fetch": "^2.6.1",
 		"svelte": "^3.31.0",
 		"xstate": "^4.15.2",
-		"xstate-component-tree": "^3.3.1",
-		"xstate-svelte": "^1.0.1"
+		"xstate-component-tree": "^3.3.1"
 	},
 	"devDependencies": {
 		"@babel/preset-env": "^7.12.11",

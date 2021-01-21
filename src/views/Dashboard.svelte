@@ -19,25 +19,21 @@
 	export let props: ViewProps;
 	export let children: View[];
 
-	log.start();
-
-	const { state: logState } = log;
-	const { state: filtersState } = filters;
 	const user = props.context.user as User;
 	const token = user.token?.access_token;
 
 	const onLoadMore = () => {
-		log.send({ type: 'LOAD_MORE', data: { token } });
+		$log.send({ type: 'LOAD_MORE', data: { token } });
 	};
 
 	const onNewSession = () => {
 		router.send({ type: 'SESSION_NEW' });
 	};
 
-	$: sessions = $logState.context.sessions || [];
-	$: filteredSessions = $filtersState.context.sessions || [];
+	$: sessions = $log.state.context.sessions || [];
+	$: filteredSessions = $filters.state.context.sessions || [];
 
-	log.send({ type: 'LOAD', data: { token } });
+	$log.send({ type: 'LOAD', data: { token } });
 </script>
 
 <section class="space-y-70 px-50">
@@ -48,24 +44,24 @@
 	</div>
 	<div class="flex flex-col space-y-110 pb-110">
 		<Filters {token} />
-		{#if $filtersState.matches('idle.clear')}
-			{#if $logState.matches('loaded.empty')}
+		{#if $filters.state.matches('idle.clear')}
+			{#if $log.state.matches('loaded.empty')}
 				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
 			{/if}
-			{#if $logState.matches('loaded') || $logState.matches('fetching')}
+			{#if $log.state.matches('loaded') || $log.state.matches('fetching')}
 				<SessionsList {sessions} />
 			{/if}
-			{#if $logState.matches('fetching')}
+			{#if $log.state.matches('fetching')}
 				<Spinner />
 			{/if}
-			{#if $logState.matches('loaded.normal')}
+			{#if $log.state.matches('loaded.normal')}
 				<Button theme="success" variant="outlined" on:click={onLoadMore}>
 					{ui.loadMore}
 				</Button>
 			{/if}
 		{:else}
 			<SessionsList sessions={filteredSessions} />
-			{#if $filtersState.matches('idle.error')}
+			{#if $filters.state.matches('idle.error')}
 				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
 			{/if}
 		{/if}

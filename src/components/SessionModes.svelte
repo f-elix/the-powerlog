@@ -1,4 +1,6 @@
 <script lang="ts">
+	// Types
+	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
 	// Svelte
 	import { getContext } from 'svelte';
 	// Components
@@ -6,25 +8,25 @@
 	import History from 'coms/svg/History.svelte';
 	import Delete from 'coms/svg/Delete.svelte';
 
-	const { state, send } = getContext('modes');
+	const modes: UseServiceOutput = getContext('modes');
 
 	const onReorder = () => {
-		send({ type: 'REORDER' });
+		$modes.send({ type: 'REORDER' });
 	};
 
 	const onHistory = () => {
-		send({ type: 'HISTORY' });
+		$modes.send({ type: 'HISTORY' });
 	};
 
 	const onDelete = () => {
-		send({ type: 'DELETE' });
+		$modes.send({ type: 'DELETE' });
 	};
 </script>
 
 <div class="flex items-center justify-end space-x-80 px-50">
 	<button
 		type="button"
-		class:_reorder={$state.matches('enabled.reordering')}
+		class:_reorder={$modes.state.matches('enabled.reordering')}
 		class="w-100 h-100 text-gray"
 		aria-label="Reorder"
 		on:click={onReorder}>
@@ -32,7 +34,7 @@
 	</button>
 	<button
 		type="button"
-		class:_history={$state.matches('enabled.history')}
+		class:_history={$modes.state.matches('enabled.history')}
 		class="w-100 h-100 text-gray"
 		aria-label="History"
 		on:click={onHistory}>
@@ -40,7 +42,7 @@
 	</button>
 	<button
 		type="button"
-		class:_delete={$state.matches('enabled.deleting')}
+		class:_delete={$modes.state.matches('enabled.deleting')}
 		class="w-100 h-100 text-gray"
 		aria-label="Delete"
 		on:click={onDelete}>

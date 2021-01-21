@@ -1,4 +1,4 @@
-import { useMachine } from 'xstate-svelte';
-import { filtersMachine } from '../machines/filters';
+import { useMachine } from 'src/lib/xstate-svelte';
+import { filtersMachine } from 'src/machines/filters';
 
 export const filters = useMachine(filtersMachine);

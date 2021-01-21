@@ -15,8 +15,6 @@
 
 	export let token: string;
 
-	const { state } = filters;
-
 	const filterOptions = [
 		{
 			name: 'Name',
@@ -51,7 +49,7 @@
 	let selectedFilter = filterOptions[0].component;
 
 	const onClearFilters = () => {
-		filters.send({ type: 'CLEAR' });
+		$filters.send({ type: 'CLEAR' });
 	};
 
 	const onFilterInput = (e: InputEvent | CustomEvent) => {
@@ -69,15 +67,17 @@
 		}
 		const value = { [target?.name]: targetValue } || detailValue;
 		const debounce = ['name', 'daysAgo', 'weeksAgo'].includes(filterType);
-		filters.send({ type: 'FILTER', data: { token, filterType, value, debounce } });
+		$filters.send({ type: 'FILTER', data: { token, filterType, value, debounce } });
 	};
 </script>
 
 <div id="filters" class="flex flex-col relative space-y-70">
-	{#if !$state.matches('idle.clear')}
+	{#if !$filters.state.matches('idle.clear')}
 		<button
 			on:click={onClearFilters}
-			class="absolute top-60 right-0 px-30 border-solid border-danger-light border-20 rounded-10 transition-colors focus:bg-danger-light pointer:hover:bg-danger-light active:bg-danger-light">{ui.clearFilters}</button>
+			class="absolute top-60 right-0 px-30 border-solid border-danger-light border-20 rounded-10 transition-colors focus:bg-danger-light pointer:hover:bg-danger-light active:bg-danger-light"
+			>{ui.clearFilters}</button
+		>
 	{/if}
 	<Label extClass="space-y-70">
 		<span>{ui.filterBy}</span>

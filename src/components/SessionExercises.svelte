@@ -1,8 +1,9 @@
 <script lang="ts">
-	// Svelte
-	import { getContext } from 'svelte';
 	// Types
 	import type { Performance } from 'types';
+	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
+	// Svelte
+	import { getContext } from 'svelte';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -14,34 +15,31 @@
 	export let performances: Performance[] = [];
 	export let token: string;
 
-	const modes: any = getContext('modes');
-
-	const sessionState = session.state;
-	const modesState = modes.state;
+	const modes: UseServiceOutput = getContext('modes');
 
 	let exerciseEls: HTMLElement[] = [];
 
-	$: editedExercise = $sessionState.children.exercise;
-	$: editedId = $sessionState.context.editedId;
-	$: draggedId = $modesState.context.draggedId;
-	$: historySession = $modesState.context.history;
+	$: editedExercise = $session.state.children.exercise;
+	$: editedId = $session.state.context.editedId;
+	$: draggedId = $modes.state.context.draggedId;
+	$: historySession = $modes.state.context.history;
 
 	const onHistoryDismiss = () => {
-		modes.send({ type: 'DISMISS' });
+		$modes.send({ type: 'DISMISS' });
 	};
 
 	const onDrag = (e: PointerEvent | TouchEvent, id: number, index: number) => {
 		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		modes.send({ type: 'DRAG', data: { index, y, id, exerciseEls } });
+		$modes.send({ type: 'DRAG', data: { index, y, id, exerciseEls } });
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
 		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		modes.send({ type: 'MOVE', data: { y } });
+		$modes.send({ type: 'MOVE', data: { y } });
 	};
 
 	const onDrop = () => {
-		modes.send({ type: 'DROP' });
+		$modes.send({ type: 'DROP' });
 	};
 </script>
 
@@ -52,27 +50,27 @@
 	on:touchmove={onMove} />
 
 <div class="flex flex-col">
-	{#if $modesState.matches('enabled.history.loaded')}
+	{#if $modes.state.matches('enabled.history.loaded')}
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
 	{#each performances as performance, i}
-		{#if $sessionState.matches('editing.exercise.editing') && performance.id === editedId}
+		{#if $session.state.matches('editing.exercise.editing') && performance.id === editedId}
 			<ExerciseField service={editedExercise} />
 		{:else}
 			<div
 				data-id={performance.id}
 				class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
-				class:_disabled={$sessionState.matches('editing.exercise.editing')}
-				class:_dragging={$modesState.matches('enabled.reordering.dragging') &&
+				class:_disabled={$session.state.matches('editing.exercise.editing')}
+				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
 					performance.id === draggedId}
-				style="--y: {$modesState.matches('enabled.reordering.dragging') &&
+				style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
 				performance.id === draggedId
-					? $modesState.context.y
+					? $modes.state.context.y
 					: 0}px"
 				bind:this={exerciseEls[i]}
 			>
 				<ExerciseButton {performance} index={i} {token} />
-				{#if $modesState.matches('enabled.reordering')}
+				{#if $modes.state.matches('enabled.reordering')}
 					<button
 						type="button"
 						class="absolute top-0 right-0 h-full w-140 {i % 2 === 0
@@ -89,7 +87,7 @@
 			</div>
 		{/if}
 	{/each}
-	{#if $sessionState.matches('editing.exercise.creating')}
+	{#if $session.state.matches('editing.exercise.creating')}
 		<ExerciseField service={editedExercise} />
 	{/if}
 </div>

@@ -1,8 +1,9 @@
 <script lang="ts">
+	// Types
+	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
+	import type { Performance } from 'types';
 	// Svelte
 	import { getContext } from 'svelte';
-	// Types
-	import type { Performance } from 'types';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -15,16 +16,14 @@
 	export let token: string;
 	export let index: number;
 
-	const modes: any = getContext('modes');
-	const modesState = modes.state;
-	const sessionState = session.state;
+	const modes: UseServiceOutput = getContext('modes');
 
 	const onEditPerformance = () => {
-		session.send({ type: 'EDIT_PERFORMANCE', data: { performanceId: performance.id } });
+		$session.send({ type: 'EDIT_PERFORMANCE', data: { performanceId: performance.id } });
 	};
 
 	const onDeletePerformance = (instanceId: number) => {
-		modes.send({
+		$modes.send({
 			type: 'DELETE_EXERCISE',
 			data: { performanceId: performance.id, instanceId }
 		});
@@ -34,9 +33,9 @@
 		if (!exerciseId) {
 			return;
 		}
-		modes.send({
+		$modes.send({
 			type: 'EXERCISE_HISTORY',
-			data: { exerciseId, token, date: $sessionState.context.session?.date }
+			data: { exerciseId, token, date: $session.state.context.session?.date }
 		});
 	};
 </script>
@@ -46,7 +45,7 @@
 		<ExerciseData {performance} />
 	</button>
 	{#each performance.exerciseInstances as instance}
-		<!-- {#if $modesState.matches('enabled.reordering')}
+		<!-- {#if $modes.state.matches('enabled.reordering')}
 			<button
 				type="button"
 				class="absolute top-0 right-0 h-full w-140 {index % 2 === 0
@@ -60,7 +59,7 @@
 				</div>
 			</button>
 		{/if} -->
-		{#if $modesState.matches('enabled.history') && instance.exercise?.id}
+		{#if $modes.state.matches('enabled.history') && instance.exercise?.id}
 			<button
 				type="button"
 				class="absolute top-0 right-0 h-full w-140 {index % 2 === 0
@@ -73,7 +72,7 @@
 				</div>
 			</button>
 		{/if}
-		{#if $modesState.matches('enabled.deleting')}
+		{#if $modes.state.matches('enabled.deleting')}
 			<button
 				type="button"
 				class="absolute top-0 right-0 h-full w-140 {index % 2 === 0
