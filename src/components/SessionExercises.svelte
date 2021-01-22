@@ -10,7 +10,6 @@
 	import ExerciseField from 'coms/ExerciseField.svelte';
 	import ExerciseButton from 'coms/ExerciseButton.svelte';
 	import HistoryModal from 'coms/HistoryModal.svelte';
-	import Reorder from 'coms/svg/Reorder.svelte';
 
 	export let performances: Performance[] = [];
 	export let token: string;
@@ -69,21 +68,12 @@
 					: 0}px"
 				bind:this={exerciseEls[i]}
 			>
-				<ExerciseButton {performance} index={i} {token} />
-				{#if $modes.state.matches('enabled.reordering')}
-					<button
-						type="button"
-						class="absolute top-0 right-0 h-full w-140 {i % 2 === 0
-							? 'bg-info-light'
-							: 'bg-info-lighter'} cursor-grab"
-						aria-label="Drag handle"
-						on:pointerdown={(e) => onDrag(e, performance.id, i)}
-						on:touchstart|preventDefault={() => {}}>
-						<div class="flex items-center justify-center">
-							<Reorder extClass="w-80 h-80" />
-						</div>
-					</button>
-				{/if}
+				<ExerciseButton
+					{performance}
+					index={i}
+					{token}
+					on:pointerdown={(e) => onDrag(e, performance.id, i)}
+				/>
 			</div>
 		{/if}
 	{/each}

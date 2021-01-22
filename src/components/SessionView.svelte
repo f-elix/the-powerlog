@@ -36,7 +36,13 @@
 	<ul>
 		{#each performances as performance (performance.id)}
 			<li class="bg-fg-light odd:bg-fg">
-				<ExerciseData {performance} />
+				{#each performance.exerciseInstances as instance, i}
+					<ExerciseData
+						{instance}
+						isSuperset={performance.exerciseInstances.length > 1}
+						exerciseNum={i + 1}
+					/>
+				{/each}
 			</li>
 		{/each}
 	</ul>
