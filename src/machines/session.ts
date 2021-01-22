@@ -237,7 +237,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['deleteExercise']
 							},
 							DRAGGING_INTERSECTING: {
-								actions: ['reorderExercises', 'notifyReordered']
+								actions: ['reorderExercises']
 							},
 							SAVE: {
 								target: '#session.fetching.saving'
@@ -429,18 +429,6 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 				}
 			}),
-			notifyReordered: send(
-				(_, event) => {
-					assertEventType(event, 'DRAGGING_INTERSECTING');
-					return {
-						type: 'EXERCISES_REORDERED',
-						data: {
-							newIndex: event.data.intersectingIndex
-						}
-					};
-				},
-				{ to: 'modes' }
-			),
 			disableModes: send('DISABLE', { to: 'modes' }),
 			enableModes: send('ENABLE', { to: 'modes' }),
 			redirectToDashboard: () => {

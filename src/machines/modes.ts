@@ -2,13 +2,20 @@ import type { Session } from 'types';
 import { assign, createMachine, sendParent } from 'xstate';
 import { assertEventType, getElMid, getElOffsetBottom, getElOffsetTop } from 'src/utils';
 
+enum Intersections {
+	prev = 'prev',
+	next = 'next'
+}
+
 export interface ModesContext {
 	history?: Partial<Session>;
 	y: number;
-	pointery: number;
+	pointerY: number;
+	pageY: number;
 	draggedIndex?: number;
 	draggedId?: number;
 	exerciseEls?: HTMLElement[];
+	intersecting?: Intersections;
 }
 
 export type ModesEvent =
@@ -26,7 +33,7 @@ export type ModesEvent =
 	| { type: 'DISABLE' }
 	| { type: 'DRAG'; data: { y: number; index: number; id: number; exerciseEls: HTMLElement[] } }
 	| { type: 'MOVE'; data: { y: number } }
-	| { type: 'EXERCISES_REORDERED'; data: { newIndex: number } }
+	| { type: 'EXERCISES_REORDERED'; data: { exerciseEls: HTMLElement[] } }
 	| { type: 'DROP' };
 
 export type ModesState =
@@ -42,7 +49,7 @@ export type ModesState =
 			value: 'enabled.reordering.dragging';
 			context: ModesContext & {
 				y: number;
-				pointery: number;
+				pointerY: number;
 				draggedIndex: number;
 				draggedId: number;
 				exerciseEls: HTMLElement[];
@@ -86,10 +93,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 		context: {
 			history: undefined,
 			y: 0,
-			pointery: 0,
+			pointerY: 0,
+			pageY: 0,
 			draggedIndex: undefined,
 			draggedId: undefined,
-			exerciseEls: undefined
+			exerciseEls: undefined,
+			intersecting: undefined
 		},
 		states: {
 			enabled: {
@@ -122,31 +131,28 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 										states: {
 											normal: {
 												on: {
-													MOVE: [
-														{
-															cond: 'isIntersectingPrev',
-															actions: ['notifySwapPrev'],
-															target: 'swapping'
-														},
-														{
-															cond: 'isIntersectingNext',
-															actions: ['notifySwapNext'],
-															target: 'swapping'
-														}
-													]
-												}
-											},
-											swapping: {
-												on: {
-													EXERCISES_REORDERED: {
-														actions: ['updateDragging'],
-														target: 'normal'
+													MOVE: {
+														cond: 'isIntersecting',
+														target: 'intersecting'
 													}
 												}
-												// after: {
-												// 	250: {
-												// 	}
-												// }
+											},
+											intersecting: {
+												entry: ['notifySwap'],
+												on: {
+													MOVE: [
+														{
+															cond: 'isIntersecting',
+															internal: true
+														},
+														{
+															target: 'normal'
+														}
+													],
+													EXERCISES_REORDERED: {
+														actions: ['updateDragging']
+													}
+												}
 											}
 										}
 									}
@@ -234,8 +240,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			setDragging: assign((_, event) => {
 				assertEventType(event, 'DRAG');
 				const { y, index, id, exerciseEls } = event.data;
+				const draggedEl = exerciseEls[index];
+				const draggedElMidPoint = draggedEl.offsetTop + draggedEl.offsetHeight / 2;
 				return {
-					pointery: y,
+					pointerY: draggedElMidPoint,
+					y: y - draggedElMidPoint,
+					pageY: y,
 					draggedIndex: index,
 					draggedId: id,
 					exerciseEls
@@ -245,63 +255,76 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				assertEventType(event, 'DROP');
 				return {
 					y: 0,
-					pointery: 0,
+					pointerY: 0,
+					pageY: 0,
 					draggedIndex: undefined,
-					draggedId: undefined
+					draggedId: undefined,
+					intersecting: undefined
 				};
 			}),
-			updateCoords: assign({
-				y: (context, event) => {
-					assertEventType(event, 'MOVE');
-					return event.data.y - context.pointery;
-				}
-			}),
-			notifySwapPrev: sendParent((context, event) => {
+			updateCoords: assign((context, event) => {
 				assertEventType(event, 'MOVE');
-				const { draggedIndex, exerciseEls } = context;
-				if (typeof draggedIndex === 'undefined' || !exerciseEls) {
+				const { exerciseEls, draggedIndex } = context;
+				let intersecting;
+				if (!exerciseEls || typeof draggedIndex === 'undefined') {
+					return {
+						y: event.data.y - context.pointerY,
+						pageY: event.data.y,
+						intersecting
+					};
+				}
+				const targetMid = getElMid(exerciseEls[draggedIndex]);
+				const prevEl = exerciseEls[draggedIndex - 1];
+				const prevElBottom = getElOffsetBottom(prevEl);
+				const nextEl = exerciseEls[draggedIndex + 1];
+				const nextElTop = getElOffsetTop(nextEl);
+				const isIntersectingPrev = !!prevEl && targetMid <= prevElBottom;
+				const isIntersectingNext = !!nextEl && targetMid >= nextElTop;
+				if (isIntersectingPrev) {
+					intersecting = Intersections.prev;
+				} else if (isIntersectingNext) {
+					intersecting = Intersections.next;
+				}
+				return {
+					y: event.data.y - context.pointerY,
+					pageY: event.data.y,
+					intersecting
+				};
+			}),
+			notifySwap: sendParent((context, event) => {
+				assertEventType(event, 'MOVE');
+				const { draggedIndex, exerciseEls, intersecting } = context;
+				if (typeof draggedIndex === 'undefined' || !exerciseEls || !intersecting) {
 					return { type: '' };
+				}
+				const elsLastIndex = exerciseEls.length - 1;
+				let intersectingIndex = draggedIndex;
+				if (intersecting === Intersections.prev) {
+					const prevIndex = draggedIndex - 1 < 0 ? 0 : draggedIndex - 1;
+					intersectingIndex = prevIndex;
+				} else if (intersecting === Intersections.next) {
+					const nextIndex =
+						draggedIndex + 1 > elsLastIndex ? elsLastIndex : draggedIndex + 1;
+					intersectingIndex = nextIndex;
 				}
 				return {
 					type: 'DRAGGING_INTERSECTING',
-					data: { draggedIndex, intersectingIndex: draggedIndex - 1 }
-				};
-			}),
-			notifySwapNext: sendParent((context, event) => {
-				assertEventType(event, 'MOVE');
-				const { draggedIndex, exerciseEls } = context;
-				if (typeof draggedIndex === 'undefined' || !exerciseEls) {
-					return { type: '' };
-				}
-				return {
-					type: 'DRAGGING_INTERSECTING',
-					data: { draggedIndex, intersectingIndex: draggedIndex + 1 }
+					data: { draggedIndex, intersectingIndex }
 				};
 			}),
 			updateDragging: assign((context, event) => {
 				assertEventType(event, 'EXERCISES_REORDERED');
-				const { exerciseEls } = context;
-				const { newIndex } = event.data;
-				if (!exerciseEls) {
-					return {
-						pointery: context.pointery,
-						y: context.y,
-						draggedIndex: newIndex
-					};
-				}
-				const draggedEl = exerciseEls[event.data.newIndex];
-				if (!draggedEl) {
-					return {
-						pointery: context.pointery,
-						y: context.y,
-						draggedIndex: newIndex
-					};
-				}
-				const draggedElMidPoint = draggedEl.offsetTop + draggedEl.offsetHeight / 2;
+				const { draggedId } = context;
+				const { exerciseEls } = event.data;
+				const newDraggedIndex = exerciseEls.findIndex(
+					(el) => parseInt(el.dataset.id || '', 10) === draggedId
+				);
+				const draggedEl = exerciseEls[newDraggedIndex];
+				const newPointerY = draggedEl.offsetTop + draggedEl.offsetHeight / 2;
 				return {
-					pointery: draggedElMidPoint,
-					y: context.y + context.pointery - draggedElMidPoint,
-					draggedIndex: newIndex
+					pointerY: newPointerY,
+					y: context.pageY - newPointerY,
+					draggedIndex: newDraggedIndex
 				};
 			})
 		},
@@ -327,34 +350,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}
 		},
 		guards: {
-			isIntersectingPrev: (context, event) => {
-				assertEventType(event, 'MOVE');
-				const { exerciseEls, draggedIndex } = context;
-				if (!exerciseEls || typeof draggedIndex === 'undefined') {
-					return false;
-				}
-				const targetMid = getElMid(exerciseEls[draggedIndex]);
-				const prevEl = exerciseEls[draggedIndex - 1];
-				if (!prevEl) {
-					return false;
-				}
-				const prevElBottom = getElOffsetBottom(prevEl);
-				return targetMid <= prevElBottom;
-			},
-			isIntersectingNext: (context, event) => {
-				assertEventType(event, 'MOVE');
-				const { exerciseEls, draggedIndex } = context;
-				if (!exerciseEls || typeof draggedIndex === 'undefined') {
-					return false;
-				}
-				const targetMid = getElMid(exerciseEls[draggedIndex]);
-				const nextEl = exerciseEls[draggedIndex + 1];
-				if (!nextEl) {
-					return false;
-				}
-				const nextElTop = getElOffsetTop(nextEl);
-				return targetMid >= nextElTop;
-			}
+			isIntersecting: (context) => !!context.intersecting
 		}
 	}
 );

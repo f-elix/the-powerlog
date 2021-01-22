@@ -3,7 +3,7 @@
 	import type { Performance } from 'types';
 	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
 	// Svelte
-	import { getContext } from 'svelte';
+	import { afterUpdate, getContext } from 'svelte';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -17,11 +17,14 @@
 	const modes: UseServiceOutput = getContext('modes');
 
 	let exerciseEls: HTMLElement[] = [];
-
 	$: editedExercise = $session.state.children.exercise;
 	$: editedId = $session.state.context.editedId;
 	$: draggedId = $modes.state.context.draggedId;
 	$: historySession = $modes.state.context.history;
+
+	afterUpdate(() => {
+		$modes.send({ type: 'EXERCISES_REORDERED', data: { exerciseEls } });
+	});
 
 	const onHistoryDismiss = () => {
 		$modes.send({ type: 'DISMISS' });
@@ -33,6 +36,9 @@
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
+		if (!$modes.state.matches('enabled.reordering.dragging')) {
+			return;
+		}
 		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
 		$modes.send({ type: 'MOVE', data: { y } });
 	};
@@ -52,6 +58,7 @@
 	{#if $modes.state.matches('enabled.history.loaded')}
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
+
 	{#each performances as performance, i}
 		{#if $session.state.matches('editing.exercise.editing') && performance.id === editedId}
 			<ExerciseField service={editedExercise} />
