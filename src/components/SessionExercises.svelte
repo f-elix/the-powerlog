@@ -23,6 +23,9 @@
 	$: historySession = $modes.state.context.history;
 
 	afterUpdate(() => {
+		if (!$modes.state.matches('enabled.reordering.dragging')) {
+			return;
+		}
 		$modes.send({ type: 'EXERCISES_REORDERED', data: { exerciseEls } });
 	});
 
