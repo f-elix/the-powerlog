@@ -54,39 +54,37 @@
 						exerciseNum={i + 1}
 					/>
 				</button>
-				{#if $modes.state.matches('enabled.reordering')}
+				{#if instances.length > 1 && $modes.state.matches('enabled.reordering')}
 					<button
 						type="button"
-						class="w-140 {index % 2 === 0
-							? 'bg-info-light'
-							: 'bg-info-lighter'} cursor-grab"
+						class="w-140 cursor-grab"
 						aria-label="Drag handle"
 						on:pointerdown
 						on:touchstart|preventDefault={() => {}}>
 						<div class="flex items-center justify-center">
-							<Reorder extClass="w-80 h-80" />
+							<Reorder extClass="w-60 h-60" />
 						</div>
 					</button>
 				{/if}
 				{#if $modes.state.matches('enabled.history') && instance.exercise?.id}
 					<button
 						type="button"
-						class="w-140 {index % 2 === 0 ? 'bg-highlight' : 'bg-highlight-light'}"
+						class="w-140 "
 						aria-label="Exercise history"
 						on:click={() => onGetExerciseHistory(instance.exercise?.id)}>
 						<div class="flex items-center justify-center">
-							<History extClass="w-80 h-80" />
+							<History extClass="w-80 h-80 text-highlight-lighter" />
 						</div>
 					</button>
 				{/if}
 				{#if $modes.state.matches('enabled.deleting')}
 					<button
 						type="button"
-						class="w-140 {index % 2 === 0 ? 'bg-danger-medium' : 'bg-danger-light'}"
+						class="w-140"
 						aria-label="Delete exercise"
 						on:click={() => onDeletePerformance(instance.id)}>
 						<div class="flex items-center justify-center">
-							<Delete extClass="w-80 h-80" />
+							<Delete extClass="w-80 h-80 text-danger-light" />
 						</div>
 					</button>
 				{/if}
@@ -96,7 +94,7 @@
 	{#if $modes.state.matches('enabled.reordering')}
 		<button
 			type="button"
-			class="h-full w-1/4 {index % 2 === 0 ? 'bg-info-light' : 'bg-info-lighter'} cursor-grab"
+			class="h-full w-1/4 cursor-grab"
 			aria-label="Drag handle"
 			on:pointerdown
 			on:touchstart|preventDefault={() => {}}>

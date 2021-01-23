@@ -23,11 +23,11 @@
 	};
 </script>
 
-<div class="flex items-center justify-end space-x-80 px-50">
+<div class="flex items-center justify-end px-50">
 	<button
 		type="button"
 		class:_reorder={$modes.state.matches('enabled.reordering')}
-		class="w-100 h-100 text-gray"
+		class="p-70 rounded-10 text-gray"
 		aria-label="Reorder"
 		on:click={onReorder}>
 		<Reorder />
@@ -35,7 +35,7 @@
 	<button
 		type="button"
 		class:_history={$modes.state.matches('enabled.history')}
-		class="w-100 h-100 text-gray"
+		class="p-70 rounded-10 text-gray"
 		aria-label="History"
 		on:click={onHistory}>
 		<History />
@@ -43,7 +43,7 @@
 	<button
 		type="button"
 		class:_delete={$modes.state.matches('enabled.deleting')}
-		class="w-100 h-100 text-gray"
+		class="p-70 rounded-10 text-gray"
 		aria-label="Delete"
 		on:click={onDelete}>
 		<Delete />
@@ -52,14 +52,14 @@
 
 <style>
 	._reorder {
-		@apply text-info-light;
+		@apply bg-info-light text-white;
 	}
 
 	._history {
-		@apply text-highlight-lighter;
+		@apply bg-highlight text-white;
 	}
 
 	._delete {
-		@apply text-danger;
+		@apply bg-danger text-white;
 	}
 </style>
