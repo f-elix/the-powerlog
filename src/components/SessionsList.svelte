@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Types
 	import type { Session } from 'types';
-
 	// Utils
 	import { getLocalDate, isFirstOfWeek } from 'src/utils';
 	// Components

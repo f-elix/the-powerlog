@@ -66,7 +66,7 @@
 					</Label>
 					<Label>
 						<span>Date</span>
-						<input type="date" name="date" value={sessionData.date} />
+						<input type="date" name="date" value={sessionData.date.split('T')[0]} />
 					</Label>
 					<div class="grid grid-cols-2 gap-x-50">
 						<Label>

@@ -341,10 +341,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					if (!session) {
 						return context.session;
 					}
-					return {
-						...session,
-						date: new Date(session.date).toLocaleDateString('en-CA')
-					};
+					return session;
 				}
 			}),
 			clearSession: assign({

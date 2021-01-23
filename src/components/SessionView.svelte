@@ -31,7 +31,10 @@
 <section class="flex flex-col min-h-100vh space-y-100 py-100">
 	<div class="space-y-40 text-center">
 		<h1 class="px-50 text-70 font-bold">{session.title}</h1>
-		<h2>{days[getLocalDate(session.date).getDay()]} {session.date}</h2>
+		<h2>
+			<span>{days[getLocalDate(session.date).getDay()]}</span>
+			<span>{session.date.split('T')[0]}</span>
+		</h2>
 		{#if session.bodyweightAmount}
 			<p>
 				Bodyweight: <span class="font-bold"
