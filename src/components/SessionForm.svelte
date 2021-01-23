@@ -55,7 +55,7 @@
 					<option value={exercise.name} data-id={exercise.id} />
 				{/each}
 			</datalist>
-			{#if $session.state.matches('editing.session')}
+			{#if $session.state.matches('editing.session') && !$modes.state.matches('enabled.reordering.dragging')}
 				<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
 			{/if}
 			<div class="flex flex-col space-y-110">
