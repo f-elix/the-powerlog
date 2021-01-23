@@ -10,6 +10,9 @@
 
 	const modes: UseServiceOutput = getContext('modes');
 
+	const classBtns = 'px-60 py-50 rounded-10 text-gray transition-colors duration-100 ease-out';
+	const classIcons = 'w-80 h-80';
+
 	const onReorder = () => {
 		$modes.send({ type: 'REORDER' });
 	};
@@ -27,26 +30,26 @@
 	<button
 		type="button"
 		class:_reorder={$modes.state.matches('enabled.reordering')}
-		class="p-70 rounded-10 text-gray"
+		class={classBtns}
 		aria-label="Reorder"
 		on:click={onReorder}>
-		<Reorder />
+		<Reorder extClass={classIcons} />
 	</button>
 	<button
 		type="button"
 		class:_history={$modes.state.matches('enabled.history')}
-		class="p-70 rounded-10 text-gray"
+		class={classBtns}
 		aria-label="History"
 		on:click={onHistory}>
-		<History />
+		<History extClass={classIcons} />
 	</button>
 	<button
 		type="button"
 		class:_delete={$modes.state.matches('enabled.deleting')}
-		class="p-70 rounded-10 text-gray"
+		class={classBtns}
 		aria-label="Delete"
 		on:click={onDelete}>
-		<Delete />
+		<Delete extClass={classIcons} />
 	</button>
 </div>
 
