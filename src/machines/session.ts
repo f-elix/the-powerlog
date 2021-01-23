@@ -31,6 +31,7 @@ type SessionEvent =
 			type: 'done.invoke.createSession';
 			data: { insert_sessions_one: Session };
 	  }
+	| { type: 'done.invoke.updateSession'; data: { update_sessions_by_pk: Session } }
 	| { type: 'SAVE'; data: { token: string; formData: SessionFormData } }
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
@@ -173,7 +174,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							id: 'updateSession',
 							src: 'updateSession',
 							onDone: {
-								target: '#session.displaying'
+								target: '#session.displaying',
+								actions: ['updateSession']
 							},
 							onError: {
 								target: '#session.error'
@@ -333,6 +335,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					if (event.type === 'done.invoke.getSession') {
 						session = event.data.sessions_by_pk;
 					}
+					if (event.type === 'done.invoke.updateSession') {
+						session = event.data.update_sessions_by_pk;
+					}
 					if (!session) {
 						return context.session;
 					}
@@ -450,6 +455,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							performances
 						};
 					}
+					return session;
 				}
 			}),
 			disableModes: send('DISABLE', { to: 'modes' }),
@@ -504,7 +510,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				try {
 					const { session } = context;
 					if (!session) {
-						return;
+						return session;
 					}
 					const sessionToUpdate = {
 						...session,
@@ -512,13 +518,15 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					};
 					delete sessionToUpdate.user;
 					const { token } = event.data;
-					await fetch('/.netlify/functions/update-session', {
+					const res = await fetch('/.netlify/functions/update-session', {
 						method: 'POST',
 						headers: {
 							Authorization: `Bearer ${token}`
 						},
 						body: JSON.stringify({ session: sessionToUpdate })
 					});
+					const data = await res.json();
+					return data;
 				} catch (error) {
 					console.warn(error);
 					throw new Error('Problem saving session');

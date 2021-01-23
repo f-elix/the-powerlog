@@ -29,9 +29,16 @@
 </script>
 
 <section class="flex flex-col min-h-100vh space-y-100 py-100">
-	<div class="text-center">
+	<div class="space-y-40 text-center">
 		<h1 class="px-50 text-70 font-bold">{session.title}</h1>
 		<h2>{days[getLocalDate(session.date).getDay()]} {session.date}</h2>
+		{#if session.bodyweightAmount}
+			<p>
+				Bodyweight: <span class="font-bold"
+					>{session.bodyweightAmount} {session.bodyweightUnit}</span
+				>
+			</p>
+		{/if}
 	</div>
 	<ul>
 		{#each performances as performance (performance.id)}

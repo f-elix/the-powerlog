@@ -93,9 +93,23 @@ export const handler: (
 			}
 			update_sessions_by_pk(pk_columns: $sessionPk, _set:{date: $date, title: $title, bodyweightAmount: $bodyweightAmount, bodyweightUnit: $bodyweightUnit}) {
 				id
+				userId
 				date
 				title
-			}
+				bodyweightAmount
+				bodyweightUnit
+				performances {
+					id
+					exerciseInstances {
+						id
+						executions
+						exercise {
+							id
+							name
+						}
+					}
+				}
+			 }
 		  }
 		`,
 		variables: {
