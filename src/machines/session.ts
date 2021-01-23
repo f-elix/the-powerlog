@@ -173,8 +173,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							id: 'updateSession',
 							src: 'updateSession',
 							onDone: {
-								target: '#session.idle',
-								actions: ['clearSession']
+								target: '#session.displaying'
 							},
 							onError: {
 								target: '#session.error'
@@ -224,8 +223,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							editing: {
 								on: {
 									CANCEL: {
-										target: '#session.idle',
-										actions: ['redirectToDashboard']
+										target: '#session.displaying'
 									}
 								}
 							},
