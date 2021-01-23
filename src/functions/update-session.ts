@@ -46,9 +46,11 @@ export const handler: (
 						return updatedInstance;
 					}
 					if (instance.exercise) {
+						const { exercise } = instance;
+						delete exercise.id;
 						const exerciseInput: ExerciseInput = {
 							data: {
-								...instance.exercise
+								...exercise
 							}
 						};
 						const updatedInstance: ExerciseInstanceInput = {

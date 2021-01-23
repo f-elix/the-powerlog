@@ -15,24 +15,26 @@
 		{/if}
 		<span>{instance.exercise?.name}</span>
 	</div>
-	{#each instance.executions as execution (execution.id)}
-		{#if !!execution.sets}
-			<div class="flex items-center space-x-50 text-40">
-				<span>{execution.sets}</span>
-				<span>X</span>
-				{#if execution.setType === SetType.time}
+	{#if instance.executions}
+		{#each instance.executions as execution (execution.id)}
+			{#if !!execution.sets}
+				<div class="flex items-center space-x-50 text-40">
+					<span>{execution.sets}</span>
+					<span>X</span>
+					{#if execution.setType === SetType.time}
+						<div>
+							<span>{execution.duration.amount || 0}</span>
+							<span>{execution.duration.unit}</span>
+						</div>
+					{:else}<span>{execution.reps || 0}</span>{/if}
+					<span>|</span>
 					<div>
-						<span>{execution.duration.amount || 0}</span>
-						<span>{execution.duration.unit}</span>
+						{#if execution.load.bodyweight}<span>Bodyweight + </span>{/if}
+						<span>{execution.load.amount || 0}</span>
+						<span>{execution.load.unit}</span>
 					</div>
-				{:else}<span>{execution.reps || 0}</span>{/if}
-				<span>|</span>
-				<div>
-					{#if execution.load.bodyweight}<span>Bodyweight + </span>{/if}
-					<span>{execution.load.amount || 0}</span>
-					<span>{execution.load.unit}</span>
 				</div>
-			</div>
-		{/if}
-	{/each}
+			{/if}
+		{/each}
+	{/if}
 </div>
