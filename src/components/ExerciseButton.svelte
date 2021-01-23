@@ -155,7 +155,7 @@
 
 <style>
 	._dragging {
-		@apply relative z-50 bg-fg-lighter;
+		@apply relative z-50 bg-info-lighter;
 		box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.4);
 		transform: translate3d(0, var(--y), 0);
 		transition: none;
