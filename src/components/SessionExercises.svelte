@@ -2,6 +2,7 @@
 	// Types
 	import type { Performance } from 'types';
 	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
+	import { ListTypes } from 'src/machines/modes';
 	// Svelte
 	import { afterUpdate, getContext } from 'svelte';
 	// Stores
@@ -16,33 +17,35 @@
 
 	const modes: UseServiceOutput = getContext('modes');
 
-	let exerciseEls: HTMLElement[] = [];
+	let listEls: HTMLElement[] = [];
 	$: editedExercise = $session.state.children.exercise;
 	$: editedId = $session.state.context.editedId;
 	$: draggedId = $modes.state.context.draggedId;
+	$: listType = $modes.state.context.listType;
 	$: historySession = $modes.state.context.history;
 
 	afterUpdate(() => {
 		if (!$modes.state.matches('enabled.reordering.dragging')) {
 			return;
 		}
-		$modes.send({ type: 'EXERCISES_REORDERED', data: { exerciseEls } });
+		$modes.send({ type: 'LIST_REORDERED', data: { listEls } });
 	});
 
 	const onHistoryDismiss = () => {
 		$modes.send({ type: 'DISMISS' });
 	};
 
-	const onDrag = (e: PointerEvent | TouchEvent, id: number, index: number) => {
-		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		$modes.send({ type: 'DRAG', data: { index, y, id, exerciseEls } });
+	const onDragPerformance = (e: CustomEvent, id: number, index: number) => {
+		const event: PointerEvent | TouchEvent = e.detail;
+		const { clientY: y } = event instanceof TouchEvent ? event.touches[0] : event;
+		$modes.send({ type: 'DRAG', data: { index, y, id, listEls, listType: ListTypes.perf } });
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
 		if (!$modes.state.matches('enabled.reordering.dragging')) {
 			return;
 		}
-		const { pageY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
 		$modes.send({ type: 'MOVE', data: { y } });
 	};
 
@@ -71,18 +74,20 @@
 				class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
 				class:_disabled={$session.state.matches('editing.exercise.editing')}
 				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
+					listType === ListTypes.perf &&
 					performance.id === draggedId}
 				style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
+				listType === ListTypes.perf &&
 				performance.id === draggedId
 					? $modes.state.context.y
 					: 0}px"
-				bind:this={exerciseEls[i]}
+				bind:this={listEls[i]}
 			>
 				<ExerciseButton
 					{performance}
 					index={i}
 					{token}
-					on:pointerdown={(e) => onDrag(e, performance.id, i)}
+					on:performancedrag={(e) => onDragPerformance(e, performance.id, i)}
 				/>
 			</div>
 		{/if}

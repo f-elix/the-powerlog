@@ -111,9 +111,9 @@ export const updateObjectKey = <TObj extends Record<string, any>>(
 	};
 };
 
-export const getElMid = (el: HTMLElement): number | false => {
+export const getElMid = (el: HTMLElement): number => {
 	if (!el) {
-		return false;
+		return 0;
 	}
 	const rect = el.getBoundingClientRect();
 	const { height, top } = rect;
@@ -148,17 +148,25 @@ export const getPosition = (element: HTMLElement): { x: number; y: number } => {
 	};
 };
 
-export const getElOffsetTop = (el: HTMLElement): number | false => {
+export const getElOffsetMid = (el: HTMLElement): number => {
 	if (!el) {
-		return false;
+		return 0;
+	}
+	const top = getPosition(el).y;
+	return top + el.offsetHeight / 2;
+};
+
+export const getElOffsetTop = (el: HTMLElement): number => {
+	if (!el) {
+		return 0;
 	}
 	const top = getPosition(el).y;
 	return top;
 };
 
-export const getElOffsetBottom = (el: HTMLElement): number | false => {
+export const getElOffsetBottom = (el: HTMLElement): number => {
 	if (!el) {
-		return false;
+		return 0;
 	}
 	const top = getPosition(el).y;
 	return top + el.offsetHeight;

@@ -2,8 +2,9 @@
 	// Types
 	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
 	import type { ExerciseInstance, Performance } from 'types';
+	import { ListTypes } from 'src/machines/modes';
 	// Svelte
-	import { getContext } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -16,13 +17,40 @@
 	export let token: string;
 	export let index: number;
 
+	const dispatch = createEventDispatcher();
+
 	const modes: UseServiceOutput = getContext('modes');
 
+	let instancesEls: HTMLElement[] = [];
 	let instances: ExerciseInstance[];
 	$: instances = performance.exerciseInstances;
+	$: draggedId = $modes.state.context.draggedId;
+	$: listType = $modes.state.context.listType;
 
 	const onEditPerformance = () => {
 		$session.send({ type: 'EDIT_PERFORMANCE', data: { performanceId: performance.id } });
+	};
+
+	const onDragPerformance = (e: MouseEvent | TouchEvent) => {
+		dispatch('performancedrag', e);
+	};
+
+	const onDragInstance = (
+		e: MouseEvent | TouchEvent,
+		instanceId: number,
+		instanceIndex: number
+	) => {
+		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
+		$modes.send({
+			type: 'DRAG',
+			data: {
+				index: instanceIndex,
+				y,
+				id: instanceId,
+				listEls: instancesEls,
+				listType: ListTypes.inst
+			}
+		});
 	};
 
 	const onDeletePerformance = (instanceId: number) => {
@@ -46,7 +74,18 @@
 <div class="flex w-full">
 	<div class="flex flex-col w-full">
 		{#each instances as instance, i}
-			<div class="flex w-full">
+			<div
+				class="flex w-full"
+				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
+					listType === ListTypes.inst &&
+					draggedId === instance.id}
+				style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
+				listType === ListTypes.inst &&
+				instance.id === draggedId
+					? $modes.state.context.y
+					: 0}px"
+				bind:this={instancesEls[i]}
+			>
 				<button class="w-full" type="button" on:click={onEditPerformance}>
 					<ExerciseData
 						{instance}
@@ -59,7 +98,7 @@
 						type="button"
 						class="w-140 cursor-grab"
 						aria-label="Drag handle"
-						on:pointerdown
+						on:pointerdown={(e) => onDragInstance(e, instance.id, i)}
 						on:touchstart|preventDefault={() => {}}>
 						<div class="flex items-center justify-center">
 							<Reorder extClass="w-60 h-60" />
@@ -96,7 +135,7 @@
 			type="button"
 			class="h-full w-1/4 cursor-grab"
 			aria-label="Drag handle"
-			on:pointerdown
+			on:pointerdown={onDragPerformance}
 			on:touchstart|preventDefault={() => {}}>
 			<div class="flex items-center justify-center">
 				<Reorder extClass="w-80 h-80" />
@@ -104,3 +143,12 @@
 		</button>
 	{/if}
 </div>
+
+<style>
+	._dragging {
+		@apply relative z-50 bg-fg-lighter;
+		box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.4);
+		transform: translate3d(0, var(--y), 0);
+		transition: none;
+	}
+</style>
