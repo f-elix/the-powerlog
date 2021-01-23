@@ -4,7 +4,7 @@ import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
 import { assertEventType, createPerformance, reorderArray } from 'src/utils';
 import { ExerciseContext, exerciseMachine } from 'src/machines/exercise';
-import { modesMachine } from 'src/machines/modes';
+import { modesMachine, ListTypes } from 'src/machines/modes';
 import { router } from 'src/router';
 
 export type Modes = Interpreter<ModesContext, any, ModesEvent, ModesState>;
@@ -35,7 +35,15 @@ type SessionEvent =
 	| { type: 'DELETE'; data: { token?: string } }
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'DELETE_EXERCISE'; data: { performanceId: number; instanceId: number } }
-	| { type: 'DRAGGING_INTERSECTING'; data: { draggedIndex: number; intersectingIndex: number } }
+	| {
+			type: 'DRAGGING_INTERSECTING';
+			data: {
+				draggedIndex: number;
+				intersectingIndex: number;
+				listType: ListTypes;
+				performanceId?: number;
+			};
+	  }
 	| { type: 'EDIT_PERFORMANCE'; data: { performanceId: number } }
 	| { type: 'NEW_PERFORMANCE' }
 	| { type: 'CANCEL_PERFORMANCE' }
@@ -417,16 +425,33 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						return session;
 					}
 					const performances = session.performances || [];
-					const { draggedIndex, intersectingIndex } = event.data;
-					const updatedPerformances = reorderArray(
-						performances,
-						draggedIndex,
-						intersectingIndex
-					);
-					return {
-						...session,
-						performances: updatedPerformances
-					};
+					const { draggedIndex, intersectingIndex, listType, performanceId } = event.data;
+					if (listType === ListTypes.perf) {
+						const updatedPerformances = reorderArray(
+							performances,
+							draggedIndex,
+							intersectingIndex
+						);
+						return {
+							...session,
+							performances: updatedPerformances
+						};
+					}
+					const performanceIndex = performances.findIndex((p) => p.id === performanceId);
+					const performance = performances[performanceIndex];
+					if (listType === ListTypes.inst && performance) {
+						const updatedInstances = reorderArray(
+							performance.exerciseInstances,
+							draggedIndex,
+							intersectingIndex
+						);
+						performance.exerciseInstances = updatedInstances;
+						performances[performanceIndex] = performance;
+						return {
+							...session,
+							performances
+						};
+					}
 				}
 			}),
 			disableModes: send('DISABLE', { to: 'modes' }),

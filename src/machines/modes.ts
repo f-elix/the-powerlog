@@ -28,6 +28,7 @@ export interface ModesContext {
 	listEls?: HTMLElement[];
 	intersecting?: Intersections;
 	listType?: ListTypes;
+	draggedInstancePerformanceId?: number;
 }
 
 export type ModesEvent =
@@ -51,6 +52,7 @@ export type ModesEvent =
 				id: number;
 				listEls: HTMLElement[];
 				listType: ListTypes;
+				performanceId?: number;
 			};
 	  }
 	| { type: 'MOVE'; data: { y: number } }
@@ -120,7 +122,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			draggedId: undefined,
 			listEls: undefined,
 			intersecting: undefined,
-			listType: undefined
+			listType: undefined,
+			draggedInstancePerformanceId: undefined
 		},
 		states: {
 			enabled: {
@@ -261,7 +264,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			setDragging: assign((_, event) => {
 				assertEventType(event, 'DRAG');
-				const { y, index, id, listEls, listType } = event.data;
+				const { y, index, id, listEls, listType, performanceId } = event.data;
 				const draggedEl = listEls[index];
 				if (!draggedEl) {
 					return {
@@ -272,7 +275,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 						draggedId: undefined,
 						intersecting: undefined,
 						listType: undefined,
-						listEls: undefined
+						listEls: undefined,
+						draggedInstancePerformanceId: undefined
 					};
 				}
 				const draggedElMidPoint = getElOffsetMid(draggedEl);
@@ -283,7 +287,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					draggedIndex: index,
 					draggedId: id,
 					listEls,
-					listType
+					listType,
+					draggedInstancePerformanceId: performanceId
 				};
 			}),
 			clearDragging: assign((_, event) => {
@@ -296,7 +301,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					draggedId: undefined,
 					intersecting: undefined,
 					listType: undefined,
-					listEls: undefined
+					listEls: undefined,
+					draggedInstancePerformanceId: undefined
 				};
 			}),
 			updateCoords: assign((context, event) => {
@@ -330,7 +336,13 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			}),
 			notifySwap: sendParent((context, event) => {
 				assertEventType(event, 'MOVE');
-				const { draggedIndex, listEls, intersecting } = context;
+				const {
+					draggedIndex,
+					listEls,
+					intersecting,
+					listType,
+					draggedInstancePerformanceId
+				} = context;
 				if (typeof draggedIndex === 'undefined' || !listEls || !intersecting) {
 					return { type: '' };
 				}
@@ -346,7 +358,12 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				}
 				return {
 					type: 'DRAGGING_INTERSECTING',
-					data: { draggedIndex, intersectingIndex }
+					data: {
+						draggedIndex,
+						intersectingIndex,
+						listType,
+						performanceId: draggedInstancePerformanceId
+					}
 				};
 			}),
 			updateDragging: assign((context, event) => {
@@ -354,14 +371,18 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 				const { draggedId } = context;
 				const { listEls } = event.data;
 				const newDraggedIndex = listEls.findIndex(
-					(el) => parseInt(el.dataset.id || '', 10) === draggedId
+					(el) => el && parseInt(el.dataset.id || '', 10) === draggedId
 				);
+				if (newDraggedIndex < 0) {
+					return {};
+				}
 				const draggedEl = listEls[newDraggedIndex];
 				const newPointerY = getElOffsetMid(draggedEl);
 				return {
 					pointerY: newPointerY,
 					y: context.clientY - newPointerY,
-					draggedIndex: newDraggedIndex
+					draggedIndex: newDraggedIndex,
+					listEls
 				};
 			})
 		},

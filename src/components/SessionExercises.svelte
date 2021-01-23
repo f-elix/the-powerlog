@@ -17,7 +17,7 @@
 
 	const modes: UseServiceOutput = getContext('modes');
 
-	let listEls: HTMLElement[] = [];
+	let performanceEls: HTMLElement[] = [];
 	$: editedExercise = $session.state.children.exercise;
 	$: editedId = $session.state.context.editedId;
 	$: draggedId = $modes.state.context.draggedId;
@@ -25,10 +25,9 @@
 	$: historySession = $modes.state.context.history;
 
 	afterUpdate(() => {
-		if (!$modes.state.matches('enabled.reordering.dragging')) {
-			return;
+		if (listType === ListTypes.perf) {
+			$modes.send({ type: 'LIST_REORDERED', data: { listEls: performanceEls } });
 		}
-		$modes.send({ type: 'LIST_REORDERED', data: { listEls } });
 	});
 
 	const onHistoryDismiss = () => {
@@ -38,7 +37,10 @@
 	const onDragPerformance = (e: CustomEvent, id: number, index: number) => {
 		const event: PointerEvent | TouchEvent = e.detail;
 		const { clientY: y } = event instanceof TouchEvent ? event.touches[0] : event;
-		$modes.send({ type: 'DRAG', data: { index, y, id, listEls, listType: ListTypes.perf } });
+		$modes.send({
+			type: 'DRAG',
+			data: { index, y, id, listEls: performanceEls, listType: ListTypes.perf }
+		});
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
@@ -81,7 +83,7 @@
 				performance.id === draggedId
 					? $modes.state.context.y
 					: 0}px"
-				bind:this={listEls[i]}
+				bind:this={performanceEls[i]}
 			>
 				<ExerciseButton
 					{performance}

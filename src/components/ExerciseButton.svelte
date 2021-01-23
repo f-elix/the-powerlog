@@ -4,7 +4,7 @@
 	import type { ExerciseInstance, Performance } from 'types';
 	import { ListTypes } from 'src/machines/modes';
 	// Svelte
-	import { createEventDispatcher, getContext } from 'svelte';
+	import { createEventDispatcher, getContext, afterUpdate } from 'svelte';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Components
@@ -26,6 +26,13 @@
 	$: instances = performance.exerciseInstances;
 	$: draggedId = $modes.state.context.draggedId;
 	$: listType = $modes.state.context.listType;
+	$: draggedInstancePerformanceId = $modes.state.context.draggedInstancePerformanceId;
+
+	afterUpdate(() => {
+		if (listType === ListTypes.inst && performance.id === draggedInstancePerformanceId) {
+			$modes.send({ type: 'LIST_REORDERED', data: { listEls: instancesEls } });
+		}
+	});
 
 	const onEditPerformance = () => {
 		$session.send({ type: 'EDIT_PERFORMANCE', data: { performanceId: performance.id } });
@@ -48,7 +55,8 @@
 				y,
 				id: instanceId,
 				listEls: instancesEls,
-				listType: ListTypes.inst
+				listType: ListTypes.inst,
+				performanceId: performance.id
 			}
 		});
 	};
@@ -75,7 +83,8 @@
 	<div class="flex flex-col w-full">
 		{#each instances as instance, i}
 			<div
-				class="flex w-full"
+				data-id={instance.id}
+				class="flex w-full transition-all duration-500 ease-out-expo"
 				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
 					listType === ListTypes.inst &&
 					draggedId === instance.id}
