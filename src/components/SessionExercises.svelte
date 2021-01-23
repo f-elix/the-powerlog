@@ -101,7 +101,7 @@
 
 <style>
 	._disabled {
-		opacity: 0.25;
+		@apply opacity-25;
 	}
 
 	:global(._disabled button) {

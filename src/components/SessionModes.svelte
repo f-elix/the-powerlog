@@ -26,7 +26,7 @@
 	};
 </script>
 
-<div class="flex items-center justify-end px-50">
+<div class="flex items-center justify-end px-50" class:_disabled={$modes.state.matches('disabled')}>
 	<button
 		type="button"
 		class:_reorder={$modes.state.matches('enabled.reordering')}
@@ -54,6 +54,10 @@
 </div>
 
 <style>
+	._disabled {
+		@apply opacity-25;
+	}
+
 	._reorder {
 		@apply bg-info-light text-white;
 	}
