@@ -21,7 +21,10 @@
 					{getLocalDate(session.date).getFullYear()}
 				</h2>
 			{/if}
-			<li class="flex flex-col" in:fly|local={{ y: -30, easing: expoOut, duration: 250 }}>
+			<li
+				class="flex flex-col"
+				in:fly|local={{ y: -30, easing: expoOut, duration: 400, delay: i * 80 }}
+			>
 				<CardSession {session} />
 			</li>
 			{#if isFirstOfWeek(sessions, session.date, i)}
