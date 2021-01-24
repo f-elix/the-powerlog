@@ -17,8 +17,7 @@
 	const token = user.token?.access_token;
 	const exercises = context.exercises;
 
-	session.service.start();
-	session.send({ type: 'CREATE', data: { token } });
+	$session.send({ type: 'CREATE', data: { token } });
 </script>
 
 <SessionForm {token} {exercises} title={ui.creatingSession} />
