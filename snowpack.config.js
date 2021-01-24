@@ -17,24 +17,18 @@ module.exports = {
 		'@snowpack/plugin-dotenv',
 		'@snowpack/plugin-typescript'
 	],
-	install: [
-		/* ... */
-	],
-	installOptions: {
+	exclude: ['./src/functions/**/*', './src/styles/**/*'],
+	packageOptions: {
 		installTypes: true,
 		env: {
-			'NODE_ENV': true
+			NODE_ENV: true
 		}
-		/* ... */
 	},
 	devOptions: {
 		port: 5000,
 		output: 'stream'
 	},
 	buildOptions: {
-		/* ... */
-	},
-	proxy: {
 		/* ... */
 	},
 	alias: {
