@@ -41,6 +41,7 @@ export interface View {
 	component?: unknown;
 	props?: ViewProps;
 	children?: View[];
+	path?: string;
 }
 
 export interface RouterTypestate {

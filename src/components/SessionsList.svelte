@@ -1,6 +1,9 @@
 <script lang="ts">
 	// Types
 	import type { Session } from 'types';
+	// Svelte
+	import { fly } from 'svelte/transition';
+	import { expoOut } from 'svelte/easing';
 	// Utils
 	import { getLocalDate, isFirstOfWeek } from 'src/utils';
 	// Components
@@ -18,7 +21,7 @@
 					{getLocalDate(session.date).getFullYear()}
 				</h2>
 			{/if}
-			<li class="flex flex-col">
+			<li class="flex flex-col" in:fly|local={{ y: -30, easing: expoOut, duration: 250 }}>
 				<CardSession {session} />
 			</li>
 			{#if isFirstOfWeek(sessions, session.date, i)}
