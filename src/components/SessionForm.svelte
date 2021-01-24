@@ -46,55 +46,53 @@
 	};
 </script>
 
-<section class="space-y-100 pb-160">
-	{#if $session.state.matches('editing') && sessionData}
-		<h1 class="mt-70 px-50 text-70 font-bold">{title}</h1>
-		<form bind:this={form} on:submit|preventDefault={onSave} novalidate>
-			<datalist id="exercises">
-				{#each exercises as exercise (exercise.id)}
-					<option value={exercise.name} data-id={exercise.id} />
-				{/each}
-			</datalist>
-			{#if $session.state.matches('editing.session') && !$modes.state.matches('enabled.reordering.dragging')}
-				<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
-			{/if}
-			<div class="flex flex-col space-y-110">
-				<div class="flex flex-col space-y-70 px-50">
+{#if $session.state.matches('editing') && sessionData}
+	<h1 class="mt-70 px-50 text-70 font-bold">{title}</h1>
+	<form bind:this={form} on:submit|preventDefault={onSave} novalidate>
+		<datalist id="exercises">
+			{#each exercises as exercise (exercise.id)}
+				<option value={exercise.name} data-id={exercise.id} />
+			{/each}
+		</datalist>
+		{#if $session.state.matches('editing.session') && !$modes.state.matches('enabled.reordering.dragging')}
+			<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
+		{/if}
+		<div class="flex flex-col space-y-110">
+			<div class="flex flex-col space-y-70 px-50">
+				<Label>
+					<span>Name</span>
+					<input use:focusInput type="text" name="title" value={sessionData.title} />
+				</Label>
+				<Label>
+					<span>Date</span>
+					<input type="date" name="date" value={sessionData.date.split('T')[0]} />
+				</Label>
+				<div class="grid grid-cols-2 gap-x-50">
 					<Label>
-						<span>Name</span>
-						<input use:focusInput type="text" name="title" value={sessionData.title} />
-					</Label>
-					<Label>
-						<span>Date</span>
-						<input type="date" name="date" value={sessionData.date.split('T')[0]} />
-					</Label>
-					<div class="grid grid-cols-2 gap-x-50">
-						<Label>
-							<span>Bodyweight</span>
-							<input
-								type="number"
-								name="bodyweightAmount"
-								min="0"
-								step=".01"
-								value={sessionData.bodyweightAmount}
-							/>
-						</Label>
-						<RadioGroup
-							name="bodyweightUnit"
-							options={LoadUnit}
-							selected={sessionData.bodyweightUnit || LoadUnit.lbs}
+						<span>Bodyweight</span>
+						<input
+							type="number"
+							name="bodyweightAmount"
+							min="0"
+							step=".01"
+							value={sessionData.bodyweightAmount}
 						/>
-					</div>
+					</Label>
+					<RadioGroup
+						name="bodyweightUnit"
+						options={LoadUnit}
+						selected={sessionData.bodyweightUnit || LoadUnit.lbs}
+					/>
 				</div>
-				<SessionModes />
-				<SessionExercises performances={sessionData.performances} {token} />
-				{#if $session.state.matches('editing.session')}
-					<div class="flex flex-col space-y-70 px-50">
-						<Button type="submit" theme="success">Save</Button>
-						<Button theme="danger" on:click={onCancel}>Cancel</Button>
-					</div>
-				{/if}
 			</div>
-		</form>
-	{/if}
-</section>
+			<SessionModes />
+			<SessionExercises performances={sessionData.performances} {token} />
+			{#if $session.state.matches('editing.session')}
+				<div class="flex flex-col space-y-70 px-50">
+					<Button type="submit" theme="success">Save</Button>
+					<Button theme="danger" on:click={onCancel}>Cancel</Button>
+				</div>
+			{/if}
+		</div>
+	</form>
+{/if}

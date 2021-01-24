@@ -23,10 +23,11 @@ interface SessionContext {
 
 type SessionEvent =
 	| { type: 'CANCEL'; data: { token?: string } }
-	| { type: 'VIEW'; data: { token?: string; sessionId?: string } }
+	| { type: 'GET_SESSION'; data: { token?: string; sessionId?: string } }
+	| { type: 'DISPLAY'; data: { session: Session } }
 	| { type: 'done.invoke.getSession'; data: { sessions_by_pk: Session } }
 	| { type: 'CREATE'; data: { token?: string } }
-	| { type: 'EDIT' }
+	| { type: 'EDIT'; data: { session: Session } }
 	| {
 			type: 'done.invoke.createSession';
 			data: { insert_sessions_one: Session };
@@ -135,8 +136,16 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					CREATE: {
 						target: 'fetching.creating'
 					},
-					VIEW: {
+					EDIT: {
+						target: 'editing.session.editing',
+						actions: ['updateSession']
+					},
+					GET_SESSION: {
 						target: 'fetching.session'
+					},
+					DISPLAY: {
+						target: 'displaying',
+						actions: ['updateSession']
 					}
 				}
 			},
@@ -174,8 +183,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							id: 'updateSession',
 							src: 'updateSession',
 							onDone: {
-								target: '#session.displaying',
-								actions: ['updateSession']
+								actions: ['redirectToSessionView']
 							},
 							onError: {
 								target: '#session.error'
@@ -199,9 +207,6 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			},
 			displaying: {
 				on: {
-					EDIT: {
-						target: 'editing.session.editing'
-					},
 					DELETE: {
 						target: '#session.fetching.deleting',
 						actions: ['redirectToDashboard']
@@ -225,7 +230,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							editing: {
 								on: {
 									CANCEL: {
-										target: '#session.displaying'
+										actions: ['redirectToSessionView']
 									}
 								}
 							},
@@ -329,6 +334,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			updateSession: assign({
 				session: (context, event) => {
 					let session;
+					if (event.type === 'EDIT' || event.type === 'DISPLAY') {
+						session = event.data.session;
+					}
 					if (event.type === 'done.invoke.createSession') {
 						session = event.data.insert_sessions_one;
 					}
@@ -459,6 +467,23 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			enableModes: send('ENABLE', { to: 'modes' }),
 			redirectToDashboard: () => {
 				router.send('DASHBOARD');
+			},
+			redirectToSessionView: (context, event) => {
+				const sessionId = `${context.session?.id || ''}`;
+				if (event.type === 'CANCEL') {
+					router.send({
+						type: 'VIEW',
+						params: { id: sessionId },
+						data: { session: context.session }
+					});
+				}
+				if (event.type === 'done.invoke.updateSession') {
+					router.send({
+						type: 'VIEW_UPDATED',
+						params: { id: sessionId },
+						data: { session: event.data.update_sessions_by_pk }
+					});
+				}
 			}
 		},
 		services: {
@@ -530,7 +555,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				}
 			},
 			getSession: async (_, event) => {
-				assertEventType(event, 'VIEW');
+				assertEventType(event, 'GET_SESSION');
 				try {
 					const { token, sessionId } = event.data;
 					const res = await fetch('/.netlify/functions/get-session', {

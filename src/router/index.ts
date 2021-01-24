@@ -1,7 +1,8 @@
 import Auth from 'src/views/Auth.svelte';
 import Dashboard from 'src/views/Dashboard.svelte';
 import SessionNew from 'src/views/SessionNew.svelte';
-import Session from 'src/views/Session.svelte';
+import SessionView from 'src/views/SessionView.svelte';
+import SessionEdit from 'src/views/SessionEdit.svelte';
 import { assign } from 'xstate';
 import netlifyIdentity from 'netlify-identity-widget';
 import { createRouter, view } from '../lib/router/index';
@@ -68,7 +69,30 @@ export const router = createRouter(
 				initial: 'new',
 				states: {
 					new: view(SessionNew),
-					id: view(Session)
+					id: {
+						initial: 'displaying',
+						states: {
+							displaying: view(SessionView, {
+								on: {
+									EDIT: {
+										target: 'editing',
+										actions: ['storeSessionData']
+									}
+								}
+							}),
+							editing: view(SessionEdit, {
+								on: {
+									VIEW: {
+										target: 'displaying'
+									},
+									VIEW_UPDATED: {
+										target: 'displaying',
+										actions: ['storeSessionData']
+									}
+								}
+							})
+						}
+					}
 				},
 				on: {
 					DASHBOARD: {
@@ -83,7 +107,8 @@ export const router = createRouter(
 				'dashboard.fetchingExercises': '/dashboard',
 				'dashboard.loaded': '/dashboard',
 				'session.new': '/session/new',
-				'session.id': '/session/:id'
+				'session.id.displaying': '/session/:id',
+				'session.id.editing': '/session/:id/edit'
 			}
 		}
 	},
@@ -109,6 +134,9 @@ export const router = createRouter(
 			},
 			updateExercises: assign({
 				exercises: (_, event) => event.data.exercises
+			}),
+			storeSessionData: assign({
+				session: (_, event) => event.data.session
 			})
 		},
 		services: {
