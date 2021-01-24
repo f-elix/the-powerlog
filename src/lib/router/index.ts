@@ -95,10 +95,7 @@ export const createRouter: (
 			},
 			on: {
 				...machineConfig.on,
-				...$events,
-				'router:update': {
-					actions: ['updatePage']
-				}
+				...$events
 			}
 		},
 		{
@@ -146,7 +143,11 @@ export const createRouter: (
 		if (event.type === RouterEvents.update || event.type.includes('xstate')) {
 			return;
 		}
-		service.send({ type: RouterEvents.update, query: event.query, params: event.params });
+		service.send({
+			type: RouterEvents.update,
+			query: event.query,
+			params: event.params
+		});
 	});
 
 	const sendRoutingEvent = (url: string) => {
