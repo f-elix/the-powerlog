@@ -6,3 +6,7 @@
 <main class="max-w-ip mx-auto">
 	<RouterView {router} />
 </main>
+
+<style global>
+	@import '../styles/main.css';
+</style>

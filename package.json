@@ -2,7 +2,7 @@
 	"name": "the-powerlog",
 	"version": "1.0.0",
 	"scripts": {
-		"build:lambda": "netlify-lambda build src/functions",
+		"build:lambda": "netlify-lambda build functions",
 		"start": "snowpack dev",
 		"build": "snowpack build",
 		"ts-check": "svelte-check"
@@ -10,7 +10,6 @@
 	"dependencies": {
 		"@snowpack/app-scripts-svelte": "^2.0.0",
 		"@snowpack/plugin-dotenv": "^2.0.5",
-		"@snowpack/plugin-run-script": "^2.3.0",
 		"@snowpack/plugin-svelte": "^3.5.2",
 		"@snowpack/plugin-typescript": "^1.2.1",
 		"autoprefixer": "^10.0.1",

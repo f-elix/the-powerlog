@@ -5,19 +5,7 @@ module.exports = {
 		public: '/',
 		src: '/dist'
 	},
-	plugins: [
-		[
-			'@snowpack/plugin-run-script',
-			{
-				cmd: 'postcss src/styles/main.css -o public/styles/main.css --no-map',
-				watch: 'postcss src/styles/main.css -o public/styles/main.css --no-map -w --verbose'
-			}
-		],
-		'@snowpack/plugin-svelte',
-		'@snowpack/plugin-dotenv',
-		'@snowpack/plugin-typescript'
-	],
-	exclude: ['./src/functions/**/*', './src/styles/**/*'],
+	plugins: ['@snowpack/plugin-svelte', '@snowpack/plugin-dotenv', '@snowpack/plugin-typescript'],
 	packageOptions: {
 		installTypes: true,
 		env: {
@@ -28,12 +16,16 @@ module.exports = {
 		port: 5000,
 		output: 'stream'
 	},
-	buildOptions: {
-		/* ... */
-	},
 	alias: {
 		src: './src',
 		coms: './src/components',
 		types: './types'
+	},
+	optimize: {
+		bundle: true,
+		minify: true,
+		treeshake: true,
+		manifest: false,
+		target: 'es2020'
 	}
 };

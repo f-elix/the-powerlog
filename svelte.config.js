@@ -6,8 +6,5 @@ module.exports = {
 			script: 'typescript'
 		},
 		postcss: true
-	}),
-	compilerOptions: {
-		css: false
-	}
+	})
 };
