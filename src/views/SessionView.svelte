@@ -27,11 +27,11 @@
 
 	let sessionData: Session;
 	let performances: Performance[];
-	$: sessionData = context.session || $session.state.context.session;
+	$: sessionData = $session.state.context.session;
 	$: performances = sessionData?.performances || [];
 
 	if (context.session && context.session.id === parseInt(sessionId, 10)) {
-		$session.send({ type: 'DISPLAY', data: { sessionData } });
+		$session.send({ type: 'DISPLAY', data: { session: context.session } });
 	} else {
 		$session.send({ type: 'GET_SESSION', data: { token, sessionId } });
 	}
