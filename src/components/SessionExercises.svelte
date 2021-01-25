@@ -104,7 +104,7 @@
 		@apply opacity-25;
 	}
 
-	:global(._disabled button) {
+	._disabled :global(button) {
 		cursor: default;
 	}
 
@@ -115,7 +115,7 @@
 		transition: none;
 	}
 
-	:global(._dragging *) {
+	._dragging :global(*) {
 		cursor: grabbing;
 	}
 
