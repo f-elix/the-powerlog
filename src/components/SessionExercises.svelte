@@ -34,6 +34,20 @@
 		$modes.send({ type: 'DISMISS' });
 	};
 
+	const addDragListeners = () => {
+		document.addEventListener('pointermove', onMove);
+		document.addEventListener('touchmove', onMove);
+		document.addEventListener('pointerup', onDrop);
+		document.addEventListener('touchend', onDrop);
+	};
+
+	const removeDragListeners = () => {
+		document.removeEventListener('pointermove', onMove);
+		document.removeEventListener('touchmove', onMove);
+		document.removeEventListener('pointerup', onDrop);
+		document.removeEventListener('touchend', onDrop);
+	};
+
 	const onDragPerformance = (e: CustomEvent, id: number, index: number) => {
 		const event: PointerEvent | TouchEvent = e.detail;
 		const { clientY: y } = event instanceof TouchEvent ? event.touches[0] : event;
@@ -41,6 +55,7 @@
 			type: 'DRAG',
 			data: { index, y, id, listEls: performanceEls, listType: ListTypes.perf }
 		});
+		addDragListeners();
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
@@ -53,14 +68,9 @@
 
 	const onDrop = () => {
 		$modes.send({ type: 'DROP' });
+		removeDragListeners();
 	};
 </script>
-
-<svelte:body
-	on:pointerup={onDrop}
-	on:touchend={onDrop}
-	on:pointermove={onMove}
-	on:touchmove={onMove} />
 
 <div class="flex flex-col">
 	{#if $modes.state.matches('enabled.history.loaded')}
@@ -89,6 +99,7 @@
 					{performance}
 					index={i}
 					{token}
+					on:drag={addDragListeners}
 					on:performancedrag={(e) => onDragPerformance(e, performance.id, i)}
 				/>
 			</div>

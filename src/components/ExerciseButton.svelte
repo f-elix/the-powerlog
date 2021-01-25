@@ -59,6 +59,7 @@
 				performanceId: performance.id
 			}
 		});
+		dispatch('drag', e);
 	};
 
 	const onDeletePerformance = (instanceId: number) => {
