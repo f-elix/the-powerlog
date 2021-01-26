@@ -21,8 +21,8 @@
 		dispatch('done');
 	};
 
-	const performances = session?.performances || [];
-	const exerciseName = performances[0]?.exerciseInstances[0].exercise?.name;
+	$: performances = session?.performances || [];
+	$: exerciseName = performances[0]?.exerciseInstances[0].exercise?.name;
 </script>
 
 <div class="fixed z-50 inset-0 px-50 pt-120">
