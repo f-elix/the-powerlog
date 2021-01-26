@@ -68,7 +68,14 @@ export const router = createRouter(
 				},
 				initial: 'new',
 				states: {
-					new: view(SessionNew),
+					new: view(SessionNew, {
+						on: {
+							VIEW_UPDATED: {
+								target: 'id.displaying',
+								actions: ['storeSessionData']
+							}
+						}
+					}),
 					id: {
 						initial: 'displaying',
 						states: {
