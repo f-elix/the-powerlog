@@ -23,7 +23,7 @@ export const handler: (
 					date
 					performances(where: {exerciseInstances: {exerciseId: {_eq: $id}}}) {
 						exerciseInstances {
-						executions
+							executions
 							exercise {
 								name
 							}

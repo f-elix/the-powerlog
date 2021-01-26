@@ -73,7 +73,7 @@
 </script>
 
 <div class="flex flex-col">
-	{#if $modes.state.matches('enabled.history.loaded')}
+	{#if $modes.state.matches('enabled.history.fetching') || $modes.state.matches('enabled.history.loaded')}
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
 

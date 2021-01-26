@@ -109,7 +109,8 @@
 						class="w-140 cursor-grab"
 						aria-label="Drag handle"
 						on:pointerdown={(e) => onDragInstance(e, instance.id, i)}
-						on:touchstart|preventDefault={() => {}}>
+						on:touchstart|preventDefault={() => {}}
+					>
 						<div class="flex items-center justify-center">
 							<Reorder extClass="w-60 h-60" />
 						</div>
@@ -120,7 +121,8 @@
 						type="button"
 						class="w-140 "
 						aria-label="Exercise history"
-						on:click={() => onGetExerciseHistory(instance.exercise?.id)}>
+						on:click={() => onGetExerciseHistory(instance.exercise?.id)}
+					>
 						<div class="flex items-center justify-center">
 							<History extClass="w-80 h-80 text-highlight-lighter" />
 						</div>
@@ -131,7 +133,8 @@
 						type="button"
 						class="w-140"
 						aria-label="Delete exercise"
-						on:click={() => onDeletePerformance(instance.id)}>
+						on:click={() => onDeletePerformance(instance.id)}
+					>
 						<div class="flex items-center justify-center">
 							<Delete extClass="w-80 h-80 text-danger-light" />
 						</div>
@@ -146,7 +149,8 @@
 			class="h-full w-1/4 cursor-grab"
 			aria-label="Drag handle"
 			on:pointerdown={onDragPerformance}
-			on:touchstart|preventDefault={() => {}}>
+			on:touchstart|preventDefault={() => {}}
+		>
 			<div class="flex items-center justify-center">
 				<Reorder extClass="w-80 h-80" />
 			</div>
