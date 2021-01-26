@@ -21,6 +21,8 @@
 
 	const user = props.context.user as User;
 	const token = user.token?.access_token;
+	const userName = user.user_metadata.full_name;
+	const { email } = user;
 
 	const onLoadMore = () => {
 		$log.send({ type: 'LOAD_MORE', data: { token } });
@@ -38,10 +40,18 @@
 
 <section class="space-y-70 px-50">
 	<Fab label={ui.newSession} on:click={onNewSession} />
-	<div class="flex items-center justify-center relative py-50">
-		<Logout extClass="absolute left-0" />
-		<h1 class="text-70 font-bold">{ui.dashboardTitle}</h1>
+	<div class="flex items-center justify-between">
+		<Logout />
+		<div class="text-right">
+			{#if userName}
+				<p>{userName}</p>
+			{/if}
+			{#if email}
+				<p>{email}</p>
+			{/if}
+		</div>
 	</div>
+	<h1 class="text-center text-70 font-bold">{ui.dashboardTitle}</h1>
 	<div class="flex flex-col space-y-110 pb-110">
 		<Filters {token} />
 		{#if $filters.state.matches('idle.clear')}
