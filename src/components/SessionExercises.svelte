@@ -84,7 +84,7 @@
 			<div
 				data-id={performance.id}
 				class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
-				class:_disabled={$session.state.matches('editing.exercise.editing')}
+				class:_disabled={$session.state.matches('editing.exercise')}
 				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
 					listType === ListTypes.perf &&
 					performance.id === draggedId}

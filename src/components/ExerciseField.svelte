@@ -102,7 +102,8 @@
 					{#if instances.length > 1}
 						<button
 							class="self-end text-danger-light"
-							on:click={() => onDeleteInstance(instance.id)}>
+							on:click={() => onDeleteInstance(instance.id)}
+						>
 							<Close />
 						</button>
 					{/if}
@@ -202,7 +203,8 @@
 							<button
 								class="p-30 border-20 border-action border-solid rounded-10 shadow-md transition-colors pointer:hover:bg-action active:bg-action _focus-default"
 								aria-label="Add sets"
-								on:click={() => onNewExecution(instance.id)}>
+								on:click={() => onNewExecution(instance.id)}
+							>
 								<Plus extClass="w-60 h-60" />
 							</button>
 						{/if}
@@ -212,22 +214,25 @@
 		</fieldset>
 	{/each}
 	<div class="flex flex-col items-end">
-		<div class="grid grid-cols-2 gap-50">
+		<div class="grid grid-cols-2 gap-50 w-1/3">
 			<button
 				class="col-span-2 py-30 px-100 border-20 border-action border-solid rounded-10 shadow-md text-center transition-colors pointer:hover:bg-action active:bg-action _focus-default"
-				on:click={onNewInstance}>
+				on:click={onNewInstance}
+			>
 				<Plus extClass="w-full" />
 			</button>
 			<button
 				class="py-50 px-60 rounded-10 bg-danger shadow-md transition-colors pointer:hover:bg-opacity-50 active:bg-opacity-50 _focus-default"
 				aria-label="Cancel"
-				on:click={onCancel}>
+				on:click={onCancel}
+			>
 				<Close />
 			</button>
 			<button
 				class="py-50 px-60 rounded-10 bg-action shadow-md transition-colors pointer:hover:bg-opacity-50 active:bg-opacity-50 _focus-default"
 				aria-label="Confirm"
-				on:click={onSave}>
+				on:click={onSave}
+			>
 				<Check />
 			</button>
 		</div>
