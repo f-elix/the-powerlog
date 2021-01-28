@@ -14,7 +14,7 @@
 	import Filters from 'coms/Filters.svelte';
 	import SessionsList from 'coms/SessionsList.svelte';
 	import Fab from 'coms/Fab.svelte';
-	import Spinner from 'coms/Spinner.svelte';
+	import ProgressBar from 'src/components/ProgressBar.svelte';
 
 	export let props: ViewProps;
 	export let children: View[];
@@ -37,42 +37,56 @@
 	$log.send({ type: 'LOAD' });
 </script>
 
-<section class="space-y-70 px-50">
+<section class="px-50">
 	<Fab label={ui.newSession} on:click={onNewSession} />
-	<div class="flex items-center justify-between">
-		<Logout />
-		<div class="text-right">
-			{#if userName}
-				<p>{userName}</p>
-			{/if}
-			{#if email}
-				<p>{email}</p>
+	{#if $log.state.matches('fetching')}
+		<ProgressBar />
+	{/if}
+	<div class="space-y-70 pt-70">
+		<div class="flex items-center justify-between">
+			<Logout />
+			<div class="text-right">
+				{#if userName}
+					<p>{userName}</p>
+				{/if}
+				{#if email}
+					<p>{email}</p>
+				{/if}
+			</div>
+		</div>
+		<h1 class="text-center text-70 font-bold">{ui.dashboardTitle}</h1>
+		<div class="flex flex-col space-y-110 pb-110">
+			<div
+				class="transition-opacity duration-150 ease-out"
+				class:_disabled={$log.state.matches('fetching')}
+			>
+				<Filters />
+			</div>
+			{#if $filters.state.matches('idle.clear')}
+				{#if $log.state.matches('loaded.empty')}
+					<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
+				{/if}
+				{#if $log.state.matches('loaded') || $log.state.matches('fetching')}
+					<SessionsList {sessions} />
+				{/if}
+
+				{#if $log.state.matches('loaded.normal')}
+					<Button theme="success" variant="outlined" on:click={onLoadMore}>
+						{ui.loadMore}
+					</Button>
+				{/if}
+			{:else}
+				<SessionsList sessions={filteredSessions} />
+				{#if $filters.state.matches('idle.error')}
+					<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
+				{/if}
 			{/if}
 		</div>
 	</div>
-	<h1 class="text-center text-70 font-bold">{ui.dashboardTitle}</h1>
-	<div class="flex flex-col space-y-110 pb-110">
-		<Filters />
-		{#if $filters.state.matches('idle.clear')}
-			{#if $log.state.matches('loaded.empty')}
-				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
-			{/if}
-			{#if $log.state.matches('loaded') || $log.state.matches('fetching')}
-				<SessionsList {sessions} />
-			{/if}
-			{#if $log.state.matches('fetching')}
-				<Spinner />
-			{/if}
-			{#if $log.state.matches('loaded.normal')}
-				<Button theme="success" variant="outlined" on:click={onLoadMore}>
-					{ui.loadMore}
-				</Button>
-			{/if}
-		{:else}
-			<SessionsList sessions={filteredSessions} />
-			{#if $filters.state.matches('idle.error')}
-				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
-			{/if}
-		{/if}
-	</div>
 </section>
+
+<style>
+	._disabled {
+		@apply opacity-50 pointer-events-none;
+	}
+</style>
