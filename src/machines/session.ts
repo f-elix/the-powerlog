@@ -208,8 +208,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			displaying: {
 				on: {
 					DELETE: {
-						target: '#session.fetching.deleting',
-						actions: ['redirectToDashboard']
+						target: '#session.fetching.deleting'
 					}
 				}
 			},
@@ -222,8 +221,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 							creating: {
 								on: {
 									CANCEL: {
-										target: '#session.fetching.deleting',
-										actions: ['redirectToDashboard']
+										target: '#session.fetching.deleting'
 									}
 								}
 							},
