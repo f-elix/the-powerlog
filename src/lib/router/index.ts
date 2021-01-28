@@ -117,9 +117,9 @@ export const createRouter: (
 						const stateStr = state.toStrings();
 						const statePath = stateStr[stateStr.length - 1];
 						const route = $routes[statePath];
-						const params = event.params || {};
+						const params = event.params || context.$page?.params || {};
 						const pathString = addParamsToPath(route, params);
-						const query = event.query || {};
+						const query = event.query || context.$page?.query || {};
 						const queryString = toQueryString(query);
 						const url = `#/${pathString}${queryString}`;
 						if (url !== window.location.hash) {
