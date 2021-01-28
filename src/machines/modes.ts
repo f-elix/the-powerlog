@@ -5,7 +5,8 @@ import {
 	getElMid,
 	getElOffsetBottom,
 	getElOffsetTop,
-	getElOffsetMid
+	getElOffsetMid,
+	getToken
 } from 'src/utils';
 
 enum Intersections {
@@ -36,7 +37,7 @@ export type ModesEvent =
 	| { type: 'HISTORY' }
 	| { type: 'DELETE' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
-	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; date: string; token: string } }
+	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; date: string } }
 	| {
 			type: 'done.invoke.getHistory';
 			data: Partial<Session>;
@@ -389,8 +390,9 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 		services: {
 			getHistory: async (_, event) => {
 				assertEventType(event, 'EXERCISE_HISTORY');
-				const { token, exerciseId, date } = event.data;
 				try {
+					const token = await getToken();
+					const { exerciseId, date } = event.data;
 					const res = await fetch('/.netlify/functions/get-exercise-history', {
 						method: 'POST',
 						headers: {

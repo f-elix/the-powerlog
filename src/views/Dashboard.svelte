@@ -20,12 +20,11 @@
 	export let children: View[];
 
 	const user = props.context.user as User;
-	const token = user.token?.access_token;
 	const userName = user.user_metadata.full_name;
 	const { email } = user;
 
 	const onLoadMore = () => {
-		$log.send({ type: 'LOAD_MORE', data: { token } });
+		$log.send({ type: 'LOAD_MORE' });
 	};
 
 	const onNewSession = () => {
@@ -35,7 +34,7 @@
 	$: sessions = $log.state.context.sessions || [];
 	$: filteredSessions = $filters.state.context.sessions || [];
 
-	$log.send({ type: 'LOAD', data: { token } });
+	$log.send({ type: 'LOAD' });
 </script>
 
 <section class="space-y-70 px-50">
@@ -53,7 +52,7 @@
 	</div>
 	<h1 class="text-center text-70 font-bold">{ui.dashboardTitle}</h1>
 	<div class="flex flex-col space-y-110 pb-110">
-		<Filters {token} />
+		<Filters />
 		{#if $filters.state.matches('idle.clear')}
 			{#if $log.state.matches('loaded.empty')}
 				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>

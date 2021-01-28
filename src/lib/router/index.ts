@@ -119,7 +119,7 @@ export const createRouter: (
 						const route = $routes[statePath];
 						const params = event.params || context.$page?.params || {};
 						const pathString = addParamsToPath(route, params);
-						const query = event.query || context.$page?.query || {};
+						const query = event.query || {};
 						const queryString = toQueryString(query);
 						const url = `#/${pathString}${queryString}`;
 						if (url !== window.location.hash) {

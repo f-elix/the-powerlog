@@ -13,7 +13,8 @@
 <button
 	class="fixed z-50 bottom-110 right-80 w-120 h-120 rounded-full border-action border-solid border-20 bg-action shadow-md transition-colors  _focus-default {variant}"
 	aria-label={label}
-	on:click>
+	on:click
+>
 	<div class="flex items-center justify-center">
 		<Plus extClass="w-80 h-80" />
 	</div>

@@ -13,8 +13,6 @@
 	import Date from 'coms/filters/Date.svelte';
 	import Period from 'coms/filters/Period.svelte';
 
-	export let token: string;
-
 	const filterOptions = [
 		{
 			name: 'Name',
@@ -67,7 +65,7 @@
 		}
 		const value = { [target?.name]: targetValue } || detailValue;
 		const debounce = ['name', 'daysAgo', 'weeksAgo'].includes(filterType);
-		$filters.send({ type: 'FILTER', data: { token, filterType, value, debounce } });
+		$filters.send({ type: 'FILTER', data: { filterType, value, debounce } });
 	};
 </script>
 
@@ -84,7 +82,8 @@
 		<select
 			class="bg-main border-main border-solid border-20 rounded-10 p-30 text-main"
 			bind:value={selectedFilter}
-			name="filters">
+			name="filters"
+		>
 			{#each filterOptions as filter}
 				<option value={filter.component}>{filter.name}</option>
 			{/each}

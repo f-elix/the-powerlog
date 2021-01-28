@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
-	import type { User } from 'netlify-identity-widget';
 	// Svelte
 	import { fly } from 'svelte/transition';
 	import { expoOut } from 'svelte/easing';
@@ -17,11 +16,9 @@
 	export let children: View[];
 
 	const { context } = props;
-	const user = context.user as User;
-	const token = user.token?.access_token;
 	const exercises = context.exercises;
 
-	$session.send({ type: 'CREATE', data: { token } });
+	$session.send({ type: 'CREATE' });
 </script>
 
 <section class="space-y-100 pb-160" in:fly|local={{ y: -60, easing: expoOut, duration: 600 }}>
@@ -31,6 +28,6 @@
 		</div>
 	{/if}
 	{#if $session.state.matches('editing')}
-		<SessionForm {token} {exercises} title={ui.creatingSession} />
+		<SessionForm {exercises} title={ui.creatingSession} />
 	{/if}
 </section>

@@ -2,7 +2,7 @@ import type { Session, Performance } from 'types';
 import type { Interpreter } from 'xstate';
 import type { ModesContext, ModesEvent, ModesState } from 'src/machines/modes';
 import { createMachine, assign, send } from 'xstate';
-import { assertEventType, createPerformance, reorderArray } from 'src/utils';
+import { assertEventType, createPerformance, getToken, reorderArray } from 'src/utils';
 import { ExerciseContext, exerciseMachine } from 'src/machines/exercise';
 import { modesMachine, ListTypes } from 'src/machines/modes';
 import { router } from 'src/router';
@@ -22,19 +22,19 @@ interface SessionContext {
 }
 
 type SessionEvent =
-	| { type: 'CANCEL'; data: { token?: string } }
-	| { type: 'GET_SESSION'; data: { token?: string; sessionId?: string } }
+	| { type: 'CANCEL' }
+	| { type: 'GET_SESSION'; data: { sessionId?: string } }
 	| { type: 'DISPLAY'; data: { session: Session } }
 	| { type: 'done.invoke.getSession'; data: { sessions_by_pk: Session } }
-	| { type: 'CREATE'; data: { token?: string } }
+	| { type: 'CREATE' }
 	| { type: 'EDIT'; data: { session: Session } }
 	| {
 			type: 'done.invoke.createSession';
 			data: { insert_sessions_one: Session };
 	  }
 	| { type: 'done.invoke.updateSession'; data: { update_sessions_by_pk: Session } }
-	| { type: 'SAVE'; data: { token: string; formData: SessionFormData } }
-	| { type: 'DELETE'; data: { token?: string } }
+	| { type: 'SAVE'; data: { formData: SessionFormData } }
+	| { type: 'DELETE' }
 	| { type: 'done.invoke.deleteSession' }
 	| { type: 'DELETE_EXERCISE'; data: { performanceId: number; instanceId: number } }
 	| {
@@ -490,7 +490,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			createSession: async (_, event) => {
 				assertEventType(event, 'CREATE');
 				try {
-					const { token } = event.data;
+					const token = await getToken();
 					const res = await fetch('/.netlify/functions/create-session', {
 						method: 'POST',
 						headers: {
@@ -511,8 +511,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 					);
 				}
 				try {
+					const token = await getToken();
 					const id = context.session?.id;
-					const { token } = event.data;
 					const res = await fetch('/.netlify/functions/delete-session', {
 						method: 'POST',
 						headers: {
@@ -539,7 +539,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						...event.data.formData
 					};
 					delete sessionToUpdate.user;
-					const { token } = event.data;
+					const token = await getToken();
 					const res = await fetch('/.netlify/functions/update-session', {
 						method: 'POST',
 						headers: {
@@ -557,7 +557,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			getSession: async (_, event) => {
 				assertEventType(event, 'GET_SESSION');
 				try {
-					const { token, sessionId } = event.data;
+					const token = await getToken();
+					const { sessionId } = event.data;
 					const res = await fetch('/.netlify/functions/get-session', {
 						method: 'POST',
 						headers: {

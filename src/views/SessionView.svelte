@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Types
-	import type { User } from 'netlify-identity-widget';
 	import type { View, ViewProps } from '../lib/router/types';
 	import type { Performance, Session } from 'types';
 	// Svelte
@@ -21,8 +20,6 @@
 	export let children: View[];
 
 	const { context } = props;
-	const user = context.user as User;
-	const token = user.token?.access_token;
 	const sessionId = context.$page?.params?.id || '';
 
 	let sessionData: Session;
@@ -33,7 +30,7 @@
 	if (context.session && context.session.id === parseInt(sessionId, 10)) {
 		$session.send({ type: 'DISPLAY', data: { session: context.session } });
 	} else {
-		$session.send({ type: 'GET_SESSION', data: { token, sessionId } });
+		$session.send({ type: 'GET_SESSION', data: { sessionId } });
 	}
 
 	const onBack = () => {
@@ -41,7 +38,7 @@
 	};
 
 	const onDelete = () => {
-		$session.send({ type: 'DELETE', data: { token } });
+		$session.send({ type: 'DELETE' });
 	};
 
 	const onEdit = () => {

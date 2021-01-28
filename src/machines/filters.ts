@@ -1,9 +1,8 @@
 import type { Session } from 'types';
 import { createMachine, assign } from 'xstate';
-import { assertEventType, isTouchDevice } from 'src/utils';
+import { assertEventType, getToken, isTouchDevice } from 'src/utils';
 
 interface FilterData {
-	token?: string;
 	filterType?: string;
 	value?: Record<string, string | number>;
 	debounce?: boolean;
@@ -129,7 +128,8 @@ export const filtersMachine = createMachine<FiltersContext, FiltersEvent, Filter
 		services: {
 			filter: async (context) => {
 				try {
-					const { token, filterType, value } = context.filterData || {};
+					const token = await getToken();
+					const { filterType, value } = context.filterData || {};
 					const res = await fetch('/.netlify/functions/filter-sessions', {
 						method: 'POST',
 						headers: {

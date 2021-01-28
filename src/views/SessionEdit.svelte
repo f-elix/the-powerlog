@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
-	import type { User } from 'netlify-identity-widget';
 	// Svelte
 	import { fly } from 'svelte/transition';
 	import { expoOut } from 'svelte/easing';
@@ -19,8 +18,6 @@
 	export let children: View[];
 
 	const { context } = props;
-	const user = context.user as User;
-	const token = user.token?.access_token;
 	const { exercises, session: sessionData } = context;
 	const sessionId = context.$page?.params?.id || '';
 
@@ -38,6 +35,6 @@
 		</div>
 	{/if}
 	{#if $session.state.matches('editing')}
-		<SessionForm {token} {exercises} title={ui.editingSession} />
+		<SessionForm {exercises} title={ui.editingSession} />
 	{/if}
 </section>

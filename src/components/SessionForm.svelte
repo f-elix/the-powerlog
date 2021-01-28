@@ -21,7 +21,6 @@
 	import Label from 'coms/Label.svelte';
 	import RadioGroup from 'coms/RadioGroup.svelte';
 
-	export let token: string;
 	export let exercises: Exercise[];
 	export let title: string;
 
@@ -34,11 +33,11 @@
 
 	const onSave = () => {
 		const formData = Object.fromEntries(new FormData(form)) as SessionFormData;
-		$session.send({ type: 'SAVE', data: { token, formData } });
+		$session.send({ type: 'SAVE', data: { formData } });
 	};
 
 	const onCancel = () => {
-		$session.send({ type: 'CANCEL', data: { token } });
+		$session.send({ type: 'CANCEL' });
 	};
 
 	const onNewExercise = () => {
@@ -86,7 +85,7 @@
 				</div>
 			</div>
 			<SessionModes />
-			<SessionExercises performances={sessionData.performances} {token} />
+			<SessionExercises performances={sessionData.performances} />
 			{#if $session.state.matches('editing.session')}
 				<div class="flex flex-col space-y-70 px-50">
 					<Button type="submit" theme="success">Save</Button>

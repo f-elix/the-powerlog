@@ -1,5 +1,18 @@
+import netlifyIdentity from 'netlify-identity-widget';
 import type { EventObject } from 'xstate';
 import type { Session, Execution, ExerciseInstance, Performance } from 'types';
+import type { AuthUser } from './router';
+
+export const getToken = async (): Promise<string | null> => {
+	const user: AuthUser | null = netlifyIdentity.currentUser() as AuthUser;
+	if (!user || !user.token) {
+		return null;
+	}
+	const { token } = user;
+	const expiresAt = token.expires_at;
+	const isExpired = Date.now() > expiresAt;
+	return user.jwt(isExpired);
+};
 
 export const getLocalDate: (dateInput: string) => Date = (dateInput: string) => {
 	const date = new Date(dateInput);

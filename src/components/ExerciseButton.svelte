@@ -14,7 +14,6 @@
 	import Delete from 'coms/svg/Delete.svelte';
 
 	export let performance: Performance;
-	export let token: string;
 	export let index: number;
 
 	const dispatch = createEventDispatcher();
@@ -75,7 +74,7 @@
 		}
 		$modes.send({
 			type: 'EXERCISE_HISTORY',
-			data: { exerciseId, token, date: $session.state.context.session?.date }
+			data: { exerciseId, date: $session.state.context.session?.date }
 		});
 	};
 </script>

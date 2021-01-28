@@ -1,5 +1,5 @@
 import { createMachine, assign } from 'xstate';
-import { assertEventType } from 'src/utils';
+import { assertEventType, getToken } from 'src/utils';
 import type { Session } from 'types';
 
 interface LogContext {
@@ -16,8 +16,8 @@ enum LoadEvents {
 }
 
 type LogEvent =
-	| { type: LoadEvents.LOAD; data: { token?: string } }
-	| { type: LoadEvents.LOADMORE; data: { token?: string } }
+	| { type: LoadEvents.LOAD }
+	| { type: LoadEvents.LOADMORE }
 	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
 	| { type: 'error.platform.fetchUserSessions'; data: string };
 
@@ -200,8 +200,8 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					);
 				}
 				try {
+					const token = await getToken();
 					const { cursor, limit } = context;
-					const { token } = event.data;
 					const res = await fetch('/.netlify/functions/get-sessions', {
 						method: 'POST',
 						headers: {

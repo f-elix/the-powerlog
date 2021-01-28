@@ -4,106 +4,126 @@ import SessionNew from 'src/views/SessionNew.svelte';
 import SessionView from 'src/views/SessionView.svelte';
 import SessionEdit from 'src/views/SessionEdit.svelte';
 import { assign } from 'xstate';
-import netlifyIdentity from 'netlify-identity-widget';
+import netlifyIdentity, { User } from 'netlify-identity-widget';
+import { getToken } from 'src/utils';
 import { createRouter, view } from '../lib/router/index';
+
+export interface AuthUser extends User {
+	jwt: (force?: boolean) => Promise<string>;
+}
 
 export const router = createRouter(
 	{
-		initial: 'auth',
 		context: {
-			user: null,
-			exercises: null
+			user: undefined,
+			exercises: undefined
 		},
+		initial: 'loggedOut',
 		states: {
-			auth: view(Auth, {
-				always: {
-					cond: 'isLoggedIn',
-					target: 'dashboard',
-					actions: ['storeUser']
+			loggedOut: view(Auth, {
+				invoke: {
+					src: 'checkingAuth'
 				},
 				on: {
-					LOGIN: {
-						target: 'dashboard',
+					AUTHENTICATED: {
+						target: 'loggedIn',
 						actions: ['storeUser']
 					}
 				}
 			}),
-			dashboard: {
+			loggedIn: {
 				entry: ['closeWidget'],
-				always: {
-					cond: 'isLoggedOut',
-					target: 'auth'
-				},
-				initial: 'fetchingExercises',
-				states: {
-					fetchingExercises: {
-						invoke: {
-							id: 'getExercises',
-							src: 'getExercises',
-							onDone: {
-								target: 'loaded',
-								actions: ['updateExercises']
-							},
-							onError: 'loaded'
-						}
-					},
-					loaded: view(Dashboard, {
-						on: {
-							SESSION_NEW: '#router.session.new',
-							SESSION: '#router.session.id'
-						}
-					})
+				invoke: {
+					src: 'checkingAuth'
 				},
 				on: {
-					LOGOUT: {
-						target: 'auth',
-						actions: ['logout']
+					NOT_AUTHENTICATED: {
+						target: '.dashboard.loggingOut'
 					}
-				}
-			},
-			session: {
-				always: {
-					cond: 'isLoggedOut',
-					target: 'auth'
 				},
-				initial: 'new',
+				initial: 'dashboard',
 				states: {
-					new: view(SessionNew, {
+					dashboard: view(Dashboard, {
+						initial: 'fetchingExercises',
+						states: {
+							fetchingExercises: {
+								invoke: {
+									id: 'getExercises',
+									src: 'getExercises',
+									onDone: {
+										target: 'loaded',
+										actions: ['updateExercises']
+									},
+									onError: 'loaded'
+								}
+							},
+							loaded: {
+								on: {
+									SESSION_NEW: '#router.loggedIn.session.new',
+									SESSION: '#router.loggedIn.session.id'
+								}
+							},
+							loggingOut: {
+								invoke: {
+									src: 'logout',
+									onDone: {
+										target: '#router.loggedOut',
+										actions: ['clearAuth']
+									},
+									onError: {
+										target: '#router.loggedOut',
+										actions: ['clearAuth']
+									}
+								}
+							}
+						},
 						on: {
-							VIEW_UPDATED: {
-								target: 'id.displaying',
-								actions: ['storeSessionData']
+							LOGOUT: {
+								target: '.loggingOut'
 							}
 						}
 					}),
-					id: {
-						initial: 'displaying',
+					session: {
+						initial: 'new',
 						states: {
-							displaying: view(SessionView, {
+							new: view(SessionNew, {
 								on: {
-									EDIT: {
-										target: 'editing',
+									VIEW_UPDATED: {
+										target: 'id.displaying',
 										actions: ['storeSessionData']
 									}
 								}
 							}),
-							editing: view(SessionEdit, {
-								on: {
-									VIEW: {
-										target: 'displaying'
-									},
-									VIEW_UPDATED: {
-										target: 'displaying',
-										actions: ['storeSessionData']
-									}
+							id: {
+								initial: 'displaying',
+								states: {
+									displaying: view(SessionView, {
+										on: {
+											EDIT: {
+												target: 'editing',
+												actions: ['storeSessionData']
+											}
+										}
+									}),
+									editing: view(SessionEdit, {
+										on: {
+											VIEW: {
+												target: 'displaying'
+											},
+											VIEW_UPDATED: {
+												target: 'displaying',
+												actions: ['storeSessionData']
+											}
+										}
+									})
 								}
-							})
+							}
+						},
+						on: {
+							DASHBOARD: {
+								target: 'dashboard'
+							}
 						}
-					}
-				},
-				on: {
-					DASHBOARD: {
-						target: 'dashboard'
 					}
 				}
 			}
@@ -111,11 +131,11 @@ export const router = createRouter(
 		entry: ['initNetlifyIdentity'],
 		meta: {
 			routes: {
-				'dashboard.fetchingExercises': '/dashboard',
-				'dashboard.loaded': '/dashboard',
-				'session.new': '/session/new',
-				'session.id.displaying': '/session/:id',
-				'session.id.editing': '/session/:id/edit'
+				'loggedIn.dashboard.fetchingExercises': '/dashboard',
+				'loggedIn.dashboard.loaded': '/dashboard',
+				'loggedIn.session.new': '/session/new',
+				'loggedIn.session.id.displaying': '/session/:id',
+				'loggedIn.session.id.editing': '/session/:id/edit'
 			}
 		}
 	},
@@ -130,11 +150,10 @@ export const router = createRouter(
 			storeUser: assign({
 				user: (_, event) => event.user || netlifyIdentity.currentUser()
 			}),
-			logout: assign({
-				user: (_, __) => {
-					netlifyIdentity.logout();
-					return null;
-				}
+			clearAuth: assign({
+				user: (_, __) => undefined,
+				jwt: (_, __) => undefined,
+				exercises: (_, __) => undefined
 			}),
 			closeWidget: () => {
 				netlifyIdentity.close();
@@ -147,20 +166,27 @@ export const router = createRouter(
 			})
 		},
 		services: {
-			getExercises: async (context) => {
-				const { user } = context;
-				if (!user) {
-					return {
-						exercises: context.exercises
-					};
-				}
-				const token = user.token?.access_token;
-				if (!token) {
-					return {
-						exercises: context.exercises
-					};
+			checkingAuth: (context) => async (callback) => {
+				const user: AuthUser = context.user || netlifyIdentity.currentUser();
+				if (!user || !user.token) {
+					callback('NOT_AUTHENTICATED');
+					return;
 				}
 				try {
+					callback({ type: 'AUTHENTICATED', user });
+				} catch (error) {
+					console.warn(error);
+				}
+			},
+			getExercises: async (context) => {
+				try {
+					const { user } = context;
+					const token = await getToken();
+					if (!user || !token) {
+						return {
+							exercises: context.exercises
+						};
+					}
 					const res = await fetch('/.netlify/functions/get-exercises', {
 						method: 'POST',
 						headers: {
@@ -175,15 +201,23 @@ export const router = createRouter(
 						exercises: context.exercises
 					};
 				}
+			},
+			logout: async () => {
+				try {
+					await netlifyIdentity.logout();
+				} catch (error) {
+					console.warn(error);
+					throw error;
+				}
 			}
 		},
 		guards: {
-			isLoggedIn: (context, _) => !!context.user,
-			isLoggedOut: (context, _) => !context.user
+			isLoggedOut: (context, _) => !context.user && !context.jwt
 		}
 	}
 );
 
-netlifyIdentity.on('login', (user) => {
-	router.send('LOGIN', { user });
+netlifyIdentity.on('login', async (user) => {
+	const jwt = user.token?.access_token;
+	router.send({ type: 'AUTHENTICATED', user, jwt });
 });

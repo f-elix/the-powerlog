@@ -13,7 +13,6 @@
 	import HistoryModal from 'coms/HistoryModal.svelte';
 
 	export let performances: Performance[] = [];
-	export let token: string;
 
 	const modes: UseServiceOutput = getContext('modes');
 
@@ -98,7 +97,6 @@
 				<ExerciseButton
 					{performance}
 					index={i}
-					{token}
 					on:drag={addDragListeners}
 					on:performancedrag={(e) => onDragPerformance(e, performance.id, i)}
 				/>
