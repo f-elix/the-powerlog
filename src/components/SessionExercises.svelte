@@ -71,11 +71,10 @@
 	};
 </script>
 
+{#if $modes.state.matches('enabled.history.fetching') || $modes.state.matches('enabled.history.loaded')}
+	<HistoryModal session={historySession} on:done={onHistoryDismiss} />
+{/if}
 <div class="flex flex-col">
-	{#if $modes.state.matches('enabled.history.fetching') || $modes.state.matches('enabled.history.loaded')}
-		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
-	{/if}
-
 	{#each performances as performance, i}
 		{#if $session.state.matches('editing.exercise.editing') && performance.id === editedId}
 			<ExerciseField service={editedExercise} />
