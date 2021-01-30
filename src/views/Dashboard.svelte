@@ -20,7 +20,7 @@
 	export let children: View[];
 
 	const user = props.context.user as User;
-	const userName = user.user_metadata.full_name;
+	const userName = user.user_metadata?.full_name;
 	const { email } = user;
 
 	const onLoadMore = () => {
