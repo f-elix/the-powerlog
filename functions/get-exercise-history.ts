@@ -18,8 +18,8 @@ export const handler: (
 
 	return gqlQuery({
 		query: `
-		query getExeciseHistory($id: Int!, $date: timestamptz!) {
-			sessions(limit: 1, where: {performances: {exerciseInstances: {exerciseId: {_eq: $id}}}, date: {_lt: $date}}) {
+		query getExeciseHistory($id: Int!, $date: timestamptz!, $userId: String!) {
+			sessions(limit: 1, where: {userId: {_eq: $userId}, performances: {exerciseInstances: {exerciseId: {_eq: $id}}}, date: {_lt: $date}}) {
 			  date
 			  performances(where: {exerciseInstances: {exerciseId: {_eq: $id}}}) {
 				exerciseInstances(where: {exerciseId: {_eq: $id}}) {
@@ -35,7 +35,8 @@ export const handler: (
 		`,
 		variables: {
 			id: exerciseId,
-			date
+			date,
+			userId: user.sub
 		}
 	});
 };

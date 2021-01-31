@@ -45,8 +45,8 @@ export const handler: (
 	const types: FilterTypeQueries = {
 		name: {
 			query: `
-				query getSessionsByName($name: String!) {
-					sessions(where: {title: {_ilike: $name}}, order_by: {date: desc}) {
+				query getSessionsByName($userId: String!, $name: String!) {
+					sessions(where: {userId: {_eq: $userId}, title: {_ilike: $name}}, order_by: {date: desc}) {
 						id
 						title
 						date
@@ -54,13 +54,14 @@ export const handler: (
 				}
 			`,
 			variables: {
-				name: `%${name}%`
+				name: `%${name}%`,
+				userId: user.sub
 			}
 		},
 		daysAgo: {
 			query: `
-				query getSessionsByDate($date: timestamptz!) {
-					sessions(where: {date: {_eq: $date}}, order_by: {date: desc})  {
+				query getSessionsByDate($userId: String!, $date: timestamptz!) {
+					sessions(where: {userId: {_eq: $userId}, date: {_eq: $date}}, order_by: {date: desc})  {
 						id
 						title
 						date
@@ -68,13 +69,14 @@ export const handler: (
 				}
 			`,
 			variables: {
-				date: new Date(Date.now() - numDaysAgo * msInDay).toISOString()
+				date: new Date(Date.now() - numDaysAgo * msInDay).toISOString(),
+				userId: user.sub
 			}
 		},
 		weeksAgo: {
 			query: `
-				query getSessionsByDate($date: timestamptz!) {
-					sessions(where: {date: {_eq: $date}}, order_by: {date: desc})  {
+				query getSessionsByDate($userId: String!, $date: timestamptz!) {
+					sessions(where: {userId: {_eq: $userId}, date: {_eq: $date}}, order_by: {date: desc})  {
 						id
 						title
 						date
@@ -82,13 +84,14 @@ export const handler: (
 				}
 			`,
 			variables: {
-				date: new Date(Date.now() - numWeeksAgo * msInWeek).toISOString()
+				date: new Date(Date.now() - numWeeksAgo * msInWeek).toISOString(),
+				userId: user.sub
 			}
 		},
 		date: {
 			query: `
-				query getSessionsByDate($date: timestamptz!) {
-					sessions(where: {date: {_eq: $date}}, order_by: {date: desc})  {
+				query getSessionsByDate($userId: String!, $date: timestamptz!) {
+					sessions(where: {userId: {_eq: $userId}, date: {_eq: $date}}, order_by: {date: desc})  {
 						id
 						title
 						date
@@ -96,13 +99,14 @@ export const handler: (
 				}
 			`,
 			variables: {
-				date: date || ''
+				date: date || '',
+				userId: user.sub
 			}
 		},
 		period: {
 			query: `
-				query getSessionsByPeriod($from: timestamptz!, $to: timestamptz!) {
-					sessions(where: {date: {_gte: $from, _lte:$to}}, order_by: {date: desc}) {
+				query getSessionsByPeriod($userId: String!, $from: timestamptz!, $to: timestamptz!) {
+					sessions(where: {userId: {_eq: $userId}, date: {_gte: $from, _lte:$to}}, order_by: {date: desc}) {
 						id
 						title
 						date
@@ -111,7 +115,8 @@ export const handler: (
 			`,
 			variables: {
 				from: from || '',
-				to: to || ''
+				to: to || '',
+				userId: user.sub
 			}
 		}
 	};

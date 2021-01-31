@@ -144,7 +144,7 @@ export const filtersMachine = createMachine<FiltersContext, FiltersEvent, Filter
 					return data;
 				} catch (error) {
 					console.warn(error);
-					throw new Error('No sessions found');
+					throw error;
 				}
 			}
 		},

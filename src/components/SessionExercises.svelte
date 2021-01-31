@@ -71,40 +71,42 @@
 	};
 </script>
 
-{#if $modes.state.matches('enabled.history.fetching') || $modes.state.matches('enabled.history.loaded')}
-	<HistoryModal session={historySession} on:done={onHistoryDismiss} />
-{/if}
 <div class="flex flex-col">
-	{#each performances as performance, i}
-		{#if $session.state.matches('editing.exercise.editing') && performance.id === editedId}
-			<ExerciseField service={editedExercise} />
-		{:else}
-			<div
-				data-id={performance.id}
-				class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
-				class:_disabled={$session.state.matches('editing.exercise')}
-				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
-					listType === ListTypes.perf &&
-					performance.id === draggedId}
-				style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
-				listType === ListTypes.perf &&
-				performance.id === draggedId
-					? $modes.state.context.y
-					: 0}px"
-				bind:this={performanceEls[i]}
-			>
-				<ExerciseButton
-					{performance}
-					index={i}
-					on:drag={addDragListeners}
-					on:performancedrag={(e) => onDragPerformance(e, performance.id, i)}
-				/>
-			</div>
-		{/if}
-	{/each}
-	{#if $session.state.matches('editing.exercise.creating')}
-		<ExerciseField service={editedExercise} />
+	{#if $modes.state.matches('enabled.history.fetching') || $modes.state.matches('enabled.history.loaded')}
+		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
+	<div class="flex flex-col">
+		{#each performances as performance, i}
+			{#if $session.state.matches('editing.exercise.editing') && performance.id === editedId}
+				<ExerciseField service={editedExercise} />
+			{:else}
+				<div
+					data-id={performance.id}
+					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
+					class:_disabled={$session.state.matches('editing.exercise')}
+					class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
+						listType === ListTypes.perf &&
+						performance.id === draggedId}
+					style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
+					listType === ListTypes.perf &&
+					performance.id === draggedId
+						? $modes.state.context.y
+						: 0}px"
+					bind:this={performanceEls[i]}
+				>
+					<ExerciseButton
+						{performance}
+						index={i}
+						on:drag={addDragListeners}
+						on:performancedrag={(e) => onDragPerformance(e, performance.id, i)}
+					/>
+				</div>
+			{/if}
+		{/each}
+		{#if $session.state.matches('editing.exercise.creating')}
+			<ExerciseField service={editedExercise} />
+		{/if}
+	</div>
 </div>
 
 <style>
