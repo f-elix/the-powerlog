@@ -17,14 +17,14 @@ export const handler: (event: APIGatewayEvent) => Promise<{ statusCode: number }
 			query: `
 				mutation ($id: String!, $name: String!, $email: String!) {
 					insert_users(objects: {id: $id, name: $name, email: $email}) {
-					affected_rows
+						affected_rows
 					}
 				}
 			`,
 			variables: {
 				id: user.id,
-				email: user.email,
-				name: user.user_metadata.full_name
+				email: user.email || '',
+				name: user.user_metadata?.full_name || ''
 			}
 		});
 		/* eslint-disable-next-line no-console */
