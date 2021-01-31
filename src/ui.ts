@@ -17,7 +17,8 @@ export const ui: Ui = {
 		to: 'To'
 	},
 	loadMore: 'Load More',
-	noSessions: 'No sessions entered yet.',
+	noSessions: 'No sessions logged yet',
+	noFilteredSessions: 'No sessions found',
 	newSession: 'New session',
 	clearFilters: 'Clear',
 	creatingSession: 'Creating session...',

@@ -218,7 +218,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			}
 		},
 		guards: {
-			isEmpty: (context) => !context.sessions,
+			isEmpty: (context) => !context.sessions?.length,
 			hasNextPage: (context) => context.hasNextPage
 		}
 	}
