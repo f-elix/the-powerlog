@@ -216,16 +216,13 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 									}
 								}
 							},
-							loaded: {
-								on: {
-									DISMISS: {
-										target: 'ready'
-									}
-								}
-							}
+							loaded: {}
 						},
 						on: {
-							HISTORY: 'idle'
+							HISTORY: 'idle',
+							DISMISS: {
+								target: '.ready'
+							}
 						}
 					},
 					deleting: {
