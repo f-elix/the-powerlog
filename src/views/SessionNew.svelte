@@ -2,8 +2,7 @@
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
 	// Svelte
-	import { fly } from 'svelte/transition';
-	import { expoOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Ui
@@ -21,13 +20,13 @@
 	$session.send({ type: 'CREATE' });
 </script>
 
-<section class="space-y-100 pb-160" in:fly|local={{ y: -60, easing: expoOut, duration: 600 }}>
-	{#if $session.state.matches('fetching')}
-		<div class="flex items-center justify-center h-100vh">
-			<Spinner />
-		</div>
-	{/if}
-	{#if $session.state.matches('editing')}
+{#if $session.state.matches('fetching')}
+	<div class="flex items-center justify-center h-100vh">
+		<Spinner />
+	</div>
+{/if}
+{#if $session.state.matches('editing')}
+	<section class="space-y-100 pb-160" in:fade|local={{ duration: 100 }}>
 		<SessionForm {exercises} title={ui.creatingSession} />
-	{/if}
-</section>
+	</section>
+{/if}

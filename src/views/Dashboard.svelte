@@ -2,6 +2,8 @@
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
 	import type { User } from 'netlify-identity-widget';
+	// Svelte
+	import { fade } from 'svelte/transition';
 	// Machines
 	import { log } from 'src/stores/log';
 	import { filters } from 'src/stores/filters';
@@ -35,11 +37,9 @@
 	$: filteredSessions = $filters.state.context.sessions || [];
 
 	$log.send({ type: 'LOAD' });
-
-	$: console.log($log.state);
 </script>
 
-<section class="px-50">
+<section class="px-50" in:fade|local={{ duration: 100 }}>
 	<Fab label={ui.newSession} on:click={onNewSession} />
 	{#if $log.state.matches('fetching') || $filters.state.matches('fetching')}
 		<ProgressBar />

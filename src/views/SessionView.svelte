@@ -3,8 +3,7 @@
 	import type { View, ViewProps } from '../lib/router/types';
 	import type { Performance, Session } from 'types';
 	// Svelte
-	import { fly } from 'svelte/transition';
-	import { expoOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
 	// Router
 	import { router } from 'src/router';
 	// Stores
@@ -46,16 +45,13 @@
 	};
 </script>
 
-<section
-	class="flex flex-col min-h-100vh space-y-100 py-100"
-	in:fly|local={{ y: 60, easing: expoOut, duration: 600 }}
->
-	{#if $session.state.matches('fetching')}
-		<div class="flex items-center justify-center h-100vh">
-			<Spinner />
-		</div>
-	{/if}
-	{#if $session.state.matches('displaying') && sessionData}
+{#if $session.state.matches('fetching')}
+	<div class="flex items-center justify-center h-100vh">
+		<Spinner />
+	</div>
+{/if}
+{#if $session.state.matches('displaying') && sessionData}
+	<section class="flex flex-col min-h-100vh space-y-100 py-100" in:fade={{ duration: 100 }}>
 		<div class="space-y-40 text-center">
 			<h1 class="px-50 text-70 font-bold">{sessionData.title}</h1>
 			<h2>
@@ -83,11 +79,10 @@
 				</li>
 			{/each}
 		</ul>
-	{/if}
-
-	<div class="flex flex-col space-y-70 px-50">
-		<Button theme="success" on:click={onEdit}>Edit</Button>
-		<Button theme="danger" on:click={onDelete}>Delete</Button>
-		<Button variant="outlined" on:click={onBack}>Back</Button>
-	</div>
-</section>
+		<div class="flex flex-col space-y-70 px-50">
+			<Button theme="success" on:click={onEdit}>Edit</Button>
+			<Button theme="danger" on:click={onDelete}>Delete</Button>
+			<Button variant="outlined" on:click={onBack}>Back</Button>
+		</div>
+	</section>
+{/if}

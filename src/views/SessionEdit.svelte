@@ -2,8 +2,7 @@
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
 	// Svelte
-	import { fly } from 'svelte/transition';
-	import { expoOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
 	// Router
 	import { router } from 'src/router';
 	// Stores
@@ -28,7 +27,7 @@
 	}
 </script>
 
-<section class="space-y-100 pb-160" in:fly|local={{ y: -60, easing: expoOut, duration: 600 }}>
+<section class="space-y-100 pb-160" in:fade|local={{ duration: 100 }}>
 	{#if $session.state.matches('fetching')}
 		<div class="flex items-center justify-center h-100vh">
 			<Spinner />
