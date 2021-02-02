@@ -56,15 +56,12 @@
 				{/if}
 			</div>
 		</div>
-		<h1 class="text-center text-70 font-bold">{ui.dashboardTitle}</h1>
+		<h1 class="text-center text-70 font-bold" class:_disabled={$log.state.matches('fetching')}>
+			{ui.dashboardTitle}
+		</h1>
 		<div class="flex flex-col space-y-110 pb-110">
-			{#if !$log.state.matches('loaded.empty')}
-				<div
-					class="transition-opacity duration-150 ease-out"
-					class:_disabled={$log.state.matches('fetching')}
-				>
-					<Filters />
-				</div>
+			{#if !$log.state.matches('loaded.empty') && !$log.state.matches('fetching')}
+				<Filters />
 			{/if}
 			{#if $filters.state.matches('idle.clear')}
 				{#if $log.state.matches('loaded.empty')}
