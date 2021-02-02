@@ -1,11 +1,12 @@
+import { assign } from 'xstate';
+import netlifyIdentity, { User } from 'netlify-identity-widget';
+import { getToken } from 'src/utils';
 import Auth from 'src/views/Auth.svelte';
 import Dashboard from 'src/views/Dashboard.svelte';
 import SessionNew from 'src/views/SessionNew.svelte';
 import SessionView from 'src/views/SessionView.svelte';
 import SessionEdit from 'src/views/SessionEdit.svelte';
-import { assign } from 'xstate';
-import netlifyIdentity, { User } from 'netlify-identity-widget';
-import { getToken } from 'src/utils';
+import Exercises from 'src/views/Exercises.svelte';
 import { createRouter, view } from '../lib/router/index';
 
 export interface AuthUser extends User {
@@ -83,6 +84,7 @@ export const router = createRouter(
 							}
 						}
 					}),
+					exercises: view(Exercises),
 					session: {
 						initial: 'new',
 						states: {
@@ -133,6 +135,7 @@ export const router = createRouter(
 			routes: {
 				'loggedIn.dashboard.fetchingExercises': '/dashboard',
 				'loggedIn.dashboard.loaded': '/dashboard',
+				'loggedIn.exercises': '/exercises',
 				'loggedIn.session.new': '/session/new',
 				'loggedIn.session.id.displaying': '/session/:id',
 				'loggedIn.session.id.editing': '/session/:id/edit'

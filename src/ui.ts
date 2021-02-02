@@ -21,6 +21,8 @@ export const ui: Ui = {
 	noFilteredSessions: 'No sessions found',
 	newSession: 'New session',
 	clearFilters: 'Clear',
+	exercisesTitle: 'My Exercises',
+	exerciseFilterLabel: 'Search Exercises',
 	creatingSession: 'Creating session...',
 	editingSession: 'Editing session...',
 	newExercise: 'New exercise',

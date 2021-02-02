@@ -40,14 +40,33 @@
 </script>
 
 <section class="px-50" in:fade|local={{ duration: 100 }}>
-	<Fab label={ui.newSession} on:click={onNewSession} />
 	{#if $log.state.matches('fetching') || $filters.state.matches('fetching')}
 		<ProgressBar />
 	{/if}
+	<Fab label={ui.newSession} on:click={onNewSession} />
 	<div class="space-y-70 pt-70">
-		<div class="flex items-center justify-between">
+		<div class="flex items-center">
 			<Logout />
-			<div class="text-right">
+			<a class="ml-80" href="/exercises"
+				><svg
+					width="38"
+					height="19"
+					viewBox="0 0 38 19"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<rect x="5" y="7" width="27" height="5" fill="#60A5FA" />
+					<rect x="4.38452" width="1.46154" height="19" fill="#60A5FA" />
+					<rect x="2.9231" y="1.46153" width="1.46154" height="16.0769" fill="#60A5FA" />
+					<rect x="1.46143" y="2.92308" width="1.46154" height="13.1538" fill="#60A5FA" />
+					<rect x="34.9231" y="2.92308" width="1.46154" height="13.1538" fill="#60A5FA" />
+					<rect x="36.3845" y="4.38461" width="1.46154" height="10.2308" fill="#60A5FA" />
+					<rect y="4.38461" width="1.46154" height="10.2308" fill="#60A5FA" />
+					<rect x="32" width="1.46154" height="19" fill="#60A5FA" />
+					<rect x="33.4617" y="1.46153" width="1.46154" height="16.0769" fill="#60A5FA" />
+				</svg>
+			</a>
+			<div class="ml-auto text-right">
 				{#if userName}
 					<p>{userName}</p>
 				{/if}
