@@ -35,7 +35,7 @@ export interface RouterEvent extends EventObject {
 	[key: string]: any;
 }
 
-export type RouterConfig = MachineConfig<RouterContext, any, RouterEvent>;
+export type RouterConfig = MachineConfig<Partial<RouterContext>, any, RouterEvent>;
 
 export interface View {
 	component?: unknown;
