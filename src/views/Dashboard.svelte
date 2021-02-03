@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
-	import type { User } from 'netlify-identity-widget';
 	// Svelte
 	import { fade } from 'svelte/transition';
 	// Machines
@@ -11,8 +10,8 @@
 	// ui
 	import { ui } from 'src/ui';
 	// Components
+	import Nav from 'coms/Nav.svelte';
 	import Button from 'coms/Button.svelte';
-	import Logout from 'coms/Logout.svelte';
 	import Filters from 'coms/Filters.svelte';
 	import SessionsList from 'coms/SessionsList.svelte';
 	import Fab from 'coms/Fab.svelte';
@@ -20,10 +19,6 @@
 
 	export let props: ViewProps;
 	export let children: View[];
-
-	const user = props.context.user as User;
-	const userName = user.user_metadata?.full_name;
-	const { email } = user;
 
 	const onLoadMore = () => {
 		$log.send({ type: 'LOAD_MORE' });
@@ -39,42 +34,13 @@
 	$log.send({ type: 'LOAD' });
 </script>
 
+<Nav {props} />
 <section class="px-50" in:fade|local={{ duration: 100 }}>
 	{#if $log.state.matches('fetching') || $filters.state.matches('fetching')}
 		<ProgressBar />
 	{/if}
 	<Fab label={ui.newSession} on:click={onNewSession} />
 	<div class="space-y-70 pt-70">
-		<div class="flex items-center">
-			<Logout />
-			<a class="ml-80" href="/exercises"
-				><svg
-					width="38"
-					height="19"
-					viewBox="0 0 38 19"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<rect x="5" y="7" width="27" height="5" fill="#60A5FA" />
-					<rect x="4.38452" width="1.46154" height="19" fill="#60A5FA" />
-					<rect x="2.9231" y="1.46153" width="1.46154" height="16.0769" fill="#60A5FA" />
-					<rect x="1.46143" y="2.92308" width="1.46154" height="13.1538" fill="#60A5FA" />
-					<rect x="34.9231" y="2.92308" width="1.46154" height="13.1538" fill="#60A5FA" />
-					<rect x="36.3845" y="4.38461" width="1.46154" height="10.2308" fill="#60A5FA" />
-					<rect y="4.38461" width="1.46154" height="10.2308" fill="#60A5FA" />
-					<rect x="32" width="1.46154" height="19" fill="#60A5FA" />
-					<rect x="33.4617" y="1.46153" width="1.46154" height="16.0769" fill="#60A5FA" />
-				</svg>
-			</a>
-			<div class="ml-auto text-right">
-				{#if userName}
-					<p>{userName}</p>
-				{/if}
-				{#if email}
-					<p>{email}</p>
-				{/if}
-			</div>
-		</div>
 		<h1 class="text-center text-70 font-bold" class:_disabled={$log.state.matches('fetching')}>
 			{ui.dashboardTitle}
 		</h1>
