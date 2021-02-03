@@ -27,12 +27,14 @@ export interface Session {
 export interface Performance {
 	id: number;
 	sessionId: number;
+	session?: Session;
 	exerciseInstances: ExerciseInstance[];
 }
 
 export interface ExerciseInstance {
 	id: number;
 	performanceId: number;
+	performance?: Performance;
 	exerciseId?: number;
 	exercise?: Exercise;
 	executions: Execution[];

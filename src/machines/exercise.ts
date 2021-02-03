@@ -2,8 +2,7 @@ import {
 	assertEventType,
 	createExecution,
 	createExerciseInstance,
-	updateObjectKey,
-	generateId
+	updateObjectKey
 } from 'src/utils';
 import type { Performance } from 'types';
 import { createMachine, assign, sendParent } from 'xstate';

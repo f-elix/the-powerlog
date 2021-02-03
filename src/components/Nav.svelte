@@ -13,18 +13,21 @@
 	const userName = user.user_metadata?.full_name;
 	const { email } = user;
 	const currentPath = props.context.$page.path;
+
+	const dashboardPath = '/dashboard';
+	const exercisesPath = '/exercises';
 </script>
 
 <nav class="flex items-center p-50">
 	<div class="flex items-center space-x-80">
 		<Logout />
-		{#if !currentPath.includes('dashboard')}
-			<a class="text-info-light" href="/dashboard">
+		{#if currentPath !== dashboardPath}
+			<a class="text-info-light" href={dashboardPath}>
 				<Dashboard />
 			</a>
 		{/if}
-		{#if !currentPath.includes('exercises')}
-			<a class="text-info-light" href="/exercises">
+		{#if currentPath !== exercisesPath}
+			<a class="text-info-light" href={exercisesPath}>
 				<Exercises />
 			</a>
 		{/if}

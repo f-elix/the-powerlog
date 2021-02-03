@@ -7,6 +7,7 @@ import SessionNew from 'src/views/SessionNew.svelte';
 import SessionView from 'src/views/SessionView.svelte';
 import SessionEdit from 'src/views/SessionEdit.svelte';
 import Exercises from 'src/views/Exercises.svelte';
+import ExerciseView from 'src/views/ExerciseView.svelte';
 import { createRouter, view } from '../lib/router/index';
 
 export interface AuthUser extends User {
@@ -39,11 +40,27 @@ export const router = createRouter(
 				},
 				on: {
 					NOT_AUTHENTICATED: {
-						target: '.dashboard.loggingOut'
+						target: '.loggingOut'
+					},
+					LOGOUT: {
+						target: '.loggingOut'
 					}
 				},
 				initial: 'dashboard',
 				states: {
+					loggingOut: {
+						invoke: {
+							src: 'logout',
+							onDone: {
+								target: '#router.loggedOut',
+								actions: ['clearAuth']
+							},
+							onError: {
+								target: '#router.loggedOut',
+								actions: ['clearAuth']
+							}
+						}
+					},
 					dashboard: view(Dashboard, {
 						initial: 'fetchingExercises',
 						states: {
@@ -63,28 +80,16 @@ export const router = createRouter(
 									SESSION_NEW: '#router.loggedIn.session.new',
 									SESSION: '#router.loggedIn.session.id'
 								}
-							},
-							loggingOut: {
-								invoke: {
-									src: 'logout',
-									onDone: {
-										target: '#router.loggedOut',
-										actions: ['clearAuth']
-									},
-									onError: {
-										target: '#router.loggedOut',
-										actions: ['clearAuth']
-									}
-								}
-							}
-						},
-						on: {
-							LOGOUT: {
-								target: '.loggingOut'
 							}
 						}
 					}),
-					exercises: view(Exercises),
+					exercises: {
+						initial: 'list',
+						states: {
+							list: view(Exercises),
+							detail: view(ExerciseView)
+						}
+					},
 					session: {
 						initial: 'new',
 						states: {
@@ -133,9 +138,11 @@ export const router = createRouter(
 		entry: ['initNetlifyIdentity'],
 		meta: {
 			routes: {
+				'loggedIn.loggingOut': '/',
 				'loggedIn.dashboard.fetchingExercises': '/dashboard',
 				'loggedIn.dashboard.loaded': '/dashboard',
-				'loggedIn.exercises': '/exercises',
+				'loggedIn.exercises.list': '/exercises',
+				'loggedIn.exercises.detail': '/exercises/:id',
 				'loggedIn.session.new': '/session/new',
 				'loggedIn.session.id.displaying': '/session/:id',
 				'loggedIn.session.id.editing': '/session/:id/edit'
