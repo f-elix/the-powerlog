@@ -20,10 +20,10 @@ export type Params = Record<string, string>;
 export type Routes = Record<string, string>;
 
 export interface RouterContext {
-	$page?: {
+	$page: {
 		query?: Query;
 		params?: Params;
-		path?: string;
+		path: string;
 	};
 	[key: string]: any;
 }
