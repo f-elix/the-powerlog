@@ -13,7 +13,12 @@ type ExerciseDetailEvent =
 			type: 'done.invoke.getExerciseDetail';
 			data: { exercises_by_pk: Exercise };
 	  }
-	| { type: 'error.platform.getExerciseDetail'; data: string };
+	| { type: 'error.platform.getExerciseDetail'; data: string }
+	| { type: 'EDIT_EXERCISE_NAME' }
+	| { type: 'CANCEL' }
+	| { type: 'SAVE'; data: { value: string } }
+	| { type: 'done.invoke.updateExercise'; data: string }
+	| { type: 'error.platform.updateExercise'; data: string };
 
 type ExerciseDetailState =
 	| {
@@ -67,7 +72,33 @@ export const exerciseDetailMachine = createMachine<
 					}
 				}
 			},
-			loaded: {}
+			loaded: {
+				on: {
+					EDIT_EXERCISE_NAME: {
+						target: 'editing'
+					}
+				}
+			},
+			editing: {
+				on: {
+					CANCEL: 'loaded',
+					SAVE: 'updatingExercise'
+				}
+			},
+			updatingExercise: {
+				invoke: {
+					id: 'updateExercise',
+					src: 'updateExercise',
+					onDone: {
+						target: 'loaded',
+						actions: ['updateExerciseName']
+					},
+					onError: {
+						target: 'loaded',
+						actions: ['updateError']
+					}
+				}
+			}
 		}
 	},
 	{
@@ -78,9 +109,27 @@ export const exerciseDetailMachine = createMachine<
 					return event.data.exercises_by_pk;
 				}
 			}),
+			updateExerciseName: assign({
+				exercise: (context, event) => {
+					assertEventType(event, 'done.invoke.updateExercise');
+					const { exercise } = context;
+					if (!exercise) {
+						return undefined;
+					}
+					return {
+						...exercise,
+						name: event.data
+					};
+				}
+			}),
 			updateError: assign({
 				error: (_, event) => {
-					assertEventType(event, 'error.platform.getExerciseDetail');
+					if (
+						event.type !== 'error.platform.getExerciseDetail' &&
+						event.type !== 'error.platform.updateExercise'
+					) {
+						return undefined;
+					}
 					return event.data;
 				}
 			})
@@ -99,7 +148,6 @@ export const exerciseDetailMachine = createMachine<
 						body: JSON.stringify({ exerciseId })
 					});
 					const data = await res.json();
-					console.log(data);
 					return data;
 				} catch (error) {
 					console.warn(error);
