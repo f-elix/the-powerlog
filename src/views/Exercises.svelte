@@ -13,11 +13,23 @@
 	export let children: View[];
 
 	const exercises: Exercise[] = props.context.exercises || [];
+
+	let filter = '';
+
+	$: filteredExercises =
+		filter.length > 0
+			? exercises.filter((ex) => ex.name.toLowerCase().includes(filter))
+			: exercises;
+
+	const onSearchExercises = (e: Event) => {
+		const input = e.currentTarget as HTMLInputElement;
+		filter = input.value;
+	};
 </script>
 
 <Nav {props} />
 <section class="space-y-70 p-70">
 	<h1 class="text-center text-70 font-bold">{ui.exercisesTitle}</h1>
-	<ExercisesFilter />
-	<ExercisesList {exercises} />
+	<ExercisesFilter on:input={onSearchExercises} />
+	<ExercisesList exercises={filteredExercises} />
 </section>
