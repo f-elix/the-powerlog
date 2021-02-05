@@ -15,7 +15,6 @@ export const handler: (
 	}
 
 	const { exerciseId, exerciseName } = JSON.parse(event.body);
-	console.log({ exerciseId });
 
 	return gqlQuery({
 		query: `

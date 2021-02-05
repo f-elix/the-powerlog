@@ -20,6 +20,7 @@ export const handler: (
 		query: `
 		query getExerciseDetail($exerciseId: Int!) {
 			exercises_by_pk(id: $exerciseId) {
+			  id
 			  name
 			  exerciseInstances {
 				executions

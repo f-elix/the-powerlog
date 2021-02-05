@@ -34,7 +34,7 @@
 	const onSaveExerciseName = (e: Event) => {
 		const form = e.currentTarget as HTMLFormElement;
 		const data = Object.fromEntries(new FormData(form));
-		$exerciseDetail.send('SAVE', { data: { ...data, exerciseId } });
+		$exerciseDetail.send('SAVE', { data });
 	};
 </script>
 

@@ -1,6 +1,7 @@
 import { assertEventType, getToken } from 'src/utils';
 import type { Exercise } from 'types';
 import { createMachine, assign } from 'xstate';
+import { router } from 'src/router';
 
 interface ExerciseDetailContext {
 	exercise?: Exercise;
@@ -16,7 +17,7 @@ type ExerciseDetailEvent =
 	| { type: 'error.platform.getExerciseDetail'; data: string }
 	| { type: 'EDIT_EXERCISE_NAME' }
 	| { type: 'CANCEL' }
-	| { type: 'SAVE'; data: { exerciseName: string; exerciseId: number } }
+	| { type: 'SAVE'; data: { exerciseName: string } }
 	| { type: 'done.invoke.updateExercise'; data: { update_exercises_by_pk: { name: string } } }
 	| { type: 'error.platform.updateExercise'; data: string };
 
@@ -116,9 +117,14 @@ export const exerciseDetailMachine = createMachine<
 					if (!exercise) {
 						return undefined;
 					}
+					const { name } = event.data.update_exercises_by_pk;
+					router.send({
+						type: 'UPDATE_EXERCISE_NAME',
+						data: { exerciseName: name, exerciseId: exercise.id }
+					});
 					return {
 						...exercise,
-						name: event.data.update_exercises_by_pk.name
+						name
 					};
 				}
 			}),
@@ -154,11 +160,12 @@ export const exerciseDetailMachine = createMachine<
 					throw error;
 				}
 			},
-			updateExercise: async (_, event) => {
+			updateExercise: async (context, event) => {
 				assertEventType(event, 'SAVE');
 				try {
 					const token = await getToken();
-					const { exerciseName, exerciseId } = event.data;
+					const { exerciseName } = event.data;
+					const exerciseId = context.exercise?.id;
 					const res = await fetch('/.netlify/functions/update-exercise', {
 						method: 'POST',
 						headers: {

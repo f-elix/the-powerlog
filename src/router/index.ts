@@ -9,6 +9,7 @@ import SessionEdit from 'src/views/SessionEdit.svelte';
 import Exercises from 'src/views/Exercises.svelte';
 import ExerciseView from 'src/views/ExerciseView.svelte';
 import { createRouter, view } from '../lib/router/index';
+import type { Exercise } from 'types';
 
 export interface AuthUser extends User {
 	jwt: (force?: boolean) => Promise<string>;
@@ -87,7 +88,13 @@ export const router = createRouter(
 						initial: 'list',
 						states: {
 							list: view(Exercises),
-							detail: view(ExerciseView)
+							detail: view(ExerciseView, {
+								on: {
+									UPDATE_EXERCISE_NAME: {
+										actions: ['updateExerciseName']
+									}
+								}
+							})
 						}
 					},
 					session: {
@@ -173,6 +180,17 @@ export const router = createRouter(
 			}),
 			storeSessionData: assign({
 				session: (_, event) => event.data.session
+			}),
+			updateExerciseName: assign({
+				exercises: (context, event) => {
+					const { exercises } = context;
+					const { exerciseName, exerciseId } = event.data;
+					const exerciseIndex = exercises.findIndex(
+						(ex: Exercise) => ex.id === exerciseId
+					);
+					exercises[exerciseIndex].name = exerciseName;
+					return exercises;
+				}
 			})
 		},
 		services: {
