@@ -12,6 +12,7 @@
 	import Reorder from 'coms/svg/Reorder.svelte';
 	import History from 'coms/svg/History.svelte';
 	import Delete from 'coms/svg/Delete.svelte';
+	import Edit from 'coms/svg/Edit.svelte';
 
 	export let performance: Performance;
 	export let index: number;
@@ -96,11 +97,14 @@
 				bind:this={instancesEls[i]}
 			>
 				<button class="w-full" type="button" on:click={onEditPerformance}>
-					<ExerciseData
-						{instance}
-						isSuperset={instances.length > 1}
-						exerciseNum={i + 1}
-					/>
+					<div class="flex items-center pl-50">
+						<span class="text-fg-lighter"><Edit /></span>
+						<ExerciseData
+							{instance}
+							isSuperset={instances.length > 1}
+							exerciseNum={i + 1}
+						/>
+					</div>
 				</button>
 				{#if instances.length > 1 && $modes.state.matches('enabled.reordering')}
 					<button
