@@ -21,8 +21,8 @@ export type Routes = Record<string, string>;
 
 export interface RouterContext {
 	$page: {
-		query?: Query;
-		params?: Params;
+		query: Query;
+		params: Params;
 		path: string;
 	};
 	[key: string]: any;
