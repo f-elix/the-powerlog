@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Types
 	import type { View, ViewProps } from '../lib/router/types';
-	import type { User } from 'netlify-identity-widget';
 	// Svelte
 	import { fade } from 'svelte/transition';
 	// Machines
@@ -11,8 +10,8 @@
 	// ui
 	import { ui } from 'src/ui';
 	// Components
+	import Nav from 'coms/Nav.svelte';
 	import Button from 'coms/Button.svelte';
-	import Logout from 'coms/Logout.svelte';
 	import Filters from 'coms/Filters.svelte';
 	import SessionsList from 'coms/SessionsList.svelte';
 	import Fab from 'coms/Fab.svelte';
@@ -20,10 +19,6 @@
 
 	export let props: ViewProps;
 	export let children: View[];
-
-	const user = props.context.user as User;
-	const userName = user.user_metadata?.full_name;
-	const { email } = user;
 
 	const onLoadMore = () => {
 		$log.send({ type: 'LOAD_MORE' });
@@ -39,23 +34,13 @@
 	$log.send({ type: 'LOAD' });
 </script>
 
+<Nav {props} />
 <section class="px-50" in:fade|local={{ duration: 100 }}>
-	<Fab label={ui.newSession} on:click={onNewSession} />
 	{#if $log.state.matches('fetching') || $filters.state.matches('fetching')}
 		<ProgressBar />
 	{/if}
+	<Fab label={ui.newSession} on:click={onNewSession} />
 	<div class="space-y-70 pt-70">
-		<div class="flex items-center justify-between">
-			<Logout />
-			<div class="text-right">
-				{#if userName}
-					<p>{userName}</p>
-				{/if}
-				{#if email}
-					<p>{email}</p>
-				{/if}
-			</div>
-		</div>
 		<h1 class="text-center text-70 font-bold" class:_disabled={$log.state.matches('fetching')}>
 			{ui.dashboardTitle}
 		</h1>

@@ -20,10 +20,10 @@ export type Params = Record<string, string>;
 export type Routes = Record<string, string>;
 
 export interface RouterContext {
-	$page?: {
+	$page: {
 		query?: Query;
 		params?: Params;
-		path?: string;
+		path: string;
 	};
 	[key: string]: any;
 }
@@ -35,7 +35,7 @@ export interface RouterEvent extends EventObject {
 	[key: string]: any;
 }
 
-export type RouterConfig = MachineConfig<RouterContext, any, RouterEvent>;
+export type RouterConfig = MachineConfig<Partial<RouterContext>, any, RouterEvent>;
 
 export interface View {
 	component?: unknown;

@@ -17,7 +17,7 @@ export const handler: (
 	return gqlQuery({
 		query: `
 			query getExercises($userId: String!) {
-				exercises(where: {userId: {_eq: $userId}}) {
+				exercises(where: {userId: {_eq: $userId}}, order_by: {name: asc}) {
 					id
 					name
 					userId
