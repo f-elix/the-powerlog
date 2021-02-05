@@ -22,7 +22,7 @@ export const handler: (
 			exercises_by_pk(id: $exerciseId) {
 			  id
 			  name
-			  exerciseInstances {
+			  exerciseInstances(order_by: {performance: {session: {date: desc}}}) {
 				executions
 				performance {
 				  session {
