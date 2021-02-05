@@ -16,7 +16,7 @@
 	export let props: ViewProps;
 	export let children: View[];
 
-	const exerciseId = props.context.$page.params?.id;
+	const exerciseId = props.context.$page?.params?.id;
 
 	$exerciseDetail.send({ type: 'GET_EXERCISE', data: { exerciseId } });
 

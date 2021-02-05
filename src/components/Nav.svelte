@@ -12,7 +12,7 @@
 	const user = props.context.user as User;
 	const userName = user.user_metadata?.full_name;
 	const { email } = user;
-	const currentPath = props.context.$page.path;
+	const currentPath = props.context.$page?.path;
 
 	const dashboardPath = '/dashboard';
 	const exercisesPath = '/exercises';
