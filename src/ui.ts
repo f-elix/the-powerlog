@@ -27,5 +27,5 @@ export const ui: Ui = {
 	editingSession: 'Editing session...',
 	newExercise: 'New exercise',
 	exerciseRequired: 'Exercise is required',
-	historyTitle: (exerciseName: string) => `Last ${exerciseName.toLowerCase()} performance`
+	historyTitle: (exerciseName: string) => `Latest ${exerciseName.toLowerCase()} performance`
 };
