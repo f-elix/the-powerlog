@@ -31,8 +31,10 @@
 		$exerciseDetail.send('CANCEL');
 	};
 
-	const onSaveExerciseName = () => {
-		$exerciseDetail.send('SAVE', { data: '' });
+	const onSaveExerciseName = (e: Event) => {
+		const form = e.currentTarget as HTMLFormElement;
+		const data = Object.fromEntries(new FormData(form));
+		$exerciseDetail.send('SAVE', { data: { ...data, exerciseId } });
 	};
 </script>
 
@@ -57,7 +59,7 @@
 				>
 					<Label>
 						<span>Exercise name</span>
-						<input type="text" name="exercise-name" value={exercise.name} />
+						<input type="text" name="exerciseName" value={exercise.name} />
 					</Label>
 					<div class="flex items-center space-x-50">
 						<button
@@ -73,6 +75,11 @@
 						>
 					</div>
 				</form>
+			{/if}
+			{#if $exerciseDetail.state.matches('updatingExercise')}
+				<div class="w-110">
+					<Spinner />
+				</div>
 			{/if}
 		</div>
 		<ul>

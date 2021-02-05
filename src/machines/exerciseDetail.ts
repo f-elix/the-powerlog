@@ -16,8 +16,8 @@ type ExerciseDetailEvent =
 	| { type: 'error.platform.getExerciseDetail'; data: string }
 	| { type: 'EDIT_EXERCISE_NAME' }
 	| { type: 'CANCEL' }
-	| { type: 'SAVE'; data: { value: string } }
-	| { type: 'done.invoke.updateExercise'; data: string }
+	| { type: 'SAVE'; data: { exerciseName: string; exerciseId: number } }
+	| { type: 'done.invoke.updateExercise'; data: { update_exercises_by_pk: { name: string } } }
 	| { type: 'error.platform.updateExercise'; data: string };
 
 type ExerciseDetailState =
@@ -118,7 +118,7 @@ export const exerciseDetailMachine = createMachine<
 					}
 					return {
 						...exercise,
-						name: event.data
+						name: event.data.update_exercises_by_pk.name
 					};
 				}
 			}),
@@ -146,6 +146,25 @@ export const exerciseDetailMachine = createMachine<
 							Authorization: `Bearer ${token}`
 						},
 						body: JSON.stringify({ exerciseId })
+					});
+					const data = await res.json();
+					return data;
+				} catch (error) {
+					console.warn(error);
+					throw error;
+				}
+			},
+			updateExercise: async (_, event) => {
+				assertEventType(event, 'SAVE');
+				try {
+					const token = await getToken();
+					const { exerciseName, exerciseId } = event.data;
+					const res = await fetch('/.netlify/functions/update-exercise', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${token}`
+						},
+						body: JSON.stringify({ exerciseName, exerciseId })
 					});
 					const data = await res.json();
 					return data;
