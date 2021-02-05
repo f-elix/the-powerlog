@@ -41,7 +41,7 @@
 					</h2>
 					{#if session.date}
 						<h3 class="font-bold">
-							{new Date(session.date).toLocaleDateString('en-CA')}
+							{session.date.split('T')[0]}
 						</h3>
 					{/if}
 				</div>
