@@ -20,6 +20,15 @@ export const getLocalDate: (dateInput: string) => Date = (dateInput: string) => 
 	return localDate;
 };
 
+export const formatDate: (dateInput: Date) => string = (dateInput) => {
+	const date = new Date(dateInput);
+	const month = date.getMonth() + 1;
+	const monthValue = month > 9 ? month : `0${month}`;
+	const day = date.getDate();
+	const dayValue = day > 9 ? day : `0${day}`;
+	return `${date.getFullYear()}-${monthValue}-${dayValue}`;
+};
+
 export const getNumberOfWeek: (dateInput: string) => number = (dateInput) => {
 	const date = new Date(dateInput);
 	const firstDayOfYear = new Date(date.getFullYear(), 0, 1);

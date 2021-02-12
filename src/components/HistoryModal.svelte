@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types
 	import type { Session } from 'types';
-	import { SetType } from 'src/utils';
+	import { formatDate, getLocalDate, SetType } from 'src/utils';
 	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
 	// Svelte
 	import { createEventDispatcher, getContext } from 'svelte';
@@ -41,7 +41,7 @@
 					</h2>
 					{#if session.date}
 						<h3 class="font-bold">
-							{session.date.split('T')[0]}
+							{formatDate(getLocalDate(session.date))}
 						</h3>
 					{/if}
 				</div>

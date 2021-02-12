@@ -10,7 +10,7 @@
 	// Stores
 	import { session } from 'src/stores/session';
 	// Utils
-	import { focusInput, LoadUnit } from 'src/utils';
+	import { focusInput, formatDate, getLocalDate, LoadUnit } from 'src/utils';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -64,7 +64,11 @@
 				</Label>
 				<Label>
 					<span>Date</span>
-					<input type="date" name="date" value={sessionData.date.split('T')[0]} />
+					<input
+						type="date"
+						name="date"
+						value={formatDate(getLocalDate(sessionData.date))}
+					/>
 				</Label>
 				<div class="grid grid-cols-2 gap-x-50">
 					<Label>
