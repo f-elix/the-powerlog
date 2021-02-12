@@ -62,7 +62,8 @@ export const filtersMachine = createMachine<FiltersContext, FiltersEvent, Filter
 			debouncing: {
 				after: {
 					DEBOUNCE_DELAY: {
-						target: 'fetching'
+						target: 'fetching',
+						actions: ['clearSessions']
 					}
 				}
 			},
@@ -88,7 +89,7 @@ export const filtersMachine = createMachine<FiltersContext, FiltersEvent, Filter
 				},
 				{
 					target: 'fetching',
-					actions: ['updateFilterData']
+					actions: ['updateFilterData', 'clearSessions']
 				}
 			],
 			CLEAR: {

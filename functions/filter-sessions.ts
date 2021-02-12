@@ -5,8 +5,8 @@ import { gqlQuery } from './utils/gql-query';
 
 interface Value {
 	name?: string;
-	daysAgo?: number;
-	weeksAgo?: number;
+	daysAgo?: string;
+	weeksAgo?: string;
 	date?: string;
 	from?: string;
 	to?: string;
@@ -39,8 +39,8 @@ export const handler: (
 	);
 
 	const { name, daysAgo, weeksAgo, date, from, to }: Value = value;
-	const numDaysAgo = daysAgo || 0;
-	const numWeeksAgo = weeksAgo || 0;
+	const numDaysAgo = parseInt(daysAgo || '0', 10);
+	const numWeeksAgo = parseInt(weeksAgo || '0', 10);
 
 	const types: FilterTypeQueries = {
 		name: {
@@ -69,7 +69,7 @@ export const handler: (
 				}
 			`,
 			variables: {
-				date: new Date(Date.now() - numDaysAgo * msInDay).toISOString(),
+				date: new Date(Date.now() - numDaysAgo * msInDay).toISOString().split('T')[0],
 				userId: user.sub
 			}
 		},
@@ -84,7 +84,7 @@ export const handler: (
 				}
 			`,
 			variables: {
-				date: new Date(Date.now() - numWeeksAgo * msInWeek).toISOString(),
+				date: new Date(Date.now() - numWeeksAgo * msInWeek).toISOString().split('T')[0],
 				userId: user.sub
 			}
 		},

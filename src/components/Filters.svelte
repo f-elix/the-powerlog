@@ -57,13 +57,13 @@
 			return;
 		}
 		const filterType = target?.name || detail?.filterType;
-		const targetValue = target.value;
-		const detailValue = detail.value;
+		const targetValue = target?.value;
+		const detailValue = detail?.value;
 		if (!targetValue && !detailValue) {
 			onClearFilters();
 			return;
 		}
-		const value = { [target?.name]: targetValue } || detailValue;
+		const value = target ? { [target?.name]: targetValue } : detailValue;
 		const debounce = ['name', 'daysAgo', 'weeksAgo'].includes(filterType);
 		$filters.send({ type: 'FILTER', data: { filterType, value, debounce } });
 	};
