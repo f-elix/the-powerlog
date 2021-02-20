@@ -1,5 +1,5 @@
 import type { Session } from 'types';
-import { assign, createMachine, sendParent } from 'xstate';
+import { assign, createMachine, send, sendParent } from 'xstate';
 import {
 	assertEventType,
 	getElMid,
@@ -8,6 +8,7 @@ import {
 	getElOffsetMid,
 	getToken
 } from 'src/utils';
+import { functionFetch } from './functionFetch';
 
 enum Intersections {
 	prev = 'prev',
@@ -38,9 +39,10 @@ export type ModesEvent =
 	| { type: 'DELETE' }
 	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
 	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; date: string } }
+	| { type: 'ERROR'; data: Error }
 	| {
 			type: 'done.invoke.getHistory';
-			data: Partial<Session>;
+			data: { sessions: Partial<Session>[] };
 	  }
 	| { type: 'DISMISS' }
 	| { type: 'ENABLE' }
@@ -207,11 +209,20 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 								invoke: {
 									id: 'getHistory',
 									src: 'getHistory',
+									data: (_, event) => {
+										assertEventType(event, 'EXERCISE_HISTORY');
+										return {
+											body: event.data,
+											endpoint: 'get-exercise-history'
+										};
+									},
 									onDone: {
 										target: 'loaded',
 										actions: ['updateHistory']
-									},
-									onError: {
+									}
+								},
+								on: {
+									ERROR: {
 										target: 'loaded'
 									}
 								}
@@ -221,7 +232,8 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 						on: {
 							HISTORY: 'idle',
 							DISMISS: {
-								target: '.ready'
+								target: '.ready',
+								actions: ['notifyCancel']
 							}
 						}
 					},
@@ -257,7 +269,7 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 			updateHistory: assign({
 				history: (_, event) => {
 					assertEventType(event, 'done.invoke.getHistory');
-					return event.data;
+					return event.data.sessions[0];
 				}
 			}),
 			setDragging: assign((_, event) => {
@@ -382,29 +394,33 @@ export const modesMachine = createMachine<ModesContext, ModesEvent, ModesState>(
 					draggedIndex: newDraggedIndex,
 					listEls
 				};
-			})
+			}),
+			notifyCancel: () => {
+				send('CANCEL', { to: 'getHistory' });
+			}
 		},
 		services: {
-			getHistory: async (_, event) => {
-				assertEventType(event, 'EXERCISE_HISTORY');
-				try {
-					const token = await getToken();
-					const { exerciseId, date } = event.data;
-					const res = await fetch('/.netlify/functions/get-exercise-history', {
-						method: 'POST',
-						headers: {
-							Authorization: `Bearer ${token}`
-						},
-						body: JSON.stringify({ exerciseId, date })
-					});
-					const data = await res.json();
-					const instance = data.sessions[0];
-					return instance;
-				} catch (error) {
-					console.warn(error);
-					throw error;
-				}
-			}
+			// getHistory: async (_, event) => {
+			// 	assertEventType(event, 'EXERCISE_HISTORY');
+			// 	try {
+			// 		const token = await getToken();
+			// 		const { exerciseId, date } = event.data;
+			// 		const res = await fetch('/.netlify/functions/get-exercise-history', {
+			// 			method: 'POST',
+			// 			headers: {
+			// 				Authorization: `Bearer ${token}`
+			// 			},
+			// 			body: JSON.stringify({ exerciseId, date })
+			// 		});
+			// 		const data = await res.json();
+			// 		const instance = data.sessions[0];
+			// 		return instance;
+			// 	} catch (error) {
+			// 		console.warn(error);
+			// 		throw error;
+			// 	}
+			// }
+			getHistory: functionFetch
 		},
 		guards: {
 			isIntersecting: (context) => !!context.intersecting
