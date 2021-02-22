@@ -5,8 +5,6 @@
 	import type { ExerciseContext, ExerciseEvent, ExerciseState } from 'src/machines/exercise';
 	// xstate-svelte
 	import { useService } from 'src/lib/xstate-svelte';
-	// Utils
-	import { focusInput } from 'src/utils';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -96,7 +94,6 @@
 							list="exercises"
 							value={instance.exercise?.name || ''}
 							on:input={onExerciseInput}
-							use:focusInput
 						/>
 					</Label>
 					{#if instances.length > 1}

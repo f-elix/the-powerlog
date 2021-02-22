@@ -10,7 +10,7 @@
 	// Stores
 	import { session } from 'src/stores/session';
 	// Utils
-	import { focusInput, formatDate, getLocalDate, LoadUnit } from 'src/utils';
+	import { formatDate, getLocalDate, LoadUnit } from 'src/utils';
 	// Ui
 	import { ui } from 'src/ui';
 	// Components
@@ -60,7 +60,7 @@
 			<div class="flex flex-col space-y-70 px-50">
 				<Label>
 					<span>Name</span>
-					<input use:focusInput type="text" name="title" value={sessionData.title} />
+					<input type="text" name="title" value={sessionData.title} />
 				</Label>
 				<Label>
 					<span>Date</span>
