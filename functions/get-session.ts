@@ -34,7 +34,7 @@ export const handler: (
 					bodyweightUnit
 					performances {
 						id
-						exerciseInstances {
+						exerciseInstances(order_by: {position: asc}) {
 							id
 							executions
 							exercise {

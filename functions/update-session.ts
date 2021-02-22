@@ -34,14 +34,15 @@ export const handler: (
 	const performances: PerformanceInput[] = updatedSession.performances.map(
 		(perf: Performance) => {
 			const instances: ExerciseInstanceInput[] = perf.exerciseInstances.map(
-				(instance: ExerciseInstance): ExerciseInstanceInput => {
+				(instance: ExerciseInstance, index: number): ExerciseInstanceInput => {
 					if (instance.exercise?.id) {
 						const updatedInstance: ExerciseInstanceInput = {
 							...instance,
 							id: undefined,
 							exerciseId: instance.exercise.id,
 							performanceId: undefined,
-							exercise: undefined
+							exercise: undefined,
+							position: index
 						};
 						return updatedInstance;
 					}
@@ -57,7 +58,8 @@ export const handler: (
 							...instance,
 							id: undefined,
 							performanceId: undefined,
-							exercise: exerciseInput
+							exercise: exerciseInput,
+							position: index
 						};
 						return updatedInstance;
 					}
@@ -65,7 +67,8 @@ export const handler: (
 						...instance,
 						id: undefined,
 						performanceId: undefined,
-						exercise: undefined
+						exercise: undefined,
+						position: index
 					};
 				}
 			);
@@ -100,7 +103,7 @@ export const handler: (
 				bodyweightUnit
 				performances {
 					id
-					exerciseInstances {
+					exerciseInstances(order_by: {position: asc}) {
 						id
 						executions
 						exercise {
