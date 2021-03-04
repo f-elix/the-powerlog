@@ -10,7 +10,7 @@
 </script>
 
 <div class="flex flex-col items-start space-y-50 p-50">
-	<div class="font-bold text-50">
+	<div class="text-left font-bold text-50">
 		{#if isSuperset}
 			<span>{exerciseNum})</span>
 		{/if}
