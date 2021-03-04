@@ -18,7 +18,7 @@
 
 	$: filteredExercises =
 		filter.length > 0
-			? exercises.filter((ex) => ex.name.toLowerCase().includes(filter))
+			? exercises.filter((ex) => ex.name.toLowerCase().includes(filter.toLowerCase()))
 			: exercises;
 
 	const onSearchExercises = (e: Event) => {
