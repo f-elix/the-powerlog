@@ -25,14 +25,16 @@
 {#if href}
 	<a
 		{href}
-		class="{variant} {theme} _button py-50 text-center font-bold rounded-10 shadow-lg transition-colors _focus-default">
+		class="{variant} {theme} _button p-50 text-center font-bold rounded-10 shadow-lg transition-colors _focus-default"
+	>
 		<slot />
 	</a>
 {:else}
 	<button
 		{type}
-		class="{variant} {theme} _button py-50 text-center font-bold rounded-10 shadow-lg transition-colors _focus-default"
-		on:click>
+		class="{variant} {theme} _button p-50 text-center font-bold rounded-10 shadow-lg transition-colors _focus-default"
+		on:click
+	>
 		<slot />
 	</button>
 {/if}
