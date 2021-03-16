@@ -16,8 +16,13 @@
 	{:else}<span>{execution.reps || 0}</span>{/if}
 	<span>|</span>
 	<div>
-		{#if execution.load.bodyweight}<span>Bodyweight + </span>{/if}
-		<span>{execution.load.amount || 0}</span>
-		<span>{execution.load.unit}</span>
+		{#if execution.load.bodyweight}<span>Bodyweight</span>{/if}
+		{#if execution.load.amount || 0 > 0}
+			{#if execution.load.bodyweight}
+				<span> + </span>
+			{/if}
+			<span>{execution.load.amount}</span>
+			<span>{execution.load.unit}</span>
+		{/if}
 	</div>
 </div>
