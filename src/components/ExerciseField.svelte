@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types
 	import type { Interpreter } from 'xstate';
-	import { SetType, TimeUnit, LoadUnit } from 'src/utils';
+	import { SetType, TimeUnit, LoadUnit, scrollIntoView } from 'src/utils';
 	import type { ExerciseContext, ExerciseEvent, ExerciseState } from 'src/machines/exercise';
 	// xstate-svelte
 	import { useService } from 'src/lib/xstate-svelte';
@@ -81,7 +81,7 @@
 	};
 </script>
 
-<div class="p-50 bg-fg">
+<div class="p-50 bg-fg" use:scrollIntoView>
 	{#each instances as instance (instance.id)}
 		<fieldset data-instance-id={instance.id}>
 			<div class="space-y-80">
