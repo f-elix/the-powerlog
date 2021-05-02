@@ -8,8 +8,8 @@ import SessionView from 'src/views/SessionView.svelte';
 import SessionEdit from 'src/views/SessionEdit.svelte';
 import Exercises from 'src/views/Exercises.svelte';
 import ExerciseView from 'src/views/ExerciseView.svelte';
-import { createRouter, view } from '../lib/router/index';
 import type { Exercise } from 'types';
+import { createRouter, view } from '../lib/router/index';
 
 export interface AuthUser extends User {
 	jwt: (force?: boolean) => Promise<string>;

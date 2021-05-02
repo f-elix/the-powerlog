@@ -26,8 +26,6 @@
 	$: sessionData = $session.state.context.session;
 	$: performances = sessionData?.performances || [];
 
-	$: console.log(sessionData);
-
 	if (context.session && context.session.id === parseInt(sessionId, 10)) {
 		$session.send({ type: 'DISPLAY', data: { session: context.session } });
 	} else {

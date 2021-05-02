@@ -21,12 +21,11 @@
 	const sessionId = context.$page?.params?.id || '';
 
 	if (sessionData && sessionData.id === parseInt(sessionId, 10)) {
-		$session.send({ type: 'EDIT', data: { session: sessionData } });
+		$session.send({ type: 'EDIT', data: { session: JSON.parse(JSON.stringify(sessionData)) } }); // Copy session object
 	} else {
+		// Redirect if url session id doesn't match in-memory session id
 		router.send({ type: 'VIEW', params: { id: sessionId } });
 	}
-
-	$: console.log(sessionData);
 </script>
 
 <section class="space-y-100 pb-160" in:fade|local={{ duration: 100 }}>
