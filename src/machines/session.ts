@@ -161,7 +161,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['updateSession']
 							},
 							onError: {
-								target: '#session.error'
+								target: '#session.idle'
 							}
 						}
 					},
@@ -174,7 +174,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['clearSession', 'redirectToDashboard']
 							},
 							onError: {
-								target: '#session.error'
+								target: '#session.idle'
 							}
 						}
 					},
@@ -186,7 +186,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['redirectToSessionView']
 							},
 							onError: {
-								target: '#session.error'
+								actions: ['redirectToSessionView']
 							}
 						}
 					},
@@ -199,7 +199,7 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 								actions: ['updateSession']
 							},
 							onError: {
-								target: '#session.error'
+								target: '#session.displaying'
 							}
 						}
 					}
@@ -331,23 +331,19 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 		actions: {
 			updateSession: assign({
 				session: (context, event) => {
-					let session;
 					if (event.type === 'EDIT' || event.type === 'DISPLAY') {
-						session = event.data.session;
+						return event.data.session;
 					}
 					if (event.type === 'done.invoke.createSession') {
-						session = event.data.insert_sessions_one;
+						return event.data.insert_sessions_one;
 					}
 					if (event.type === 'done.invoke.getSession') {
-						session = event.data.sessions_by_pk;
+						return event.data.sessions_by_pk;
 					}
 					if (event.type === 'done.invoke.updateSession') {
-						session = event.data.update_sessions_by_pk;
+						return event.data.update_sessions_by_pk;
 					}
-					if (!session) {
-						return context.session;
-					}
-					return session;
+					return context.session;
 				}
 			}),
 			clearSession: assign({
@@ -468,12 +464,13 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 			},
 			redirectToSessionView: (context, event) => {
 				const sessionId = `${context.session?.id || ''}`;
-				if (event.type === 'CANCEL') {
+				if (['CANCEL', 'error.platform.updateSession'].includes(event.type)) {
 					router.send({
 						type: 'VIEW',
 						params: { id: sessionId },
 						data: { session: context.session }
 					});
+					return;
 				}
 				if (event.type === 'done.invoke.updateSession') {
 					router.send({

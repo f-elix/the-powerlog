@@ -1,6 +1,6 @@
 {
 	"extends": "@tsconfig/svelte/tsconfig.json",
-	"include": ["src", "src/types", "types/xstate-component-tree/index.d.ts"],
+	"include": ["public", "src", "src/types", "types/xstate-component-tree/index.d.ts"],
 	"compilerOptions": {
 		"module": "esnext",
 		"target": "esnext",

@@ -131,7 +131,7 @@ export const filtersMachine = createMachine<FiltersContext, FiltersEvent, Filter
 				try {
 					const token = await getToken();
 					const { filterType, value } = context.filterData || {};
-					const res = await fetch('/.netlify/functions/filter-sessions', {
+					const res = await fetch('/.netlify/functions/get-filtered-sessions', {
 						method: 'POST',
 						headers: {
 							Authorization: `Bearer ${token}`

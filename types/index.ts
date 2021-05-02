@@ -14,3 +14,9 @@ declare global {
 		beforeinstallprompt: BeforeInstallPromptEvent;
 	}
 }
+
+declare global {
+	interface ServiceWorkerGlobalScope {
+		idb: any;
+	}
+}

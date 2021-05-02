@@ -23,7 +23,19 @@
 		<script>
 			if ('serviceWorker' in navigator) {
 				window.addEventListener('load', () => {
-					navigator.serviceWorker.register('/service-worker.js');
+					navigator.serviceWorker
+						.register('/service-worker.js')
+						.then(() => navigator.serviceWorker.ready)
+						.then((reg) => {
+							if (reg.sync) {
+								reg.sync.register('bg-sync');
+							}
+						});
+				});
+				window.addEventListener('online', () => {
+					navigator.serviceWorker.ready.then((reg) => {
+						reg.active.postMessage('bg-sync');
+					});
 				});
 			}
 		</script>

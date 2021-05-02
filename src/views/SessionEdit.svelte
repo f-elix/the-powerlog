@@ -25,6 +25,8 @@
 	} else {
 		router.send({ type: 'VIEW', params: { id: sessionId } });
 	}
+
+	$: console.log(sessionData);
 </script>
 
 <section class="space-y-100 pb-160" in:fade|local={{ duration: 100 }}>
