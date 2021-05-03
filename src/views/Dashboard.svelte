@@ -5,7 +5,6 @@
 	import { fade } from 'svelte/transition';
 	// Machines
 	import { log } from 'src/stores/log';
-	import { filters } from 'src/stores/filters';
 	import { router } from 'src/router/index';
 	// ui
 	import { ui } from 'src/ui';
@@ -29,14 +28,14 @@
 	};
 
 	$: sessions = $log.state.context.sessions || [];
-	$: filteredSessions = $filters.state.context.sessions || [];
+	$: console.log($log.state);
 
 	$log.send({ type: 'LOAD' });
 </script>
 
 <Nav {props} />
 <section class="px-50" in:fade|local={{ duration: 100 }}>
-	{#if $log.state.matches('fetching') || $filters.state.matches('fetching')}
+	{#if $log.state.matches('fetching')}
 		<ProgressBar />
 	{/if}
 	<Fab label={ui.newSession} on:click={onNewSession} />
@@ -45,29 +44,20 @@
 			{ui.dashboardTitle}
 		</h1>
 		<div class="flex flex-col space-y-110 pb-110">
-			{#if !$log.state.matches('loaded.empty') && !$log.state.matches('fetching')}
-				<Filters />
+			<Filters />
+			{#if $log.state.matches('loaded.empty')}
+				<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
 			{/if}
-			{#if $filters.state.matches('idle.clear')}
-				{#if $log.state.matches('loaded.empty')}
-					<h2 class="text-60 text-center text-main opacity-75">{ui.noSessions}</h2>
-				{/if}
-				{#if $log.state.matches('loaded') || $log.state.matches('fetching')}
-					<SessionsList {sessions} />
-				{/if}
-
-				{#if $log.state.matches('loaded.normal')}
-					<Button theme="success" variant="outlined" on:click={onLoadMore}>
-						{ui.loadMore}
-					</Button>
-				{/if}
-			{:else}
-				<SessionsList sessions={filteredSessions} />
-				{#if $filters.state.matches('idle.error')}
-					<h2 class="text-60 text-center text-main opacity-75">
-						{ui.noFilteredSessions}
-					</h2>
-				{/if}
+			{#if $log.state.matches('filtered.empty')}
+				<h2 class="text-60 text-center text-main opacity-75">
+					{ui.noFilteredSessions}
+				</h2>
+			{/if}
+			<SessionsList {sessions} />
+			{#if $log.state.matches('loaded.normal')}
+				<Button theme="success" variant="outlined" on:click={onLoadMore}>
+					{ui.loadMore}
+				</Button>
 			{/if}
 		</div>
 	</div>

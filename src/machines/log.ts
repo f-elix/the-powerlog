@@ -1,13 +1,21 @@
 import { createMachine, assign } from 'xstate';
-import { assertEventType, getToken } from 'src/utils';
+import { assertEventType, getToken, isTouchDevice } from 'src/utils';
 import type { Session } from 'types';
+
+interface FilterData {
+	filterType?: string;
+	value?: Record<string, string | number>;
+	debounce?: boolean;
+}
 
 interface LogContext {
 	sessions?: Session[];
+	cachedSessions?: Session[];
 	cursor?: string;
 	limit: number;
 	hasNextPage: boolean;
 	error?: string;
+	filterData?: FilterData;
 }
 
 enum LoadEvents {
@@ -19,28 +27,35 @@ type LogEvent =
 	| { type: LoadEvents.LOAD }
 	| { type: LoadEvents.LOADMORE }
 	| { type: 'done.invoke.fetchUserSessions'; data: { sessions: Session[] } }
-	| { type: 'error.platform.fetchUserSessions'; data: string };
+	| { type: 'error.platform.fetchUserSessions'; data: string }
+	| {
+			type: 'FILTER';
+			data: FilterData;
+	  }
+	| { type: 'CLEAR' }
+	| { type: 'done.invoke.filter'; data: { sessions: Session[] } }
+	| { type: 'error.platform.filter'; data: string };
 
 type LogState =
 	| {
 			value: 'idle';
-			context: LogContext & {
-				session: undefined;
-				cursor: undefined;
-				limit: number;
-				hasNextPage: true;
-				error: undefined;
-			};
+			context: LogContext;
+	  }
+	| {
+			value: 'debouncing';
+			context: LogContext;
 	  }
 	| {
 			value: 'fetching';
-			context: LogContext & {
-				session?: Session[];
-				cursor?: string;
-				limit: number;
-				hasNextPage: true | false;
-				error: undefined;
-			};
+			context: LogContext;
+	  }
+	| {
+			value: 'fetching.sessions';
+			context: LogContext;
+	  }
+	| {
+			value: 'fetching.filtering';
+			context: LogContext;
 	  }
 	| {
 			value: 'loaded';
@@ -48,53 +63,27 @@ type LogState =
 	  }
 	| {
 			value: 'loaded.empty';
-			context: LogContext & {
-				session: [];
-				cursor: undefined;
-				limit: number;
-				hasNextPage: false;
-				error: undefined;
-			};
+			context: LogContext;
 	  }
 	| {
 			value: 'loaded.normal';
-			context: LogContext & {
-				session: Session[];
-				cursor: string;
-				limit: number;
-				hasNextPage: true;
-				error: undefined;
-			};
+			context: LogContext;
 	  }
 	| {
 			value: 'loaded.end';
-			context: LogContext & {
-				session: Session[];
-				cursor: string;
-				limit: number;
-				hasNextPage: false;
-				error: undefined;
-			};
-	  }
-	| {
-			value: 'loaded.error';
-			context: LogContext & {
-				session: undefined;
-				cursor: undefined;
-				limit: number;
-				hasNextPage: true | false;
-				error: string;
-			};
+			context: LogContext;
 	  }
 	| {
 			value: 'filtered';
-			context: LogContext & {
-				session?: Session[];
-				cursor: string;
-				limit: number;
-				hasNextPage: true;
-				error: undefined;
-			};
+			context: LogContext;
+	  }
+	| {
+			value: 'filtered.empty';
+			context: LogContext;
+	  }
+	| {
+			value: 'filtered.normal';
+			context: LogContext;
 	  };
 
 export const logMachine = createMachine<LogContext, LogEvent, LogState>(
@@ -102,17 +91,27 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 		id: 'log',
 		context: {
 			sessions: undefined,
+			cachedSessions: undefined,
 			cursor: undefined,
-			limit: 10,
+			limit: 2,
 			error: undefined,
-			hasNextPage: true
+			hasNextPage: true,
+			filterData: {}
 		},
 		initial: 'idle',
 		states: {
 			idle: {
 				on: {
 					LOAD: {
-						target: 'fetching'
+						target: 'fetching.sessions'
+					}
+				}
+			},
+			debouncing: {
+				tags: ['clear-btn'],
+				after: {
+					DEBOUNCE_DELAY: {
+						target: 'fetching.filtering'
 					}
 				}
 			},
@@ -125,10 +124,25 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 							src: 'fetchUserSessions',
 							onDone: {
 								target: '#log.loaded',
-								actions: ['updateSessions']
+								actions: ['updatePaginatedSessions']
 							},
 							onError: {
-								target: '#log.loaded.error',
+								target: '#log.loaded',
+								actions: ['updateError']
+							}
+						}
+					},
+					filtering: {
+						tags: ['clear-btn'],
+						invoke: {
+							id: 'filter',
+							src: 'filter',
+							onDone: {
+								target: '#log.filtered',
+								actions: ['updateFilteredSessions']
+							},
+							onError: {
+								target: '#log.filtered',
 								actions: ['updateError']
 							}
 						}
@@ -157,19 +171,54 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					normal: {
 						on: {
 							LOAD_MORE: {
-								target: '#log.fetching'
+								target: '#log.fetching.sessions'
 							}
 						}
 					},
-					end: {},
-					error: {}
+					end: {}
 				}
+			},
+			filtered: {
+				tags: ['clear-btn'],
+				initial: 'transient',
+				states: {
+					transient: {
+						always: [
+							{
+								cond: 'isEmpty',
+								target: 'empty'
+							},
+							{
+								target: 'normal'
+							}
+						]
+					},
+					empty: {},
+					normal: {}
+				}
+			}
+		},
+		on: {
+			FILTER: [
+				{
+					cond: 'debounce',
+					target: 'debouncing',
+					actions: ['updateFilterData', 'cacheSessions']
+				},
+				{
+					target: 'fetching.filtering',
+					actions: ['updateFilterData', 'cacheSessions']
+				}
+			],
+			CLEAR: {
+				target: 'loaded.normal',
+				actions: ['clearFilteredSessions']
 			}
 		}
 	},
 	{
 		actions: {
-			updateSessions: assign((context, event) => {
+			updatePaginatedSessions: assign((context, event) => {
 				assertEventType(event, 'done.invoke.fetchUserSessions');
 				const currentSessions = context.sessions || [];
 				const eventSessions = event.data.sessions || [];
@@ -182,9 +231,47 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					hasNextPage
 				};
 			}),
+			updateFilteredSessions: assign({
+				sessions: (_, event) => {
+					assertEventType(event, 'done.invoke.filter');
+					return event.data.sessions;
+				}
+			}),
+			cacheSessions: assign({
+				cachedSessions: (context, event) => {
+					assertEventType(event, 'FILTER');
+					return context.cachedSessions ? context.cachedSessions : context.sessions;
+				},
+				sessions: (_, __) => []
+			}),
+			clearFilteredSessions: assign({
+				sessions: (context, event) => {
+					assertEventType(event, 'CLEAR');
+					const filterCtn = <HTMLDivElement>document.querySelector('#filters');
+					if (!filterCtn) {
+						return context.cachedSessions;
+					}
+					filterCtn.querySelectorAll('input').forEach((i) => {
+						const input = i;
+						input.value = '';
+					});
+					return context.cachedSessions;
+				}
+			}),
+			updateFilterData: assign({
+				filterData: (_, event) => {
+					assertEventType(event, 'FILTER');
+					return event.data;
+				}
+			}),
 			updateError: assign({
 				error: (_, event) => {
-					assertEventType(event, 'error.platform.fetchUserSessions');
+					if (
+						event.type !== 'error.platform.fetchUserSessions' &&
+						event.type !== 'error.platform.filter'
+					) {
+						return undefined;
+					}
 					return event.data;
 				}
 			}),
@@ -215,11 +302,36 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 					console.warn(error);
 					throw new Error('No sessions found');
 				}
+			},
+			filter: async (context) => {
+				try {
+					const token = await getToken();
+					const { filterType, value } = context.filterData || {};
+					const res = await fetch('/.netlify/functions/get-filtered-sessions', {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${token}`
+						},
+						body: JSON.stringify({ filterType, value })
+					});
+					const data = await res.json();
+					return data;
+				} catch (error) {
+					console.warn(error);
+					throw error;
+				}
 			}
 		},
 		guards: {
 			isEmpty: (context) => !context.sessions?.length,
-			hasNextPage: (context) => context.hasNextPage
+			hasNextPage: (context) => context.hasNextPage,
+			debounce: (_, event) => {
+				assertEventType(event, 'FILTER');
+				return event.data.debounce || false;
+			}
+		},
+		delays: {
+			DEBOUNCE_DELAY: () => (isTouchDevice() ? 800 : 450)
 		}
 	}
 );
