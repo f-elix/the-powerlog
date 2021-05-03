@@ -28,19 +28,19 @@ export const useMachine = (
 
 	const service = interpret(machine, options);
 
-	const currentState = {
+	const store = {
 		state: machine.initialState,
 		send: service.send,
 		service
 	};
 
-	return readable(currentState, (set) => {
-		service.start(currentState.state);
-		set(currentState);
+	return readable(store, (set) => {
+		service.start(store.state);
+		set(store);
 		service.subscribe((state) => {
 			if (state.changed) {
 				set({
-					...currentState,
+					...store,
 					state
 				});
 			}
