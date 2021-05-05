@@ -93,7 +93,7 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			sessions: undefined,
 			cachedSessions: undefined,
 			cursor: undefined,
-			limit: 2,
+			limit: 10,
 			error: undefined,
 			hasNextPage: true,
 			filterData: {}
