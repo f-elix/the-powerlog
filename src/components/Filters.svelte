@@ -13,6 +13,8 @@
 	import Date from 'coms/filters/Date.svelte';
 	import Period from 'coms/filters/Period.svelte';
 
+	const { state: logState } = log;
+
 	const filterOptions = [
 		{
 			name: 'Name',
@@ -47,7 +49,7 @@
 	let selectedFilter = filterOptions[0].component;
 
 	const onClearFilters = () => {
-		$log.send({ type: 'CLEAR' });
+		log.send({ type: 'CLEAR' });
 	};
 
 	const onFilterInput = (e: InputEvent | CustomEvent) => {
@@ -65,12 +67,12 @@
 		}
 		const value = target ? { [target?.name]: targetValue } : detailValue;
 		const debounce = ['name', 'daysAgo', 'weeksAgo'].includes(filterType);
-		$log.send({ type: 'FILTER', data: { filterType, value, debounce } });
+		log.send({ type: 'FILTER', data: { filterType, value, debounce } });
 	};
 </script>
 
 <div id="filters" class="flex flex-col relative">
-	{#if $log.state.hasTag('clear-btn')}
+	{#if $logState.hasTag('clear-btn')}
 		<button
 			on:click={onClearFilters}
 			class="absolute top-0 right-0 px-30 border-solid border-danger-light border-20 rounded-10 transition-colors focus:bg-danger-light pointer:hover:bg-danger-light active:bg-danger-light"

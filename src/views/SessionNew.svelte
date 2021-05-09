@@ -14,18 +14,21 @@
 	export let props: ViewProps;
 	export let children: View[];
 
+	const { state: sessionState, service } = session;
+	service.start();
+
 	const { context } = props;
 	const exercises = context.exercises;
 
-	$session.send({ type: 'CREATE' });
+	session.send({ type: 'CREATE' });
 </script>
 
-{#if $session.state.matches('fetching')}
+{#if $sessionState.matches('fetching')}
 	<div class="flex items-center justify-center h-100vh">
 		<Spinner />
 	</div>
 {/if}
-{#if $session.state.matches('editing')}
+{#if $sessionState.matches('editing')}
 	<section class="space-y-100 pb-160" in:fade|local={{ duration: 100 }}>
 		<SessionForm {exercises} title={ui.creatingSession} />
 	</section>

@@ -16,30 +16,33 @@
 	export let props: ViewProps;
 	export let children: View[];
 
-	const exerciseId = props.context.$page?.params?.id;
+	const { state: exerciseDetailState, service } = exerciseDetail;
+	service.start();
 
-	$exerciseDetail.send({ type: 'GET_EXERCISE', data: { exerciseId } });
+	const exerciseId = parseInt(props.context.$page?.params?.id || '', 10);
 
-	$: exercise = $exerciseDetail.state.context.exercise;
+	exerciseDetail.send({ type: 'GET_EXERCISE', data: { exerciseId } });
+
+	$: exercise = $exerciseDetailState.context.exercise;
 	$: instances = exercise?.exerciseInstances as ExerciseInstance[];
 
 	const onEditExerciseName = () => {
-		$exerciseDetail.send('EDIT_EXERCISE_NAME');
+		exerciseDetail.send('EDIT_EXERCISE_NAME');
 	};
 
 	const onCancelEditExerciseName = () => {
-		$exerciseDetail.send('CANCEL');
+		exerciseDetail.send('CANCEL');
 	};
 
 	const onSaveExerciseName = (e: Event) => {
 		const form = e.currentTarget as HTMLFormElement;
 		const data = Object.fromEntries(new FormData(form));
-		$exerciseDetail.send('SAVE', { data });
+		exerciseDetail.send('SAVE', { data });
 	};
 </script>
 
 <Nav {props} />
-{#if $exerciseDetail.state.matches('fetching')}
+{#if $exerciseDetailState.matches('fetching')}
 	<div class="flex items-center justify-center h-100vh">
 		<Spinner />
 	</div>
@@ -47,11 +50,11 @@
 <section class="space-y-100">
 	{#if exercise}
 		<div class="flex items-baseline justify-center space-x-50 px-50">
-			{#if $exerciseDetail.state.matches('loaded')}
+			{#if $exerciseDetailState.matches('loaded')}
 				<h1 class="text-center text-70 font-bold">{exercise.name}</h1>
 				<button on:click={onEditExerciseName} class="text-fg-lighter"><Edit /></button>
 			{/if}
-			{#if $exerciseDetail.state.matches('editing')}
+			{#if $exerciseDetailState.matches('editing')}
 				<form
 					class="flex flex-col items-end space-y-50"
 					novalidate
@@ -76,7 +79,7 @@
 					</div>
 				</form>
 			{/if}
-			{#if $exerciseDetail.state.matches('updatingExercise')}
+			{#if $exerciseDetailState.matches('updatingExercise')}
 				<div class="w-110">
 					<Spinner />
 				</div>

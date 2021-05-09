@@ -18,7 +18,7 @@ interface LogContext {
 	filterData?: FilterData;
 }
 
-enum LoadEvents {
+export enum LoadEvents {
 	LOAD = 'LOAD',
 	LOADMORE = 'LOAD_MORE'
 }

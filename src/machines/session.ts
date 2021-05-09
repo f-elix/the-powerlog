@@ -59,6 +59,12 @@ type SessionState =
 			};
 	  }
 	| {
+			value: 'fetching';
+			context: SessionContext & {
+				session: undefined;
+			};
+	  }
+	| {
 			value: 'fetching.creating';
 			context: SessionContext & {
 				session: undefined;
@@ -90,6 +96,12 @@ type SessionState =
 	  }
 	| {
 			value: 'editing.session.editing';
+			context: SessionContext & {
+				session: Session;
+			};
+	  }
+	| {
+			value: 'editing.exercise';
 			context: SessionContext & {
 				session: Session;
 			};

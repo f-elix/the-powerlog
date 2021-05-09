@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types
-	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
+	import type { Modes } from 'src/machines/session';
 	import type { ExerciseInstance, Performance } from 'types';
 	import { ListTypes } from 'src/machines/modes';
 	// Svelte
@@ -15,27 +15,28 @@
 	import Edit from 'coms/svg/Edit.svelte';
 
 	export let performance: Performance;
-	export let index: number;
 
 	const dispatch = createEventDispatcher();
 
-	const modes: UseServiceOutput = getContext('modes');
+	const { state: sessionState } = session;
+
+	const modes: Modes = getContext('modes');
 
 	let instancesEls: HTMLElement[] = [];
 	let instances: ExerciseInstance[];
 	$: instances = performance.exerciseInstances;
-	$: draggedId = $modes.state.context.draggedId;
-	$: listType = $modes.state.context.listType;
-	$: draggedInstancePerformanceId = $modes.state.context.draggedInstancePerformanceId;
+	$: draggedId = $modes.context.draggedId;
+	$: listType = $modes.context.listType;
+	$: draggedInstancePerformanceId = $modes.context.draggedInstancePerformanceId;
 
 	afterUpdate(() => {
 		if (listType === ListTypes.inst && performance.id === draggedInstancePerformanceId) {
-			$modes.send({ type: 'LIST_REORDERED', data: { listEls: instancesEls } });
+			modes.send({ type: 'LIST_REORDERED', data: { listEls: instancesEls } });
 		}
 	});
 
 	const onEditPerformance = () => {
-		$session.send({ type: 'EDIT_PERFORMANCE', data: { performanceId: performance.id } });
+		session.send({ type: 'EDIT_PERFORMANCE', data: { performanceId: performance.id } });
 	};
 
 	const onDragPerformance = (e: MouseEvent | TouchEvent) => {
@@ -48,7 +49,7 @@
 		instanceIndex: number
 	) => {
 		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		$modes.send({
+		modes.send({
 			type: 'DRAG',
 			data: {
 				index: instanceIndex,
@@ -63,7 +64,7 @@
 	};
 
 	const onDeletePerformance = (instanceId: number) => {
-		$modes.send({
+		modes.send({
 			type: 'DELETE_EXERCISE',
 			data: { performanceId: performance.id, instanceId }
 		});
@@ -73,9 +74,9 @@
 		if (!exerciseId) {
 			return;
 		}
-		$modes.send({
+		modes.send({
 			type: 'EXERCISE_HISTORY',
-			data: { exerciseId, date: $session.state.context.session?.date }
+			data: { exerciseId, date: $sessionState.context.session?.date }
 		});
 	};
 </script>
@@ -86,13 +87,13 @@
 			<div
 				data-id={instance.id}
 				class="flex w-full transition-all duration-500 ease-out-expo"
-				class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
+				class:_dragging={$modes.matches('enabled.reordering.dragging') &&
 					listType === ListTypes.inst &&
 					draggedId === instance.id}
-				style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
+				style="--y: {$modes.matches('enabled.reordering.dragging') &&
 				listType === ListTypes.inst &&
 				instance.id === draggedId
-					? $modes.state.context.y
+					? $modes.context.y
 					: 0}px"
 				bind:this={instancesEls[i]}
 			>
@@ -106,7 +107,7 @@
 						/>
 					</div>
 				</button>
-				{#if instances.length > 1 && $modes.state.matches('enabled.reordering')}
+				{#if instances.length > 1 && $modes.matches('enabled.reordering')}
 					<button
 						type="button"
 						class="w-140 cursor-grab"
@@ -119,7 +120,7 @@
 						</div>
 					</button>
 				{/if}
-				{#if $modes.state.matches('enabled.history') && instance.exercise?.id}
+				{#if $modes.matches('enabled.history') && instance.exercise?.id}
 					<button
 						type="button"
 						class="w-140 "
@@ -131,7 +132,7 @@
 						</div>
 					</button>
 				{/if}
-				{#if $modes.state.matches('enabled.deleting')}
+				{#if $modes.matches('enabled.deleting')}
 					<button
 						type="button"
 						class="w-140"
@@ -146,7 +147,7 @@
 			</div>
 		{/each}
 	</div>
-	{#if $modes.state.matches('enabled.reordering')}
+	{#if $modes.matches('enabled.reordering')}
 		<button
 			type="button"
 			class="h-full w-1/4 cursor-grab"

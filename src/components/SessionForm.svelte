@@ -4,9 +4,6 @@
 	// Types
 	import type { Exercise } from 'types';
 	import type { SessionFormData, Modes } from 'src/machines/session';
-	// xstate
-	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
-	import { useService } from 'src/lib/xstate-svelte';
 	// Stores
 	import { session } from 'src/stores/session';
 	// Utils
@@ -24,28 +21,30 @@
 	export let exercises: Exercise[];
 	export let title: string;
 
-	const modes: UseServiceOutput = useService($session.state.children.modes as Modes);
+	const { state: sessionState } = session;
+
+	const modes = $sessionState.children.modes as Modes;
 
 	setContext('modes', modes);
 
 	let form: HTMLFormElement;
-	$: sessionData = $session.state.context.session;
+	$: sessionData = $sessionState.context.session;
 
 	const onSave = () => {
 		const formData = Object.fromEntries(new FormData(form)) as SessionFormData;
-		$session.send({ type: 'SAVE', data: { formData } });
+		session.send({ type: 'SAVE', data: { formData } });
 	};
 
 	const onCancel = () => {
-		$session.send({ type: 'CANCEL' });
+		session.send({ type: 'CANCEL' });
 	};
 
 	const onNewExercise = () => {
-		$session.send({ type: 'NEW_PERFORMANCE' });
+		session.send({ type: 'NEW_PERFORMANCE' });
 	};
 </script>
 
-{#if $session.state.matches('editing') && sessionData}
+{#if $sessionState.matches('editing') && sessionData}
 	<h1 class="mt-70 px-50 text-70 font-bold">{title}</h1>
 	<form bind:this={form} on:submit|preventDefault={onSave} novalidate>
 		<datalist id="exercises">
@@ -53,7 +52,7 @@
 				<option value={exercise.name} data-id={exercise.id} />
 			{/each}
 		</datalist>
-		{#if $session.state.matches('editing.session') && !$modes.state.matches('enabled.reordering.dragging')}
+		{#if $sessionState.matches('editing.session') && !$modes.matches('enabled.reordering.dragging')}
 			<Fab variant="outlined" label={ui.newExercise} on:click={onNewExercise} />
 		{/if}
 		<div class="flex flex-col space-y-110">
@@ -90,7 +89,7 @@
 			</div>
 			<SessionModes />
 			<SessionExercises performances={sessionData.performances} />
-			{#if $session.state.matches('editing.session')}
+			{#if $sessionState.matches('editing.session')}
 				<div class="flex flex-col space-y-70 px-50">
 					<Button type="submit" theme="success">Save</Button>
 					<Button theme="danger" on:click={onCancel}>Cancel</Button>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types
 	import type { Performance } from 'types';
-	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
+	import type { Modes } from 'src/machines/session';
 	import { ListTypes } from 'src/machines/modes';
 	// Svelte
 	import { afterUpdate, getContext } from 'svelte';
@@ -14,23 +14,25 @@
 
 	export let performances: Performance[] = [];
 
-	const modes: UseServiceOutput = getContext('modes');
+	const { state: sessionState } = session;
+
+	const modes: Modes = getContext('modes');
 
 	let performanceEls: HTMLElement[] = [];
-	$: editedExercise = $session.state.children.exercise;
-	$: editedId = $session.state.context.editedId;
-	$: draggedId = $modes.state.context.draggedId;
-	$: listType = $modes.state.context.listType;
-	$: historySession = $modes.state.context.history;
+	$: editedExercise = $sessionState.children.exercise;
+	$: editedId = $sessionState.context.editedId;
+	$: draggedId = $modes.context.draggedId;
+	$: listType = $modes.context.listType;
+	$: historySession = $modes.context.history;
 
 	afterUpdate(() => {
 		if (listType === ListTypes.perf) {
-			$modes.send({ type: 'LIST_REORDERED', data: { listEls: performanceEls } });
+			modes.send({ type: 'LIST_REORDERED', data: { listEls: performanceEls } });
 		}
 	});
 
 	const onHistoryDismiss = () => {
-		$modes.send({ type: 'DISMISS' });
+		modes.send({ type: 'DISMISS' });
 	};
 
 	const addDragListeners = () => {
@@ -50,7 +52,7 @@
 	const onDragPerformance = (e: CustomEvent, id: number, index: number) => {
 		const event: PointerEvent | TouchEvent = e.detail;
 		const { clientY: y } = event instanceof TouchEvent ? event.touches[0] : event;
-		$modes.send({
+		modes.send({
 			type: 'DRAG',
 			data: { index, y, id, listEls: performanceEls, listType: ListTypes.perf }
 		});
@@ -58,52 +60,51 @@
 	};
 
 	const onMove = (e: PointerEvent | TouchEvent) => {
-		if (!$modes.state.matches('enabled.reordering.dragging')) {
+		if (!$modes.matches('enabled.reordering.dragging')) {
 			return;
 		}
 		const { clientY: y } = e instanceof TouchEvent ? e.touches[0] : e;
-		$modes.send({ type: 'MOVE', data: { y } });
+		modes.send({ type: 'MOVE', data: { y } });
 	};
 
 	const onDrop = () => {
-		$modes.send({ type: 'DROP' });
+		modes.send({ type: 'DROP' });
 		removeDragListeners();
 	};
 </script>
 
 <div class="flex flex-col">
-	{#if $modes.state.matches('enabled.history.fetching') || $modes.state.matches('enabled.history.loaded')}
+	{#if $modes.matches('enabled.history.fetching') || $modes.matches('enabled.history.loaded')}
 		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	{/if}
 	<div class="flex flex-col">
 		{#each performances as performance, i}
-			{#if $session.state.matches('editing.exercise.editing') && performance.id === editedId}
+			{#if $sessionState.matches('editing.exercise.editing') && performance.id === editedId}
 				<ExerciseField service={editedExercise} />
 			{:else}
 				<div
 					data-id={performance.id}
 					class="relative flex bg-fg-light odd:bg-fg transition-all duration-500 ease-out-expo"
-					class:_disabled={$session.state.matches('editing.exercise')}
-					class:_dragging={$modes.state.matches('enabled.reordering.dragging') &&
+					class:_disabled={$sessionState.matches('editing.exercise')}
+					class:_dragging={$modes.matches('enabled.reordering.dragging') &&
 						listType === ListTypes.perf &&
 						performance.id === draggedId}
-					style="--y: {$modes.state.matches('enabled.reordering.dragging') &&
+					style="--y: {$modes.matches('enabled.reordering.dragging') &&
 					listType === ListTypes.perf &&
 					performance.id === draggedId
-						? $modes.state.context.y
+						? $modes.context.y
 						: 0}px"
 					bind:this={performanceEls[i]}
 				>
 					<ExerciseButton
 						{performance}
-						index={i}
 						on:drag={addDragListeners}
 						on:performancedrag={(e) => onDragPerformance(e, performance.id, i)}
 					/>
 				</div>
 			{/if}
 		{/each}
-		{#if $session.state.matches('editing.exercise.creating')}
+		{#if $sessionState.matches('editing.exercise.creating')}
 			<ExerciseField service={editedExercise} />
 		{/if}
 	</div>

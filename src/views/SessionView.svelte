@@ -18,18 +18,21 @@
 	export let props: ViewProps;
 	export let children: View[];
 
+	const { state: sessionState, service } = session;
+	service.start();
+
 	const { context } = props;
 	const sessionId = context.$page?.params?.id || '';
 
-	let sessionData: Session;
+	let sessionData: Session | undefined;
 	let performances: Performance[];
-	$: sessionData = $session.state.context.session;
+	$: sessionData = $sessionState.context.session;
 	$: performances = sessionData?.performances || [];
 
 	if (context.session && context.session.id === parseInt(sessionId, 10)) {
-		$session.send({ type: 'DISPLAY', data: { session: context.session } });
+		session.send({ type: 'DISPLAY', data: { session: context.session } });
 	} else {
-		$session.send({ type: 'GET_SESSION', data: { sessionId } });
+		session.send({ type: 'GET_SESSION', data: { sessionId } });
 	}
 
 	const onBack = () => {
@@ -37,7 +40,7 @@
 	};
 
 	const onDelete = () => {
-		$session.send({ type: 'DELETE' });
+		session.send({ type: 'DELETE' });
 	};
 
 	const onEdit = () => {
@@ -45,12 +48,12 @@
 	};
 </script>
 
-{#if $session.state.matches('fetching')}
+{#if $sessionState.matches('fetching')}
 	<div class="flex items-center justify-center h-100vh">
 		<Spinner />
 	</div>
 {/if}
-{#if $session.state.matches('displaying') && sessionData}
+{#if $sessionState.matches('displaying') && sessionData}
 	<section class="flex flex-col min-h-100vh space-y-100 py-100" in:fade={{ duration: 100 }}>
 		<div class="space-y-40 text-center">
 			<h1 class="px-50 text-70 font-bold">{sessionData.title}</h1>

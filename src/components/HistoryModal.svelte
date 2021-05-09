@@ -2,7 +2,7 @@
 	// Types
 	import type { Session } from 'types';
 	import { formatDate, getLocalDate, SetType } from 'src/utils';
-	import type { UseServiceOutput } from 'src/lib/xstate-svelte';
+	import type { Modes } from 'src/machines/session';
 	// Svelte
 	import { createEventDispatcher, getContext } from 'svelte';
 	// Ui
@@ -15,7 +15,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	const modes: UseServiceOutput = getContext('modes');
+	const modes: Modes = getContext('modes');
 
 	const onDone = () => {
 		dispatch('done');
@@ -30,10 +30,10 @@
 	<div
 		class="relative z-10 flex flex-col space-y-110 p-70 rounded-10 bg-main shadow-2xl text-center"
 	>
-		{#if $modes.state.matches('enabled.history.fetching')}
+		{#if $modes.matches('enabled.history.fetching')}
 			<Spinner />
 		{/if}
-		{#if $modes.state.matches('enabled.history.loaded')}
+		{#if $modes.matches('enabled.history.loaded')}
 			{#if performances.length}
 				<div class="space-y-70">
 					<h2 class="text-60 font-bold">

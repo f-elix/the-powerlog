@@ -36,8 +36,8 @@ export type ModesEvent =
 	| { type: 'REORDER' }
 	| { type: 'HISTORY' }
 	| { type: 'DELETE' }
-	| { type: 'DELETE_EXERCISE'; data: { instanceIndex: number } }
-	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; date: string } }
+	| { type: 'DELETE_EXERCISE'; data: { performanceId: number; instanceId: number } }
+	| { type: 'EXERCISE_HISTORY'; data: { exerciseId: number; date?: string } }
 	| {
 			type: 'done.invoke.getHistory';
 			data: Partial<Session>;
@@ -57,12 +57,16 @@ export type ModesEvent =
 			};
 	  }
 	| { type: 'MOVE'; data: { y: number } }
-	| { type: 'LIST_REORDERED'; data: { listEls: HTMLElement[]; listType: ListTypes } }
+	| { type: 'LIST_REORDERED'; data: { listEls: HTMLElement[] } }
 	| { type: 'DROP' };
 
 export type ModesState =
 	| {
 			value: 'enabled.idle';
+			context: ModesContext;
+	  }
+	| {
+			value: 'enabled.reordering';
 			context: ModesContext;
 	  }
 	| {
@@ -77,6 +81,12 @@ export type ModesState =
 				draggedIndex: number;
 				draggedId: number;
 				listEls: HTMLElement[];
+			};
+	  }
+	| {
+			value: 'enabled.history';
+			context: ModesContext & {
+				history: undefined;
 			};
 	  }
 	| {

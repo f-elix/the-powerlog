@@ -34,7 +34,9 @@ type ExerciseDetailState =
 			value: 'fetching';
 			context: ExerciseDetailContext;
 	  }
-	| { value: 'loaded'; context: ExerciseDetailContext };
+	| { value: 'loaded'; context: ExerciseDetailContext }
+	| { value: 'editing'; context: ExerciseDetailContext }
+	| { value: 'updatingExercise'; context: ExerciseDetailContext };
 
 export const exerciseDetailMachine = createMachine<
 	ExerciseDetailContext,

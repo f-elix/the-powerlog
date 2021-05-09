@@ -11,6 +11,7 @@ export interface Exercise {
 	id?: number;
 	userId: string;
 	name: string;
+	exerciseInstances?: ExerciseInstance[];
 }
 
 export interface Session {
