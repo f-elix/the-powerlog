@@ -6,6 +6,7 @@ import { assertEventType, createPerformance, getToken, reorderArray } from 'src/
 import { ExerciseContext, exerciseMachine } from 'src/machines/exercise';
 import { modesMachine, ListTypes } from 'src/machines/modes';
 import { router } from 'src/router';
+import { startProgress, endProgress } from 'src/lib/nprogress';
 
 export type Modes = Interpreter<ModesContext, any, ModesEvent, ModesState>;
 
@@ -162,6 +163,8 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 				}
 			},
 			fetching: {
+				entry: ['startProgress'],
+				exit: ['endProgress'],
 				initial: 'creating',
 				states: {
 					creating: {
@@ -491,7 +494,9 @@ export const sessionMachine = createMachine<SessionContext, SessionEvent, Sessio
 						data: { session: event.data.update_sessions_by_pk }
 					});
 				}
-			}
+			},
+			startProgress,
+			endProgress
 		},
 		services: {
 			createSession: async (_, event) => {

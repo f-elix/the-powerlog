@@ -1,3 +1,9 @@
+<div class="flex justify-center items-center">
+	<svg class="w-130 origin-center" viewBox="25 25 50 50">
+		<circle cx="50" cy="50" r="20" />
+	</svg>
+</div>
+
 <style>
 	svg {
 		animation: rotate 2s linear infinite;
@@ -30,10 +36,5 @@
 			stroke-dashoffset: -125px;
 		}
 	}
-</style>
 
-<div class="flex justify-center items-center">
-	<svg class="w-130 origin-center" viewBox="25 25 50 50">
-		<circle cx="50" cy="50" r="20" />
-	</svg>
-</div>
+</style>

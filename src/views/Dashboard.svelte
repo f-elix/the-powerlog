@@ -15,7 +15,6 @@
 	import Filters from 'coms/Filters.svelte';
 	import SessionsList from 'coms/SessionsList.svelte';
 	import Fab from 'coms/Fab.svelte';
-	import ProgressBar from 'src/components/ProgressBar.svelte';
 
 	export let props: ViewProps;
 	export let children: View[];
@@ -34,13 +33,11 @@
 	$: sessions = $logState.context.sessions || [];
 
 	log.send({ type: LoadEvents.LOAD });
+
 </script>
 
 <Nav {props} />
 <section class="px-50" in:fade|local={{ duration: 100 }}>
-	{#if $logState.matches('fetching')}
-		<ProgressBar />
-	{/if}
 	<Fab label={ui.newSession} on:click={onNewSession} />
 	<div class="space-y-70 pt-70">
 		<h1 class="text-center text-70 font-bold" class:_disabled={$logState.matches('fetching')}>
@@ -70,4 +67,5 @@
 	._disabled {
 		@apply opacity-50 pointer-events-none;
 	}
+
 </style>

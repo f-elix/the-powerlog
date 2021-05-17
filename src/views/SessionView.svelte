@@ -13,7 +13,6 @@
 	// Components
 	import ExerciseData from 'coms/ExerciseData.svelte';
 	import Button from 'coms/Button.svelte';
-	import Spinner from 'coms/Spinner.svelte';
 
 	export let props: ViewProps;
 	export let children: View[];
@@ -46,13 +45,9 @@
 	const onEdit = () => {
 		router.send({ type: 'EDIT', params: { id: sessionId }, data: { session: sessionData } });
 	};
+
 </script>
 
-{#if $sessionState.matches('fetching')}
-	<div class="flex items-center justify-center h-100vh">
-		<Spinner />
-	</div>
-{/if}
 {#if $sessionState.matches('displaying') && sessionData}
 	<section class="flex flex-col min-h-100vh space-y-100 py-100" in:fade={{ duration: 100 }}>
 		<div class="space-y-40 text-center">

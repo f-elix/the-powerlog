@@ -2,6 +2,7 @@ import { assertEventType, getToken } from 'src/utils';
 import type { Exercise } from 'types';
 import { createMachine, assign } from 'xstate';
 import { router } from 'src/router';
+import { startProgress, endProgress } from 'src/lib/nprogress';
 
 interface ExerciseDetailContext {
 	exercise?: Exercise;
@@ -62,6 +63,8 @@ export const exerciseDetailMachine = createMachine<
 				}
 			},
 			fetching: {
+				entry: ['startProgress'],
+				exit: ['endProgress'],
 				invoke: {
 					id: 'getExerciseDetail',
 					src: 'getExerciseDetail',
@@ -140,7 +143,9 @@ export const exerciseDetailMachine = createMachine<
 					}
 					return event.data;
 				}
-			})
+			}),
+			startProgress,
+			endProgress
 		},
 		services: {
 			getExerciseDetail: async (_, event) => {

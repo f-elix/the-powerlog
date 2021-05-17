@@ -39,14 +39,10 @@
 		const data = Object.fromEntries(new FormData(form));
 		exerciseDetail.send('SAVE', { data });
 	};
+
 </script>
 
 <Nav {props} />
-{#if $exerciseDetailState.matches('fetching')}
-	<div class="flex items-center justify-center h-100vh">
-		<Spinner />
-	</div>
-{/if}
 <section class="space-y-100">
 	{#if exercise}
 		<div class="flex items-baseline justify-center space-x-50 px-50">

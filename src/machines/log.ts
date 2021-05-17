@@ -1,4 +1,5 @@
 import { createMachine, assign } from 'xstate';
+import { startProgress, endProgress } from 'src/lib/nprogress';
 import { assertEventType, getToken, isTouchDevice } from 'src/utils';
 import type { Session } from 'types';
 
@@ -116,6 +117,8 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 				}
 			},
 			fetching: {
+				entry: ['startProgress'],
+				exit: ['endProgress'],
 				initial: 'sessions',
 				states: {
 					sessions: {
@@ -277,7 +280,9 @@ export const logMachine = createMachine<LogContext, LogEvent, LogState>(
 			}),
 			clearError: assign({
 				error: (_, __) => undefined
-			})
+			}),
+			startProgress,
+			endProgress
 		},
 		services: {
 			fetchUserSessions: async (context, event) => {
