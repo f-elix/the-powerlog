@@ -20,6 +20,8 @@
 	export let theme: Theme = Theme.primary;
 	export let type: Type = Type.button;
 	export let href: string | undefined = undefined;
+	export let expanded: boolean | null = null;
+
 </script>
 
 {#if href}
@@ -32,6 +34,7 @@
 {:else}
 	<button
 		{type}
+		aria-expanded={expanded}
 		class="{variant} {theme} _button p-50 text-center font-bold rounded-10 shadow-lg transition-colors _focus-default"
 		on:click
 	>
@@ -78,4 +81,5 @@
 			@apply bg-opacity-50 border-opacity-0;
 		}
 	}
+
 </style>

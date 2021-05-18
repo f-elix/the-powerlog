@@ -1,16 +1,6 @@
 import { createMachine } from 'xstate';
-import { createModel } from 'xstate/lib/model';
 
-const modalModel = createModel(
-	{},
-	{
-		events: {
-			OPEN: () => ({ value: 'OPEN' }),
-			CLOSE: () => ({ value: 'CLOSE' }),
-			TOGGLE: () => ({ value: 'TOGGLE' })
-		}
-	}
-);
+type ModelEvent = { type: 'CLOSE' } | { type: 'OPEN' } | { type: 'TOGGLE' };
 
 type ModalState =
 	| {
@@ -23,7 +13,7 @@ type ModalState =
 	  };
 
 export const modal = (id: string) =>
-	createMachine<typeof modalModel, ModalState>({
+	createMachine<any, ModelEvent, ModalState>({
 		id,
 		initial: 'closed',
 		states: {

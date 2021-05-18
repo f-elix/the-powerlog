@@ -71,12 +71,11 @@
 		modes.send({ type: 'DROP' });
 		removeDragListeners();
 	};
+
 </script>
 
 <div class="flex flex-col">
-	{#if $modes.matches('enabled.history.fetching') || $modes.matches('enabled.history.loaded')}
-		<HistoryModal session={historySession} on:done={onHistoryDismiss} />
-	{/if}
+	<HistoryModal session={historySession} on:done={onHistoryDismiss} />
 	<div class="flex flex-col">
 		{#each performances as performance, i}
 			{#if $sessionState.matches('editing.exercise.editing') && performance.id === editedId}
@@ -137,4 +136,5 @@
 	._superset-odd {
 		@apply border-solid border-info border-l-30 bg-fg;
 	}
+
 </style>

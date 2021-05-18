@@ -7,16 +7,7 @@
 
 	export let id: string;
 
-	const { state, send } = useMachine(modal(id), {
-		actions: {
-			addKeydownListener: () => {
-				window.addEventListener('keydown', onKeydown);
-			},
-			removeKeydownListener: () => {
-				window.removeEventListener('keydown', onKeydown);
-			}
-		}
-	});
+	export let isOpen: boolean = false;
 
 	const onKeydown = (e: KeyboardEvent) => {
 		if (e.key !== 'Escape') {
@@ -25,17 +16,23 @@
 		close();
 	};
 
+	$: if (isOpen) {
+		window.addEventListener('keydown', onKeydown);
+	} else {
+		window.removeEventListener('keydown', onKeydown);
+	}
+
 	export const close = () => {
-		send({ type: 'CLOSE' });
+		isOpen = false;
 	};
 
 	export const open = () => {
-		send({ type: 'OPEN' });
+		isOpen = true;
 	};
 
 </script>
 
-{#if $state.matches('open')}
+{#if isOpen}
 	<div use:trapFocus class="fixed z-50 inset-0 px-50 pt-120" aria-modal="true" role="dialog" {id}>
 		<div
 			transition:fade={{ duration: 100 }}

@@ -5,6 +5,7 @@
 	import { ui } from 'src/ui';
 
 	let modal: Modal;
+	let isModalOpen = false;
 
 	const onSignUp = () => modal.open();
 
@@ -12,9 +13,11 @@
 
 </script>
 
-<Button theme="info" variant="outlined" on:click={onSignUp}>{ui.createAccount}</Button>
+<Button theme="info" variant="outlined" expanded={isModalOpen} on:click={onSignUp}
+	>{ui.createAccount}</Button
+>
 
-<Modal id="signup" bind:this={modal}>
-	<button class="_focus-default" on:click={onClose}>Close</button>
+<Modal id="signup" bind:this={modal} bind:isOpen={isModalOpen}>
+	<button aria-expanded={isModalOpen} class="_focus-default" on:click={onClose}>Close</button>
 	<SignupForm />
 </Modal>

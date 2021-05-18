@@ -33,7 +33,7 @@
 	};
 
 	const onLogin = () => {
-		// netlifyIdentity.open('login');
+		netlifyIdentity.open('login');
 	};
 	const onSignUp = () => {
 		// netlifyIdentity.open('signup');
