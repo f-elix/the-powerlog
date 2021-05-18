@@ -4,6 +4,7 @@
 	import type { View } from '../lib/router/types';
 	import Button from 'coms/Button.svelte';
 	import Icon from 'coms/Icon.svelte';
+	import SignupModal from 'coms/SignupModal.svelte';
 	import { ui } from 'src/ui';
 	import type { BeforeInstallPromptEvent } from 'types';
 	import type { Writable } from 'svelte/store';
@@ -32,11 +33,12 @@
 	};
 
 	const onLogin = () => {
-		netlifyIdentity.open('login');
+		// netlifyIdentity.open('login');
 	};
 	const onSignUp = () => {
-		netlifyIdentity.open('signup');
+		// netlifyIdentity.open('signup');
 	};
+
 </script>
 
 <section class="flex flex-col items-center justify-center h-100vh space-y-110">
@@ -70,6 +72,6 @@
 	</div>
 	<div class="flex flex-col space-y-50 w-full px-50">
 		<Button theme="info" on:click={onLogin}>{ui.login}</Button>
-		<Button theme="info" variant="outlined" on:click={onSignUp}>{ui.signup}</Button>
+		<SignupModal />
 	</div>
 </section>

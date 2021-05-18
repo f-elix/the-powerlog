@@ -5,6 +5,7 @@ export const ui: Ui = {
 	tagline: 'Log your training, get the results.',
 	login: 'Login',
 	signup: 'Sign Up',
+	createAccount: 'Create Account',
 	logout: 'Logout',
 	dashboardTitle: 'Log History',
 	filterBy: 'Filter by',

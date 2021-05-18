@@ -23,6 +23,7 @@ module.exports = {
 		'no-use-before-define': 'off',
 		'@typescript-eslint/no-use-before-define': ['error'],
 		'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		camelcase: [
 			'error',
 			{
