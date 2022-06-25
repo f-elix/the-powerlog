@@ -18,7 +18,7 @@
 		"idb": "^6.0.0",
 		"netlify-identity-widget": "^1.9.1",
 		"netlify-lambda": "^2.0.4",
-		"node-fetch": "^2.6.1",
+		"node-fetch": "^2.6.7",
 		"nprogress": "^0.2.0",
 		"postcss": "^8.2.12",
 		"postcss-cli": "^8.3.1",
